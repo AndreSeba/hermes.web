@@ -1698,6 +1698,23 @@ label.boton {
   color: var(--acento);
 }
 
+/* Compras */
+.avisos-margen {
+  margin: 6px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.costo-compra {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borde-suave);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 /* Ventas */
 .fila-venta-anulada {
   opacity: 0.65;

@@ -6,6 +6,9 @@ import { Catalogo } from './paginas/catalogo/Catalogo'
 import { EditarProducto } from './paginas/catalogo/EditarProducto'
 import { NuevoProducto } from './paginas/catalogo/NuevoProducto'
 import { Stock } from './paginas/stock/Stock'
+import { Compras } from './paginas/compras/Compras'
+import { NuevaCompra } from './paginas/compras/NuevaCompra'
+import { Proveedores } from './paginas/compras/Proveedores'
 import { NuevaVenta } from './paginas/ventas/NuevaVenta'
 import { Ventas } from './paginas/ventas/Ventas'
 import { Ingresar } from './paginas/acceso/Ingresar'
@@ -18,7 +21,7 @@ import { RequiereSesion, SoloAnonimo } from './sesion/Guardias'
 
 // Secciones cuyo módulo todavía no está hecho: <EnConstruccion>. Al construir un módulo, su ruta
 // pasa a tener su página propia (como Inicio o Mi tienda).
-const hechas = ['/', '/mi-tienda', '/catalogo', '/stock', '/venta', '/ventas']
+const hechas = ['/', '/mi-tienda', '/catalogo', '/stock', '/venta', '/ventas', '/compras', '/proveedores']
 const pendientes = [...secciones, nuevaVenta].filter((s) => !hechas.includes(s.ruta))
 
 export const rutas = createBrowserRouter([
@@ -44,6 +47,9 @@ export const rutas = createBrowserRouter([
           { path: '/stock', element: <Stock /> },
           { path: '/venta', element: <NuevaVenta /> },
           { path: '/ventas', element: <Ventas /> },
+          { path: '/compras', element: <Compras /> },
+          { path: '/compras/nueva', element: <NuevaCompra /> },
+          { path: '/proveedores', element: <Proveedores /> },
           ...pendientes.map((s) => ({ path: s.ruta, element: <EnConstruccion seccion={s} /> })),
         ],
       },

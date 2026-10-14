@@ -431,6 +431,406 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/compras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Vista?: components["schemas"]["VistaCompras"];
+                    ProveedorId?: string;
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeComprasDto"];
+                        "application/json": components["schemas"]["PaginaDeComprasDto"];
+                        "text/json": components["schemas"]["PaginaDeComprasDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RegistrarCompraDto"];
+                    "text/json": components["schemas"]["RegistrarCompraDto"];
+                    "application/*+json": components["schemas"]["RegistrarCompraDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CompraDto"];
+                        "application/json": components["schemas"]["CompraDto"];
+                        "text/json": components["schemas"]["CompraDto"];
+                    };
+                };
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CompraDto"];
+                        "application/json": components["schemas"]["CompraDto"];
+                        "text/json": components["schemas"]["CompraDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResumenComprasDto"];
+                        "application/json": components["schemas"]["ResumenComprasDto"];
+                        "text/json": components["schemas"]["ResumenComprasDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/comparador/{productoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrecioProveedorDto"][];
+                        "application/json": components["schemas"]["PrecioProveedorDto"][];
+                        "text/json": components["schemas"]["PrecioProveedorDto"][];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CompraDto"];
+                        "application/json": components["schemas"]["CompraDto"];
+                        "text/json": components["schemas"]["CompraDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/recibir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResultadoRecibirDto"];
+                        "application/json": components["schemas"]["ResultadoRecibirDto"];
+                        "text/json": components["schemas"]["ResultadoRecibirDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/pagar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CompraDto"];
+                        "application/json": components["schemas"]["CompraDto"];
+                        "text/json": components["schemas"]["CompraDto"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CompraDto"];
+                        "application/json": components["schemas"]["CompraDto"];
+                        "text/json": components["schemas"]["CompraDto"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/imagenes": {
         parameters: {
             query?: never;
@@ -826,6 +1226,273 @@ export interface paths {
                         "text/plain": components["schemas"]["ProblemDetails"];
                         "application/json": components["schemas"]["ProblemDetails"];
                         "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    incluirInactivos?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDto"][];
+                        "application/json": components["schemas"]["ProveedorDto"][];
+                        "text/json": components["schemas"]["ProveedorDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarProveedorDto"];
+                    "text/json": components["schemas"]["GuardarProveedorDto"];
+                    "application/*+json": components["schemas"]["GuardarProveedorDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDto"];
+                        "application/json": components["schemas"]["ProveedorDto"];
+                        "text/json": components["schemas"]["ProveedorDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDetalleDto"];
+                        "application/json": components["schemas"]["ProveedorDetalleDto"];
+                        "text/json": components["schemas"]["ProveedorDetalleDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarProveedorDto"];
+                    "text/json": components["schemas"]["GuardarProveedorDto"];
+                    "application/*+json": components["schemas"]["GuardarProveedorDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDto"];
+                        "application/json": components["schemas"]["ProveedorDto"];
+                        "text/json": components["schemas"]["ProveedorDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores/{id}/desactivar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDto"];
+                        "application/json": components["schemas"]["ProveedorDto"];
+                        "text/json": components["schemas"]["ProveedorDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores/{id}/activar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProveedorDto"];
+                        "application/json": components["schemas"]["ProveedorDto"];
+                        "text/json": components["schemas"]["ProveedorDto"];
                     };
                 };
             };
@@ -1649,6 +2316,16 @@ export interface components {
             lineas: components["schemas"]["LineaAjusteDto"][];
             motivo?: null | string;
         };
+        AvisoMargenDto: {
+            /** Format: uuid */
+            productoId: string;
+            producto: string;
+            /** Format: double */
+            precio: number;
+            /** Format: double */
+            costo: number;
+            estado: components["schemas"]["EstadoPrecio"];
+        };
         CambiarDireccionDto: {
             slug: string;
         };
@@ -1658,9 +2335,66 @@ export interface components {
             nombre: string;
             activa: boolean;
         };
+        CompraDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            fecha: string;
+            /** Format: uuid */
+            proveedorId: string;
+            proveedor: string;
+            proveedorTelefono: null | string;
+            estado: components["schemas"]["EstadoCompra"];
+            pagada: boolean;
+            /** Format: date-time */
+            recibidaEn: null | string;
+            /** Format: date-time */
+            pagadaEn: null | string;
+            /** Format: date-time */
+            anuladaEn: null | string;
+            notas: null | string;
+            /** Format: int32 */
+            unidades: number;
+            /** Format: double */
+            total: number;
+            lineas: components["schemas"]["CompraLineaDto"][];
+        };
+        CompraLineaDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            productoId: string;
+            /** Format: uuid */
+            varianteId: string;
+            descripcion: string;
+            /** Format: int32 */
+            cantidad: number;
+            /** Format: double */
+            costoUnitario: number;
+            /** Format: double */
+            subtotal: number;
+        };
+        CompraResumenDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            fecha: string;
+            /** Format: uuid */
+            proveedorId: string;
+            proveedor: string;
+            estado: components["schemas"]["EstadoCompra"];
+            pagada: boolean;
+            /** Format: int32 */
+            unidades: number;
+            /** Format: double */
+            total: number;
+            detalle: string;
+        };
         CrearCategoriaDto: {
             nombre: string;
         };
+        /** @enum {unknown} */
+        EstadoCompra: "EnCamino" | "Recibida" | "Anulada";
         /** @enum {unknown} */
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
@@ -1685,6 +2419,11 @@ export interface components {
              * @default 3
              */
             stockMinimo: number;
+        };
+        GuardarProveedorDto: {
+            nombre: string;
+            telefono?: null | string;
+            notas?: null | string;
         };
         /** Format: binary */
         IFormFile: string;
@@ -1712,6 +2451,14 @@ export interface components {
             varianteId: string;
             /** Format: int32 */
             nuevoTotal: number;
+        };
+        LineaCompraDto: {
+            /** Format: uuid */
+            varianteId: string;
+            /** Format: int32 */
+            cantidad: number;
+            /** Format: double */
+            costoUnitario: number;
         };
         LineaIngresoDto: {
             /** Format: uuid */
@@ -1749,6 +2496,11 @@ export interface components {
             /** Format: date-time */
             fecha: string;
         };
+        PaginaDeComprasDto: {
+            items: components["schemas"]["CompraResumenDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+        };
         PaginaDeMovimientosDto: {
             items: components["schemas"]["MovimientoDto"][];
             /** Format: uuid */
@@ -1775,6 +2527,17 @@ export interface components {
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
+        };
+        PrecioProveedorDto: {
+            /** Format: uuid */
+            proveedorId: string;
+            proveedor: string;
+            telefono: null | string;
+            /** Format: double */
+            costoUnitario: number;
+            /** Format: date-time */
+            fecha: string;
+            esElMasBarato: boolean;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1860,6 +2623,36 @@ export interface components {
             stock: null | number;
             variantes: components["schemas"]["VarianteVendibleDto"][];
         };
+        ProveedorDetalleDto: {
+            proveedor: components["schemas"]["ProveedorDto"];
+            ultimosPrecios: components["schemas"]["UltimoPrecioDto"][];
+        };
+        ProveedorDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            telefono: null | string;
+            notas: null | string;
+            activo: boolean;
+            /** Format: double */
+            porPagar: number;
+            /** Format: int32 */
+            enCamino: number;
+            /** Format: int32 */
+            compras: number;
+        };
+        RegistrarCompraDto: {
+            /** Format: uuid */
+            claveIdempotencia: string;
+            /** Format: uuid */
+            proveedorId: string;
+            lineas: components["schemas"]["LineaCompraDto"][];
+            notas?: null | string;
+            /** @default false */
+            recibida: boolean;
+            /** @default false */
+            pagada: boolean;
+        };
         RegistrarVentaDto: {
             /** Format: uuid */
             claveIdempotencia: string;
@@ -1873,6 +2666,20 @@ export interface components {
             password: string;
             nombreTienda: string;
             slug: string;
+        };
+        ResultadoRecibirDto: {
+            compra: components["schemas"]["CompraDto"];
+            avisos: components["schemas"]["AvisoMargenDto"][];
+        };
+        ResumenComprasDto: {
+            /** Format: double */
+            porPagar: number;
+            /** Format: int32 */
+            comprasPorPagar: number;
+            /** Format: int32 */
+            enCamino: number;
+            /** Format: double */
+            valorEnCamino: number;
         };
         ResumenStockDto: {
             /** Format: double */
@@ -1924,7 +2731,16 @@ export interface components {
             slug: string;
         };
         /** @enum {unknown} */
-        TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion";
+        TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion" | "Reversion";
+        UltimoPrecioDto: {
+            /** Format: uuid */
+            productoId: string;
+            producto: string;
+            /** Format: double */
+            costoUnitario: number;
+            /** Format: date-time */
+            fecha: string;
+        };
         UsuarioSesionDto: {
             /** Format: uuid */
             id: string;
@@ -2006,6 +2822,8 @@ export interface components {
             ganancia: null | number;
             detalle: string;
         };
+        /** @enum {unknown} */
+        VistaCompras: "Todas" | "EnCamino" | "PorPagar";
         /** @enum {unknown} */
         VistaStock: "Todos" | "AReponer" | "PorEncargo";
     };
