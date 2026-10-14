@@ -55,7 +55,8 @@ const NUEVA_CATEGORIA = '__nueva'
 const borrarFoto = (id: string) => void api.DELETE('/api/v1/imagenes/{id}', { params: { path: { id } } })
 
 // Crear y editar un producto: la misma pantalla. Sin `inicial` es un producto nuevo.
-export function FormularioProducto({ inicial }: { inicial?: Producto }) {
+// `costoBloqueado`: el producto tiene costeo, así que su costo es el total de la calculadora (no se escribe acá).
+export function FormularioProducto({ inicial, costoBloqueado = false }: { inicial?: Producto; costoBloqueado?: boolean }) {
   const [servidor, setServidor] = useState<Producto | null>(inicial ?? null)
   const [form, setForm] = useState<Estado>(inicial ? desdeProducto(inicial) : vacio)
   const [creado, setCreado] = useState<Producto | null>(null)
@@ -285,7 +286,8 @@ export function FormularioProducto({ inicial }: { inicial?: Producto }) {
             value={form.costo}
             onChange={(e) => cambiar({ costo: e.target.value })}
             aria-invalid={!!avisoCosto}
-            ayuda={avisoCosto ?? undefined}
+            disabled={costoBloqueado}
+            ayuda={costoBloqueado ? 'Sale de tu costeo (calculadora de abajo).' : (avisoCosto ?? undefined)}
           />
         </div>
         {ganancia !== null && (

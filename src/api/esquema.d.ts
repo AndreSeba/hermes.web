@@ -831,6 +831,171 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/productos/{productoId}/costeo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CosteoDto"];
+                        "application/json": components["schemas"]["CosteoDto"];
+                        "text/json": components["schemas"]["CosteoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarCosteoDto"];
+                    "text/json": components["schemas"]["GuardarCosteoDto"];
+                    "application/*+json": components["schemas"]["GuardarCosteoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CosteoDto"];
+                        "application/json": components["schemas"]["CosteoDto"];
+                        "text/json": components["schemas"]["CosteoDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/productos/{productoId}/costeo/calcular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarCosteoDto"];
+                    "text/json": components["schemas"]["GuardarCosteoDto"];
+                    "application/*+json": components["schemas"]["GuardarCosteoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CosteoDto"];
+                        "application/json": components["schemas"]["CosteoDto"];
+                        "text/json": components["schemas"]["CosteoDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/imagenes": {
         parameters: {
             query?: never;
@@ -2390,6 +2555,32 @@ export interface components {
             total: number;
             detalle: string;
         };
+        CosteoDto: {
+            tiene: boolean;
+            /** Format: double */
+            material: number;
+            /** Format: double */
+            empaque: number;
+            /** Format: double */
+            manoDeObra: number;
+            /** Format: double */
+            costoFijo: number;
+            /** Format: int32 */
+            margenObjetivo: number;
+            /** Format: double */
+            costoTotal: number;
+            /** Format: double */
+            precioSugerido: number;
+            /** Format: double */
+            gananciaConSugerido: number;
+            /** Format: double */
+            precioActual: number;
+            /** Format: double */
+            gananciaActual: number;
+            /** Format: double */
+            margenActual: null | number;
+            estadoActual: components["schemas"]["EstadoPrecio"];
+        };
         CrearCategoriaDto: {
             nombre: string;
         };
@@ -2399,6 +2590,18 @@ export interface components {
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
         EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
+        GuardarCosteoDto: {
+            /** Format: double */
+            material: number;
+            /** Format: double */
+            empaque: number;
+            /** Format: double */
+            manoDeObra: number;
+            /** Format: double */
+            costoFijo: number;
+            /** Format: int32 */
+            margenObjetivo: number;
+        };
         GuardarProductoDto: {
             nombre: string;
             descripcion: null | string;
