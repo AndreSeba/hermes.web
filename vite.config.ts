@@ -14,6 +14,8 @@ export default defineConfig({
     proxy: {
       '/api': api,
       '/public': api,
+      // Fotos subidas (miniatura/catálogo/detalle). Con Cloudflare R2 serán otro dominio.
+      '/archivos': api,
     },
   },
 })
