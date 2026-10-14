@@ -1,0 +1,60 @@
+// Íconos de línea (24×24, trazo = currentColor), los mismos del prototipo. Agregar uno nuevo acá,
+// no traer una librería de íconos.
+const trazos = {
+  inicio: <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
+  catalogo: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </>
+  ),
+  stock: <path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8" />,
+  compras: <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />,
+  proveedores: (
+    <path d="M1 6h14v11H1zM15 10h4l3 3v4h-7M5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+  ),
+  precios: (
+    <>
+      <rect x="5" y="2" width="14" height="20" rx="2" />
+      <path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h8" />
+    </>
+  ),
+  tienda: <path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6" />,
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+    </>
+  ),
+  mas: <path d="M12 5v14M5 12h14" />,
+  flecha: <path d="M5 12h14M13 6l6 6-6 6" />,
+  chevron: <path d="M9 6l6 6-6 6" />,
+  calculadora: <path d="M3 17l6-6 4 4 8-8M15 7h6v6" />,
+  whatsapp: <path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.2-4.4A9 9 0 1 1 21 12zM8.5 9.5c.5 2.5 3.5 5.5 6 6l1.5-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z" />,
+  salir: <path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3" />,
+  ojo: <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />,
+  obras: <path d="M2 20h20M5 20V9l7-5 7 5v11M9 20v-5h6v5" />,
+} as const
+
+export type NombreIcono = keyof typeof trazos
+
+export function Icono({ nombre, tamano = 20 }: { nombre: NombreIcono; tamano?: number }) {
+  return (
+    <svg
+      width={tamano}
+      height={tamano}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {trazos[nombre]}
+    </svg>
+  )
+}
