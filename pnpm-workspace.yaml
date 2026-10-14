@@ -1,0 +1,6 @@
+# Endurecimiento de la cadena de suministro (por qué no npm: ver CLAUDE.md).
+# - No instalar versiones publicadas hace menos de 7 días: la mayoría de los paquetes
+#   comprometidos se detectan y retiran antes de ese plazo.
+# - Los scripts de instalación (postinstall, etc.) están bloqueados por defecto en pnpm;
+#   si un paquete realmente los necesita, se habilita uno por uno con `pnpm approve-builds`.
+minimumReleaseAge: 10080
