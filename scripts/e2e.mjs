@@ -69,12 +69,15 @@ const escritorio = () => cdp('Emulation.setDeviceMetricsOverride', { width: 1440
 
 // Helpers dentro de la página: completar un campo por su etiqueta (React necesita el setter nativo).
 const helpers = `
-  window.__campo = (etiqueta) => { const l = [...document.querySelectorAll('label')].find(x => x.textContent.trim() === etiqueta); return l && document.getElementById(l.htmlFor) };
+  window.__campo = (etiqueta) => { const l = [...document.querySelectorAll('label')].find(x => x.textContent.trim() === etiqueta); return l && (l.control || document.getElementById(l.htmlFor)) };
   window.__escribir = (etiqueta, v) => { const el = __campo(etiqueta); const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); };
   window.__subirPng = async (color) => { const c = document.createElement('canvas'); c.width = c.height = 300; const g = c.getContext('2d'); g.fillStyle = color; g.fillRect(0, 0, 300, 300); g.fillStyle = '#fff'; g.fillRect(100, 100, 100, 100); const blob = await new Promise(r => c.toBlob(r, 'image/png')); const dt = new DataTransfer(); dt.items.add(new File([blob], 'logo.png', { type: 'image/png' })); const i = document.querySelector('input[type=file]'); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true })); };
   // cache 'reload' salta la caché del navegador: las fotos se sirven con caché inmutable de un año y sin
   // esto una foto ya borrada seguiría respondiendo 200 desde la copia local. (Sin comillas invertidas
   // acá: todo este bloque es un texto entre comillas invertidas.)
+  window.__elegir = (etiqueta, v) => { const el = __campo(etiqueta); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
+  window.__subirYEsperar = async (color) => { const antes = document.querySelectorAll('.galeria-foto img').length; await __subirPng(color); for (let i = 0; i < 100; i++) { if (document.querySelectorAll('.galeria-foto img').length > antes) return true; await new Promise(r => setTimeout(r, 100)); } return false; };
+  window.__tarjetas = () => [...document.querySelectorAll('.tarjeta-producto')].map(a => a.querySelector('.producto-nombre').textContent);
   window.__estado = (url) => fetch(url, { cache: 'reload' }).then(r => r.status);
   window.__clic = (txt) => { const el = [...document.querySelectorAll('a,button')].find(x => x.textContent.trim().startsWith(txt) || x.getAttribute('aria-label') === txt); el.click(); return !!el };
 `
@@ -140,11 +143,12 @@ try {
   // 7. Secciones en construcción y barra inferior
   await evaluar(`__clic('Catálogo')`)
   await esperar(`location.pathname === '/catalogo'`, 'barra inferior → Catálogo')
-  ok('Catálogo muestra "en construcción"', (await texto()).includes('Estamos construyendo esta sección'))
+  await esperar(`document.body.innerText.includes('Todavía no cargaste productos')`, 'el catálogo de una tienda nueva está vacío')
   ok('la barra marca la sección actual', await evaluar(`document.querySelector('.barra-inferior a[aria-current="page"]')?.textContent.trim() === 'Catálogo'`))
-  await captura('m1-04-catalogo-celular.png')
+  await captura('m4-01-catalogo-vacio-celular.png')
   await evaluar(`__clic('Nueva venta')`)
   await esperar(`location.pathname === '/venta'`, 'botón central → Nueva venta')
+  ok('Nueva venta (M6) todavía muestra "en construcción"', (await texto()).includes('Estamos construyendo esta sección'))
 
   // 8. Escritorio
   await escritorio()
@@ -238,6 +242,166 @@ try {
   await ir('/mi-tienda')
   await esperar(`__campo('Nombre de la tienda')?.value === 'Luna ${n}'`, 'Mi tienda en escritorio')
   await captura('m3-03-mi-tienda-escritorio.png')
+
+  // 8c. M4 · Catálogo: crear con fotos y variantes, listar, filtrar, editar, archivar, categorías, paginar
+  await celular()
+  await ir('/catalogo')
+  await esperar(`document.body.innerText.includes('Todavía no cargaste productos')`, 'catálogo vacío')
+  await evaluar(`__clic('Cargar mi primer producto')`)
+  await esperar(`location.pathname === '/catalogo/nuevo'`, 'abre el formulario de producto nuevo')
+
+  // Categoría nueva desde el mismo formulario
+  await evaluar(`__elegir('Categoría', '__nueva')`)
+  await esperar(`!!__campo('Nombre de la categoría')`, 'aparece el campo de categoría nueva')
+  await evaluar(`__escribir('Nombre de la categoría', 'Carteras')`)
+  await evaluar(`__clic('Crear categoría')`)
+  await esperar(`__campo('Categoría').selectedOptions[0]?.textContent === 'Carteras'`, 'la categoría se crea y queda elegida')
+
+  await evaluar(`__escribir('Nombre', 'Cartera de cuero Mía')`)
+  await evaluar(`__escribir('Precio', '180')`)
+  ok('sin costo, avisa que cargándolo te avisa si perdés plata', (await texto()).includes('te avisamos si un precio te hace perder'))
+  await evaluar(`__escribir('Tu costo', '110')`)
+  await esperar(`document.body.innerText.includes('Te quedan Bs 70 de ganancia por unidad.')`, 'muestra la ganancia en vivo')
+  await evaluar(`__escribir('Colores (separados por coma)', 'café, Negro, café')`)
+  await evaluar(`__escribir('Tallas (separadas por coma)', 'S, M')`)
+  ok('4 variantes (2 colores sin repetir × 2 tallas)', (await texto()).includes('4 variantes (2 × 2)'))
+  await evaluar(`__escribir('Descripción', 'Hecha a mano en Cochabamba.')`)
+
+  ok('se suben dos fotos', (await evaluar(`__subirYEsperar('#B5532F')`)) && (await evaluar(`__subirYEsperar('#2552A3')`)))
+  const fotoA = await evaluar(`document.querySelectorAll('.galeria-foto img')[0].getAttribute('src')`)
+  const fotoB = await evaluar(`document.querySelectorAll('.galeria-foto img')[1].getAttribute('src')`)
+  ok('la primera foto es la portada', await evaluar(`document.querySelector('.galeria-foto .galeria-portada') === document.querySelectorAll('.galeria-foto')[0].querySelector('.galeria-portada')`))
+  await evaluar(`document.querySelector('[aria-label="Usar la foto 2 como portada"]').click()`)
+  await esperar(`document.querySelectorAll('.galeria-foto img')[0].getAttribute('src') === '${fotoB}'`, 'la segunda foto pasa a ser portada')
+  ok('el orden cambió (B primero, A segunda)', (await evaluar(`document.querySelectorAll('.galeria-foto img')[1].getAttribute('src')`)) === fotoA)
+
+  // Una foto que se sube y se saca antes de guardar se borra del servidor
+  await evaluar(`__subirYEsperar('#0B7A57')`)
+  const fotoC = await evaluar(`document.querySelectorAll('.galeria-foto img')[2].getAttribute('src')`)
+  ok('la tercera foto existe mientras se edita', (await evaluar(`__estado('${fotoC}')`)) === 200)
+  await evaluar(`document.querySelector('[aria-label="Quitar la foto 3"]').click()`)
+  await dormir(600)
+  ok('al sacarla sin guardar, se borró del servidor', (await evaluar(`__estado('${fotoC}')`)) === 404)
+  await captura('m4-02-nuevo-producto-celular.png')
+
+  await evaluar(`__clic('Guardar producto')`)
+  await esperar(`document.body.innerText.includes('¡Guardado!')`, 'se guarda el producto y aparece la pantalla de éxito')
+  await evaluar(`__clic('Ver mi catálogo')`)
+  await esperar(`__tarjetas().includes('Cartera de cuero Mía')`, 'el producto aparece en el catálogo')
+  ok('la tarjeta muestra el precio y cuánto ganás', await evaluar(`(() => { const t = document.querySelector('.tarjeta-producto').innerText; return t.includes('Bs 180') && t.includes('Ganás Bs 70') })()`))
+  await esperar(`document.querySelector('.tarjeta-producto img')?.complete && document.querySelector('.tarjeta-producto img').naturalWidth > 0`, 'la portada se ve en la tarjeta')
+
+  // Segundo producto: pierde plata
+  await evaluar(`__clic('Producto')`)
+  await esperar(`location.pathname === '/catalogo/nuevo'`, 'Producto → formulario nuevo')
+  await evaluar(`__escribir('Nombre', 'Billetera Tunari')`)
+  await evaluar(`__escribir('Precio', '60')`)
+  await evaluar(`__escribir('Tu costo', '62')`)
+  await esperar(`document.body.innerText.includes('Con este precio perdés Bs 2 por unidad.')`, 'avisa en vivo que perdés plata')
+  await evaluar(`__clic('Guardar producto')`)
+  await esperar(`document.body.innerText.includes('¡Guardado!')`, 'segundo producto guardado')
+  await evaluar(`__clic('Ver mi catálogo')`)
+  await esperar(`__tarjetas().length === 2`, 'dos productos en el catálogo')
+  ok('la billetera dice "Perdés Bs 2"', await evaluar(`[...document.querySelectorAll('.tarjeta-producto')].find(a => a.innerText.includes('Billetera')).innerText.includes('Perdés Bs 2')`))
+  await captura('m4-03-catalogo-celular.png')
+
+  // Filtros y búsqueda (guardados en la dirección)
+  await evaluar(`__clic('Revisar precio')`)
+  await esperar(`__tarjetas().length === 1 && __tarjetas()[0] === 'Billetera Tunari'`, '"Revisar precio" trae solo la que pierde')
+  ok('el filtro queda en la dirección', (await evaluar(`location.search`)).includes('filtro=revisar'))
+  await evaluar(`__clic('Todos')`)
+  await esperar(`__tarjetas().length === 2`, 'Todos vuelve a mostrar todo')
+  await evaluar(`__clic('Carteras')`)
+  await esperar(`__tarjetas().length === 1 && __tarjetas()[0] === 'Cartera de cuero Mía'`, 'filtro por categoría')
+  await evaluar(`__clic('Todos')`)
+  await evaluar(`__escribir('Buscar producto', 'BILLE')`)
+  await esperar(`__tarjetas().length === 1 && __tarjetas()[0] === 'Billetera Tunari'`, 'buscar ignora mayúsculas')
+  await evaluar(`__escribir('Buscar producto', 'xyz')`)
+  await esperar(`document.body.innerText.includes('No encontramos productos con ese filtro.')`, 'búsqueda sin resultados')
+  await evaluar(`__escribir('Buscar producto', '')`)
+  await esperar(`__tarjetas().length === 2`, 'al borrar la búsqueda vuelve todo')
+
+  // Editar: datos guardados, cambiar precio y sacar un color
+  await evaluar(`[...document.querySelectorAll('.tarjeta-producto')].find(a => a.innerText.includes('Cartera')).click()`)
+  await esperar(`/^\\/catalogo\\/[0-9a-f-]{36}$/.test(location.pathname) && __campo('Nombre')?.value === 'Cartera de cuero Mía'`, 'abre el producto para editar')
+  const rutaProducto = await evaluar(`location.pathname`)
+  ok('el formulario trae lo guardado', await evaluar(`__campo('Precio').value === '180' && __campo('Tu costo').value === '110' && __campo('Colores (separados por coma)').value === 'café, Negro' && __campo('Tallas (separadas por coma)').value === 'S, M' && __campo('Descripción').value === 'Hecha a mano en Cochabamba.' && __campo('Categoría').selectedOptions[0].textContent === 'Carteras'`))
+  ok('trae sus dos fotos en el orden guardado (B primera)', (await evaluar(`document.querySelectorAll('.galeria-foto img')[0].getAttribute('src')`)) === fotoB && (await evaluar(`document.querySelectorAll('.galeria-foto img').length`)) === 2)
+  ok('Guardar está desactivado sin cambios', await evaluar(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Guardar cambios').disabled`))
+  await evaluar(`__escribir('Precio', '200')`)
+  await evaluar(`__escribir('Colores (separados por coma)', 'café')`)
+  await esperar(`document.body.innerText.includes('2 variantes (1 × 2)')`, 'el resumen de variantes se actualiza')
+  await evaluar(`__clic('Guardar cambios')`)
+  await esperar(`document.body.innerText.includes('Guardado. Ya está actualizado.')`, 'guardar cambios del producto')
+  await cdp('Page.reload')
+  await esperar(`__campo('Precio')?.value === '200'`, 'el cambio persiste tras recargar')
+  ok('persisten los colores (el que se sacó ya no está)', (await evaluar(`__campo('Colores (separados por coma)').value`)) === 'café')
+  await captura('m4-04-editar-producto-celular.png')
+
+  // Archivar y desarchivar
+  await evaluar(`__clic('Archivar este producto')`)
+  await esperar(`!!document.querySelector('dialog[open]')`, 'pide confirmación para archivar')
+  await evaluar(`[...document.querySelectorAll('dialog[open] button')].find(b => b.textContent.trim() === 'Archivar').click()`)
+  await esperar(`document.body.innerText.includes('Este producto está archivado')`, 'queda archivado')
+  await ir('/catalogo')
+  await esperar(`__tarjetas().length === 1 && __tarjetas()[0] === 'Billetera Tunari'`, 'el archivado no aparece en el catálogo')
+  await evaluar(`__clic('Archivados')`)
+  await esperar(`__tarjetas().length === 1 && __tarjetas()[0] === 'Cartera de cuero Mía'`, '"Archivados" lo muestra')
+  await ir(rutaProducto)
+  await esperar(`document.body.innerText.includes('Este producto está archivado')`, 'abre el archivado')
+  await evaluar(`__clic('Desarchivar')`)
+  await esperar(`!document.body.innerText.includes('Este producto está archivado')`, 'se desarchiva')
+
+  // Categorías: agregar, renombrar y ocultar
+  await ir('/catalogo')
+  await esperar(`__tarjetas().length === 2`, 'catálogo de nuevo completo')
+  await evaluar(`__clic('Categorías')`)
+  await esperar(`!!document.querySelector('dialog[open] .categorias-lista li')`, 'el diálogo de categorías muestra la lista')
+  await evaluar(`__escribir('Nueva categoría', 'Joyería')`)
+  await evaluar(`[...document.querySelectorAll('dialog[open] button')].find(b => b.textContent.trim() === 'Agregar').click()`)
+  await esperar(`document.querySelectorAll('dialog[open] .categorias-lista li').length === 2`, 'se agrega Joyería')
+  await evaluar(`[...document.querySelectorAll('dialog[open] .categorias-lista li')].find(li => li.innerText.includes('Carteras')).querySelector('button').click()`)
+  await evaluar(`(() => { const i = document.querySelector('dialog[open] .categoria-input'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(i, 'Carteras y bolsos'); i.dispatchEvent(new Event('input', { bubbles: true })) })()`)
+  await evaluar(`[...document.querySelectorAll('dialog[open] button')].find(b => b.textContent.trim() === 'Guardar').click()`)
+  await esperar(`document.querySelector('dialog[open]').innerText.includes('Carteras y bolsos')`, 'se renombra la categoría')
+  await evaluar(`[...document.querySelectorAll('dialog[open] .categorias-lista li')].find(li => li.innerText.includes('Joyería')).querySelectorAll('button')[1].click()`)
+  await esperar(`document.querySelector('dialog[open]').innerText.includes('Joyería · oculta')`, 'se oculta Joyería')
+  await captura('m4-05-categorias-celular.png')
+  await evaluar(`[...document.querySelectorAll('dialog[open] button')].find(b => b.textContent.trim() === 'Listo').click()`)
+  await esperar(`!document.querySelector('dialog[open]')`, 'se cierra el diálogo')
+  ok('los filtros reflejan el cambio (renombrada sí, oculta no)', await evaluar(`(() => { const t = [...document.querySelectorAll('.chip')].map(c => c.textContent); return t.includes('Carteras y bolsos') && !t.includes('Joyería') })()`))
+
+  // Paginación real: 26 productos más desde la propia sesión (28 en total, 24 por página)
+  const creados = await evaluar(`(async () => { const m = await import('/src/api/cliente.ts'); let n = 0; for (let i = 1; i <= 26; i++) { const r = await m.api.POST('/api/v1/productos', { body: { nombre: 'Masivo ' + i, descripcion: null, precio: 10 + i, costo: 0, categoriaId: null, visibleEnTienda: true, colores: [], tallas: [], fotoIds: [] } }); if (r.data) n++ } return n })()`)
+  ok('se crearon 26 productos más (' + creados + ')', creados === 26)
+  await ir('/catalogo')
+  await esperar(`__tarjetas().length === 24`, 'la primera página trae 24')
+  ok('aparece "Ver más productos"', await evaluar(`!![...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Ver más productos')`))
+  await evaluar(`__clic('Ver más productos')`)
+  await esperar(`__tarjetas().length === 28`, 'la segunda página completa los 28')
+  ok('sin repetidos', await evaluar(`new Set(__tarjetas()).size === 28`))
+  ok('ya no hay más páginas', await evaluar(`![...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Ver más productos')`))
+
+  // Una foto subida en un producto nuevo que se abandona sin guardar se borra
+  await ir('/catalogo/nuevo')
+  await esperar(`!!document.querySelector('input[type=file]')`, 'formulario nuevo')
+  await evaluar(`__subirYEsperar('#7C5CFC')`)
+  const fotoAbandonada = (await evaluar(`document.querySelector('.galeria-foto img').getAttribute('src')`)).replace('miniatura', 'detalle')
+  ok('la foto está subida mientras no se guarda', (await evaluar(`__estado('${fotoAbandonada}')`)) === 200)
+  await evaluar(`__clic('Volver al catálogo')`)
+  await esperar(`location.pathname === '/catalogo'`, 'vuelve al catálogo sin guardar')
+  await dormir(700)
+  ok('al salir sin guardar, la foto se borró del servidor', (await evaluar(`__estado('${fotoAbandonada}')`)) === 404)
+
+  // Escritorio
+  await escritorio()
+  await ir('/catalogo')
+  await esperar(`__tarjetas().length === 24`, 'catálogo en escritorio')
+  await captura('m4-06-catalogo-escritorio.png')
+  await evaluar(`[...document.querySelectorAll('.tarjeta-producto')].find(a => a.innerText.includes('Billetera')) ? 0 : __clic('Ver más productos')`)
+  await ir(rutaProducto)
+  await esperar(`__campo('Nombre')?.value === 'Cartera de cuero Mía'`, 'editar en escritorio')
+  await captura('m4-07-editar-producto-escritorio.png')
 
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()

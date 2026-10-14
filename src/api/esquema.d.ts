@@ -531,6 +531,311 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/productos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Buscar?: string;
+                    CategoriaId?: string;
+                    RevisarPrecio?: boolean;
+                    Archivados?: boolean;
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeProductosDto"];
+                        "application/json": components["schemas"]["PaginaDeProductosDto"];
+                        "text/json": components["schemas"]["PaginaDeProductosDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarProductoDto"];
+                    "text/json": components["schemas"]["GuardarProductoDto"];
+                    "application/*+json": components["schemas"]["GuardarProductoDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoDto"];
+                        "application/json": components["schemas"]["ProductoDto"];
+                        "text/json": components["schemas"]["ProductoDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/productos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoDto"];
+                        "application/json": components["schemas"]["ProductoDto"];
+                        "text/json": components["schemas"]["ProductoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarProductoDto"];
+                    "text/json": components["schemas"]["GuardarProductoDto"];
+                    "application/*+json": components["schemas"]["GuardarProductoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoDto"];
+                        "application/json": components["schemas"]["ProductoDto"];
+                        "text/json": components["schemas"]["ProductoDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/productos/{id}/archivar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoDto"];
+                        "application/json": components["schemas"]["ProductoDto"];
+                        "text/json": components["schemas"]["ProductoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/productos/{id}/desarchivar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoDto"];
+                        "application/json": components["schemas"]["ProductoDto"];
+                        "text/json": components["schemas"]["ProductoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tienda": {
         parameters: {
             query?: never;
@@ -710,15 +1015,31 @@ export interface components {
         CrearCategoriaDto: {
             nombre: string;
         };
+        /** @enum {unknown} */
+        EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
+        GuardarProductoDto: {
+            nombre: string;
+            descripcion: null | string;
+            /** Format: double */
+            precio: number;
+            /** Format: double */
+            costo: number;
+            /** Format: uuid */
+            categoriaId: null | string;
+            visibleEnTienda: boolean;
+            colores: null | string[];
+            tallas: null | string[];
+            fotoIds: null | string[];
+        };
         /** Format: binary */
         IFormFile: string;
         ImagenDto: {
             /** Format: uuid */
             id: string;
             /** Format: int32 */
-            ancho: number | string;
+            ancho: number;
             /** Format: int32 */
-            alto: number | string;
+            alto: number;
             miniatura: string;
             catalogo: string;
             detalle: string;
@@ -726,6 +1047,11 @@ export interface components {
         LoginDto: {
             email: string;
             password: string;
+        };
+        PaginaDeProductosDto: {
+            items: components["schemas"]["ProductoResumenDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
         };
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
@@ -735,9 +1061,48 @@ export interface components {
             type?: null | string;
             title?: null | string;
             /** Format: int32 */
-            status?: null | number | string;
+            status?: null | number;
             detail?: null | string;
             instance?: null | string;
+        };
+        ProductoDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            descripcion: null | string;
+            /** Format: double */
+            precio: number;
+            /** Format: double */
+            costo: number;
+            /** Format: double */
+            ganancia: number;
+            estadoPrecio: components["schemas"]["EstadoPrecio"];
+            /** Format: uuid */
+            categoriaId: null | string;
+            visibleEnTienda: boolean;
+            archivado: boolean;
+            variantes: components["schemas"]["VarianteDto"][];
+            fotos: components["schemas"]["ImagenDto"][];
+        };
+        ProductoResumenDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            /** Format: double */
+            precio: number;
+            /** Format: double */
+            costo: number;
+            /** Format: double */
+            ganancia: number;
+            estadoPrecio: components["schemas"]["EstadoPrecio"];
+            /** Format: uuid */
+            categoriaId: null | string;
+            categoria: null | string;
+            portada: null | components["schemas"]["ImagenDto"];
+            visibleEnTienda: boolean;
+            archivado: boolean;
+            /** Format: int32 */
+            variantes: number;
         };
         RegistroDto: {
             nombre: string;
@@ -774,6 +1139,12 @@ export interface components {
             id: string;
             nombre: string;
             email: string;
+        };
+        VarianteDto: {
+            /** Format: uuid */
+            id: string;
+            color: null | string;
+            talla: null | string;
         };
     };
     responses: never;

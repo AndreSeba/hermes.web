@@ -7,6 +7,10 @@ import type { components, paths } from './esquema'
 export type Sesion = components['schemas']['SesionDto']
 export type ImagenSubida = components['schemas']['ImagenDto']
 export type Tienda = components['schemas']['TiendaDto']
+export type Producto = components['schemas']['ProductoDto']
+export type ProductoResumen = components['schemas']['ProductoResumenDto']
+export type EstadoPrecio = components['schemas']['EstadoPrecio']
+export type Categoria = components['schemas']['CategoriaDto']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 
