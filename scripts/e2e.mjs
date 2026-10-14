@@ -70,7 +70,12 @@ const escritorio = () => cdp('Emulation.setDeviceMetricsOverride', { width: 1440
 // Helpers dentro de la página: completar un campo por su etiqueta (React necesita el setter nativo).
 const helpers = `
   window.__campo = (etiqueta) => { const l = [...document.querySelectorAll('label')].find(x => x.textContent.trim() === etiqueta); return l && document.getElementById(l.htmlFor) };
-  window.__escribir = (etiqueta, v) => { const el = __campo(etiqueta); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+  window.__escribir = (etiqueta, v) => { const el = __campo(etiqueta); const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+  window.__subirPng = async (color) => { const c = document.createElement('canvas'); c.width = c.height = 300; const g = c.getContext('2d'); g.fillStyle = color; g.fillRect(0, 0, 300, 300); g.fillStyle = '#fff'; g.fillRect(100, 100, 100, 100); const blob = await new Promise(r => c.toBlob(r, 'image/png')); const dt = new DataTransfer(); dt.items.add(new File([blob], 'logo.png', { type: 'image/png' })); const i = document.querySelector('input[type=file]'); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true })); };
+  // cache 'reload' salta la caché del navegador: las fotos se sirven con caché inmutable de un año y sin
+  // esto una foto ya borrada seguiría respondiendo 200 desde la copia local. (Sin comillas invertidas
+  // acá: todo este bloque es un texto entre comillas invertidas.)
+  window.__estado = (url) => fetch(url, { cache: 'reload' }).then(r => r.status);
   window.__clic = (txt) => { const el = [...document.querySelectorAll('a,button')].find(x => x.textContent.trim().startsWith(txt) || x.getAttribute('aria-label') === txt); el.click(); return !!el };
 `
 await cdp('Page.enable')
@@ -147,6 +152,92 @@ try {
   await esperar(`document.querySelector('h1')?.textContent === 'Hola, Andrea'`, 'Inicio en escritorio')
   ok('menú lateral visible y barra inferior oculta', await evaluar(`getComputedStyle(document.querySelector('.menu-lateral')).display !== 'none' && getComputedStyle(document.querySelector('.barra-inferior')).display === 'none'`))
   await captura('m1-05-inicio-escritorio.png')
+
+  // 8b. M3 · Mi tienda: datos, color, WhatsApp, logo y dirección
+  await celular()
+  await ir('/mi-tienda')
+  const nombreInicial = `Ñandú Accesorios ${n}`
+  await esperar(`__campo('Nombre de la tienda')?.value === '${nombreInicial}'`, 'Mi tienda carga los datos de la tienda')
+  ok('el formulario arranca con Guardar desactivado (sin cambios)', await evaluar(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Guardar cambios').disabled`))
+
+  await evaluar(`__escribir('WhatsApp donde recibís los pedidos', '12345')`)
+  await esperar(`__campo('WhatsApp donde recibís los pedidos').getAttribute('aria-invalid') === 'true'`, 'WhatsApp inválido se marca')
+  ok('WhatsApp inválido: aviso y Guardar desactivado',
+    (await texto()).includes('8 dígitos que empiecen con 6 o 7') && await evaluar(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Guardar cambios').disabled`))
+
+  await evaluar(`__escribir('Nombre de la tienda', 'Luna ${n}')`)
+  await evaluar(`__escribir('Descripción corta', 'Accesorios hechos a mano · Cochabamba')`)
+  await evaluar(`__escribir('WhatsApp donde recibís los pedidos', '712 34567')`)
+  await evaluar(`__clic('Terracota')`)
+  await evaluar(`__subirPng('#2552A3')`)
+  await esperar(`document.querySelector('.foto-redonda img')?.complete && document.querySelector('.foto-redonda img').naturalWidth > 0`, 'el logo se sube y se ve')
+  const logoSubido = await evaluar(`document.querySelector('.foto-redonda img').getAttribute('src')`)
+  ok('el logo se sirve desde /archivos/…/miniatura.webp', /^\/archivos\/[0-9a-f-]{36}\/imagenes\/[0-9a-f-]{36}\/miniatura\.webp$/.test(logoSubido))
+  ok('Terracota queda marcado', await evaluar(`document.querySelector('[aria-label="Terracota"]').getAttribute('aria-pressed') === 'true'`))
+  await captura('m3-01-mi-tienda-celular.png')
+
+  await evaluar(`__clic('Guardar cambios')`)
+  await esperar(`document.body.innerText.includes('Guardado. Ya está actualizado.')`, 'guardar muestra confirmación')
+  ok('el menú ya muestra el nombre nuevo sin recargar', await evaluar(`document.querySelector('.menu-tienda-nombre').textContent === 'Luna ${n}'`))
+
+  await cdp('Page.reload')
+  await esperar(`__campo('Nombre de la tienda')?.value === 'Luna ${n}'`, 'tras recargar, el nombre guardado sigue')
+  ok('persiste la descripción', (await evaluar(`__campo('Descripción corta').value`)) === 'Accesorios hechos a mano · Cochabamba')
+  ok('persiste el WhatsApp (solo los 8 dígitos, el +591 va fijo)', (await evaluar(`__campo('WhatsApp donde recibís los pedidos').value`)) === '71234567')
+  ok('persiste el color Terracota', await evaluar(`document.querySelector('[aria-label="Terracota"]').getAttribute('aria-pressed') === 'true'`))
+  await esperar(`document.querySelector('.foto-redonda img')?.complete && document.querySelector('.foto-redonda img').naturalWidth > 0`, 'el logo guardado se ve tras recargar')
+  ok('persiste el logo (misma imagen)', (await evaluar(`document.querySelector('.foto-redonda img').getAttribute('src')`)) === logoSubido)
+
+  // Cambiar de logo y descartar: la foto sin guardar se borra del servidor (no quedan huérfanas)
+  await evaluar(`__subirPng('#B42318')`)
+  await esperar(`document.querySelector('.foto-redonda img')?.getAttribute('src') !== '${logoSubido}'`, 'se sube un logo nuevo')
+  const logoNuevo = await evaluar(`document.querySelector('.foto-redonda img').getAttribute('src')`)
+  ok('el logo nuevo existe en el servidor mientras se edita', (await evaluar(`__estado('${logoNuevo}')`)) === 200)
+  await evaluar(`__clic('Descartar')`)
+  await esperar(`document.querySelector('.foto-redonda img')?.getAttribute('src') === '${logoSubido}'`, 'Descartar vuelve al logo guardado')
+  await dormir(600)
+  ok('al descartar, la foto sin guardar se borró del servidor', (await evaluar(`__estado('${logoNuevo}')`)) === 404)
+  ok('y el logo guardado sigue intacto', (await evaluar(`__estado('${logoSubido}')`)) === 200)
+
+  // Lo que está a medio editar no se pierde al cambiar la dirección
+  await evaluar(`__escribir('Nombre de la tienda', 'Borrador sin guardar')`)
+  await evaluar(`__clic('Cambiar dirección')`)
+  await esperar(`!!document.querySelector('dialog[open]')`, 'se abre el diálogo de dirección')
+  ok('el diálogo advierte que los enlaces compartidos dejan de funcionar', (await evaluar(`document.querySelector('dialog[open]').innerText`)).includes('van a dejar de funcionar'))
+  await captura('m3-02-direccion-celular.png')
+  await evaluar(`__escribir('Nueva dirección', 'admin')`)
+  await evaluar(`document.querySelector('dialog[open] form button[type=submit]').click()`)
+  await esperar(`!!document.querySelector('dialog[open] [role=alert]')`, 'dirección reservada muestra error')
+  ok('dirección reservada: mensaje del servidor', (await evaluar(`document.querySelector('dialog[open] [role=alert]').textContent`)).includes('reservada'))
+  // Una dirección que ya usa otra tienda (creada desde Node: sin cookies compartidas con el navegador)
+  const otra = await fetch(`${BASE}/api/v1/auth/registro`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre: 'Otra', email: `otra${n}@ejemplo.com`, password, nombreTienda: 'Otra', slug: `ocupada-${n}` }) })
+  ok('se creó otra tienda para probar la dirección ocupada', otra.ok)
+  await evaluar(`__escribir('Nueva dirección', 'ocupada-${n}')`)
+  await evaluar(`document.querySelector('dialog[open] form button[type=submit]').click()`)
+  await esperar(`document.querySelector('dialog[open] [role=alert]')?.textContent.includes('ya está en uso')`, 'dirección ocupada muestra error')
+  await evaluar(`__escribir('Nueva dirección', 'luna-${n}')`)
+  await evaluar(`document.querySelector('dialog[open] form button[type=submit]').click()`)
+  await esperar(`!document.querySelector('dialog[open]') && document.querySelector('.direccion')?.textContent === '/luna-${n}'`, 'la dirección nueva se guarda y el diálogo se cierra')
+  ok('lo que estaba a medio editar sigue ahí', (await evaluar(`__campo('Nombre de la tienda').value`)) === 'Borrador sin guardar')
+  await evaluar(`__clic('Descartar')`)
+  await esperar(`__campo('Nombre de la tienda').value === 'Luna ${n}'`, 'Descartar restaura lo guardado')
+
+  // Quitar el logo y guardar: la foto se borra
+  await evaluar(`__clic('Quitar')`)
+  await esperar(`!document.querySelector('.foto-redonda img')`, 'Quitar saca el logo')
+  // "Luna 12345" → iniciales de las dos primeras palabras: "L1", sobre el color elegido (Terracota, texto blanco)
+  ok('sin logo se muestran las iniciales sobre el color de la tienda',
+    await evaluar(`(() => { const e = document.querySelector('.foto-redonda'); return e.textContent === 'L${String(n)[0]}' && getComputedStyle(e).backgroundColor === 'rgb(181, 83, 47)' && getComputedStyle(e).color === 'rgb(255, 255, 255)' })()`))
+  await evaluar(`__clic('Guardar cambios')`)
+  await esperar(`document.body.innerText.includes('Guardado. Ya está actualizado.')`, 'guardar sin logo')
+  await dormir(400)
+  ok('al guardar sin logo, la foto anterior se borró del servidor', (await evaluar(`__estado('${logoSubido.replace('/miniatura.webp', '/detalle.webp')}')`)) === 404)
+
+  await escritorio()
+  await ir('/mi-tienda')
+  await esperar(`__campo('Nombre de la tienda')?.value === 'Luna ${n}'`, 'Mi tienda en escritorio')
+  await captura('m3-03-mi-tienda-escritorio.png')
 
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()

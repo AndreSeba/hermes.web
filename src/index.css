@@ -1,4 +1,4 @@
-/* ───────────── Tokens (del prototipo) ─────────────
+﻿/* ───────────── Tokens (del prototipo) ─────────────
    Colores de la APP. El color de cada tienda pública (por defecto #7C5CFC) es otra cosa. */
 :root {
   --fondo: #f6f5f1;
@@ -267,6 +267,14 @@ a.avatar:hover {
 .campo-prefijo {
   color: var(--texto-suave);
   font-weight: 600;
+}
+/* Un prefijo de varias letras (+591) va separado del número; la barra de la dirección no. */
+.campo-prefijo-largo {
+  font-weight: 700;
+  margin-right: 10px;
+  padding-right: 10px;
+  border-right: 1px solid var(--borde);
+  line-height: 1.6;
 }
 .campo-input {
   flex: 1;
@@ -638,4 +646,178 @@ a.avatar:hover {
   .acceso-columna {
     max-width: 520px;
   }
+}
+
+/* ───────────── Mi tienda (M3) ───────────── */
+.pagina-angosta {
+  max-width: 640px;
+}
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.seccion-titulo {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.direccion {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+.acciones-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.boton-chico {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.boton-texto {
+  background: transparent;
+  color: var(--texto-suave);
+}
+.boton-texto:hover {
+  color: var(--texto);
+  background: var(--apagado);
+}
+.boton-inactivo {
+  opacity: 0.5;
+  pointer-events: none;
+}
+label.boton {
+  cursor: pointer;
+}
+.aviso-advertencia {
+  background: var(--ambar-suave);
+  color: #6b4a12;
+}
+
+/* Textarea con el mismo aspecto que los campos */
+.campo-caja-alta {
+  align-items: stretch;
+  padding: 6px 14px;
+}
+.campo-area {
+  resize: vertical;
+  min-height: 64px;
+  padding: 6px 0;
+  line-height: 1.4;
+  font-family: inherit;
+}
+.campo-ayuda-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Foto redonda (logo) */
+.subir-foto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.subir-foto-fila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.subir-foto-botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.subir-foto-botones:has(input:focus-visible) label {
+  outline: 3px solid color-mix(in srgb, var(--acento) 45%, transparent);
+  outline-offset: 2px;
+}
+.foto-redonda {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fuente-titulo);
+  font-weight: 800;
+  font-size: 26px;
+  border: 1px solid var(--borde);
+}
+.foto-redonda img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Selector de color */
+.colores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* 6 muestras de 44 px entran en una fila de celular (como en el prototipo) */
+}
+.color-muestra {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--borde);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.color-muestra[aria-pressed='true'],
+.color-muestra[data-activo='true'] {
+  box-shadow: 0 0 0 2px var(--texto);
+}
+.color-otro {
+  background: conic-gradient(#f2a33a, #b5532f, #7c5cfc, #2552a3, #0b7a57, #f2a33a);
+  color: #fff;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.color-otro input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.color-otro:has(input:focus-visible),
+.color-muestra:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--acento) 45%, transparent);
+  outline-offset: 3px;
+}
+
+/* Diálogo */
+.dialogo {
+  border: 0;
+  border-radius: var(--radio-grande);
+  padding: 20px;
+  width: min(440px, calc(100% - 32px));
+  color: var(--texto);
+  background: var(--superficie);
+  box-shadow: 0 20px 50px rgba(23, 24, 28, 0.3);
+}
+.dialogo::backdrop {
+  background: rgba(23, 24, 28, 0.5);
+}
+.dialogo .formulario {
+  margin-top: 14px;
 }

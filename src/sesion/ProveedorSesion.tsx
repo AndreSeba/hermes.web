@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, escucharSesion, fijarToken, renovarSesion, type Sesion } from '../api/cliente'
-import { Contexto, type EstadoSesion } from './contexto'
+import { Contexto, type EstadoSesion, type TiendaSesion } from './contexto'
 
 // Renovar un minuto antes de que venza el token de acceso (15 min), así el usuario casi nunca
 // recibe un 401. Si igual llega uno, cliente.ts renueva y repite el pedido.
@@ -49,6 +49,10 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const valor = useMemo(() => ({ estado, entrar, salir }), [estado, entrar, salir])
+  const actualizarTienda = useCallback((tienda: TiendaSesion) => {
+    setEstado((previo) => (previo.tipo === 'activa' ? { tipo: 'activa', sesion: { ...previo.sesion, tienda } } : previo))
+  }, [])
+
+  const valor = useMemo(() => ({ estado, entrar, salir, actualizarTienda }), [estado, entrar, salir, actualizarTienda])
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

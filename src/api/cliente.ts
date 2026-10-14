@@ -5,6 +5,8 @@ import type { components, paths } from './esquema'
 // genera desde el OpenAPI del backend (`pnpm api:tipos`). Nunca escribas los tipos de la API a mano.
 
 export type Sesion = components['schemas']['SesionDto']
+export type ImagenSubida = components['schemas']['ImagenDto']
+export type Tienda = components['schemas']['TiendaDto']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 

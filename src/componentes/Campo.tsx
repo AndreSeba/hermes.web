@@ -21,7 +21,7 @@ export function Campo({ etiqueta, ayuda, prefijo, type = 'text', ...resto }: Pro
         {etiqueta}
       </label>
       <div className="campo-caja">
-        {prefijo && <span className="campo-prefijo">{prefijo}</span>}
+        {prefijo && <span className={`campo-prefijo${prefijo.length > 1 ? ' campo-prefijo-largo' : ''}`}>{prefijo}</span>}
         <input
           id={id}
           type={esClave && visible ? 'text' : type}

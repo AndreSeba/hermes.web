@@ -6,10 +6,14 @@ export type EstadoSesion =
   | { tipo: 'anonimo' }
   | { tipo: 'activa'; sesion: Sesion }
 
+export type TiendaSesion = Sesion['tienda']
+
 export type ContextoSesion = {
   estado: EstadoSesion
   entrar: (sesion: Sesion) => void
   salir: () => Promise<void>
+  // Cuando la dueña renombra la tienda o cambia su dirección: el menú lo muestra sin recargar.
+  actualizarTienda: (tienda: TiendaSesion) => void
 }
 
 export const Contexto = createContext<ContextoSesion | null>(null)
