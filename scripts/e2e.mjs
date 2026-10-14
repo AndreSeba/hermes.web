@@ -917,6 +917,67 @@ try {
   await esperar(`__ventas().length === 1`, 'Gastos en escritorio')
   await captura('m9-06-gastos-escritorio.png')
 
+  // 8i. M10 · Tienda pública desde el panel: enlace, qué ven los clientes, fondo y publicar / despublicar
+  await celular()
+  await ir('/mi-tienda')
+  await esperar(`!!document.querySelector('.tienda-internet') && !!document.querySelector('.enlace-tienda a.direccion')`, 'la sección «Tu tienda en internet»')
+  const slugTienda = await evaluar(`document.querySelector('.enlace-tienda a.direccion').textContent.split('/').pop()`)
+  const interruptor = (txt) => `[...document.querySelectorAll('.tienda-internet [role=switch]')].find(b => b.innerText.startsWith('${txt}'))`
+  // `no-store`: la tienda pública se cachea 30 s a propósito (Cache-Control); acá se quiere ver el cambio al instante.
+  const publico = (ruta) => `fetch('/public/${slugTienda}${ruta}', { cache: 'no-store' }).then(async r => ({ estado: r.status, json: r.status === 200 ? await r.json() : null }))`
+  ok('arranca todo encendido', await evaluar(`['Tienda publicada', 'Mostrar los precios', 'Mostrar si hay', 'Pedidos por WhatsApp'].every(t => ${interruptor('\'+t+\'')}?.getAttribute('aria-checked') === 'true')`.replace(`${interruptor('\'+t+\'')}`, `[...document.querySelectorAll('.tienda-internet [role=switch]')].find(b => b.innerText.startsWith(t))`)))
+  ok('el enlace es el de la tienda pública con tu dirección', (await evaluar(`document.querySelector('.enlace-tienda a.direccion').href`)) === `http://localhost:5014/${slugTienda}`)
+  ok('«Ver mi tienda» se abre en otra pestaña sin pasarle el panel (noopener)', await evaluar(`(() => { const a = [...document.querySelectorAll('.enlace-tienda a')].find(x => x.textContent.trim() === 'Ver mi tienda'); return a.target === '_blank' && a.rel.includes('noopener') })()`))
+  ok('«Compartir por WhatsApp» arma el mensaje con el enlace', await evaluar(`(() => { const a = [...document.querySelectorAll('.enlace-tienda a')].find(x => x.textContent.trim() === 'Compartir por WhatsApp'); return a.href.startsWith('https://wa.me/?text=') && decodeURIComponent(a.href).includes('http://localhost:5014/${slugTienda}') })()`))
+  await evaluar(`[...document.querySelectorAll('.enlace-tienda button')].find(x => x.textContent.trim() === 'Copiar enlace').click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Copiaste el enlace') || document.querySelector('.tienda-internet').innerText.includes('No pudimos copiarlo')`, '«Copiar enlace» responde (copia o explica qué hacer)')
+  const pub0 = await evaluar(publico('/productos?Limite=50'))
+  ok('la tienda pública responde y muestra precios y disponibilidad', pub0.estado === 200 && pub0.json.items.length > 0 && pub0.json.items.every((i) => i.precio !== null && i.disponible !== null))
+
+  await evaluar(`${interruptor('Mostrar los precios')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ya no se ven los precios.')`, 'apagar precios guarda y avisa')
+  ok('sin precios: el público ya no los recibe', await evaluar(`${publico('/productos?Limite=50')}.then(r => r.json.items.every(i => i.precio === null))`))
+  ok('el interruptor refleja el cambio', (await evaluar(`${interruptor('Mostrar los precios')}.getAttribute('aria-checked')`)) === 'false')
+  await evaluar(`${interruptor('Mostrar los precios')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ahora se ven los precios.')`, 'volver a mostrar precios')
+
+  await evaluar(`${interruptor('Mostrar si hay')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ya no se ve si hay o no hay.')`, 'apagar disponibilidad')
+  ok('sin disponibilidad: el público no recibe ni el dato', await evaluar(`${publico('/productos?Limite=50')}.then(r => r.json.items.every(i => i.disponible === null))`))
+  await evaluar(`${interruptor('Mostrar si hay')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ahora se ve si hay o no hay.')`, 'volver a mostrar disponibilidad')
+
+  ok('con WhatsApp cargado, los pedidos explican cómo llegan', await evaluar(`${interruptor('Pedidos por WhatsApp')}.innerText.includes('te llega el pedido armado')`))
+  await evaluar(`${interruptor('Pedidos por WhatsApp')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ya no se puede pedir por WhatsApp.')`, 'apagar pedidos')
+  ok('sin pedidos por WhatsApp, el público no recibe el número', await evaluar(`${publico('')}.then(r => r.json.whatsapp === null)`))
+  await evaluar(`${interruptor('Pedidos por WhatsApp')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Ahora se puede pedir por WhatsApp.')`, 'volver a encender pedidos')
+
+  await evaluar(`[...document.querySelectorAll('.tienda-internet .segmento')].find(b => b.textContent.trim() === 'Oscuro').click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Fondo oscuro.')`, 'cambiar el fondo')
+  ok('el fondo elegido llega a la tienda pública', await evaluar(`${publico('')}.then(r => r.json.fondo === 'Oscuro')`))
+  await evaluar(`document.querySelector('.tienda-internet').scrollIntoView({ block: 'start' })`)
+  await captura('m10-05-tienda-en-internet-celular.png')
+  await evaluar(`[...document.querySelectorAll('.tienda-internet .segmento')].find(b => b.textContent.trim() === 'Crema').click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Fondo crema.')`, 'volver al fondo crema')
+
+  await evaluar(`${interruptor('Tienda publicada')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Tu tienda dejó de verse.')`, 'despublicar')
+  ok('despublicada: la tienda pública responde 404 y el panel lo explica', (await evaluar(publico(''))).estado === 404 && (await evaluar(`${interruptor('Tienda publicada')}.innerText.includes('no encontrada')`)))
+  await evaluar(`document.querySelector('.tienda-internet').scrollIntoView({ block: 'start' })`)
+  await captura('m10-06-tienda-despublicada-celular.png')
+  await evaluar(`${interruptor('Tienda publicada')}.click()`)
+  await esperar(`document.querySelector('.tienda-internet').innerText.includes('Tu tienda está publicada.')`, 'publicar otra vez')
+  ok('publicada otra vez: vuelve a verse', (await evaluar(publico(''))).estado === 200)
+
+  // Si cambia la dirección, el enlace cambia con ella (y la anterior deja de funcionar: el panel ya lo advierte)
+  await escritorio()
+  await ir('/mi-tienda')
+  await esperar(`!!document.querySelector('.tienda-internet')`, 'Mi tienda en escritorio')
+  await evaluar(`document.querySelector('.tienda-internet').scrollIntoView({ block: 'start' })`)
+  await captura('m10-07-tienda-en-internet-escritorio.png')
+
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()
   await ir('/mi-tienda')

@@ -1698,6 +1698,29 @@ label.boton {
   color: var(--acento);
 }
 
+/* Tu tienda en internet */
+.tienda-internet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.seccion-subtitulo {
+  margin: 8px 0 0;
+  font-family: var(--fuente-titulo);
+  font-size: 16px;
+}
+.enlace-tienda {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--radio-chico);
+  background: var(--apagado);
+}
+.enlace-tienda .direccion {
+  overflow-wrap: anywhere;
+}
+
 /* Inicio y gastos */
 .accesos {
   display: flex;

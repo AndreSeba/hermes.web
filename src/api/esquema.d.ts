@@ -1861,6 +1861,151 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TiendaPublicaDto"];
+                        "application/json": components["schemas"]["TiendaPublicaDto"];
+                        "text/json": components["schemas"]["TiendaPublicaDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/{slug}/productos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Buscar?: string;
+                    CategoriaId?: string;
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaPublicaDto"];
+                        "application/json": components["schemas"]["PaginaPublicaDto"];
+                        "text/json": components["schemas"]["PaginaPublicaDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/{slug}/productos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoPublicoDto"];
+                        "application/json": components["schemas"]["ProductoPublicoDto"];
+                        "text/json": components["schemas"]["ProductoPublicoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stock": {
         parameters: {
             query?: never;
@@ -2263,6 +2408,81 @@ export interface paths {
                 };
                 /** @description Not Found */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tienda/publica": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ConfiguracionPublicaDto"];
+                        "application/json": components["schemas"]["ConfiguracionPublicaDto"];
+                        "text/json": components["schemas"]["ConfiguracionPublicaDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConfiguracionPublicaDto"];
+                    "text/json": components["schemas"]["ConfiguracionPublicaDto"];
+                    "application/*+json": components["schemas"]["ConfiguracionPublicaDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ConfiguracionPublicaDto"];
+                        "application/json": components["schemas"]["ConfiguracionPublicaDto"];
+                        "text/json": components["schemas"]["ConfiguracionPublicaDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -2703,6 +2923,11 @@ export interface components {
             nombre: string;
             activa: boolean;
         };
+        CategoriaPublicaDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+        };
         CompraDto: {
             /** Format: uuid */
             id: string;
@@ -2758,6 +2983,13 @@ export interface components {
             total: number;
             detalle: string;
         };
+        ConfiguracionPublicaDto: {
+            publicada: boolean;
+            mostrarPrecios: boolean;
+            mostrarDisponibilidad: boolean;
+            pedidosPorWhatsapp: boolean;
+            fondo: components["schemas"]["FondoTienda"];
+        };
         CosteoDto: {
             tiene: boolean;
             /** Format: double */
@@ -2793,6 +3025,8 @@ export interface components {
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
         EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
+        /** @enum {unknown} */
+        FondoTienda: "Claro" | "Crema" | "Oscuro";
         GastoDto: {
             /** Format: uuid */
             id: string;
@@ -2977,6 +3211,10 @@ export interface components {
             /** Format: uuid */
             siguiente: null | string;
         };
+        PaginaPublicaDto: {
+            items: components["schemas"]["ProductoPublicoResumenDto"][];
+            siguiente: null | string;
+        };
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
@@ -3029,6 +3267,28 @@ export interface components {
             estado: components["schemas"]["EstadoStock"];
             /** Format: int32 */
             stock: number;
+        };
+        ProductoPublicoDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            descripcion: null | string;
+            /** Format: double */
+            precio: null | number;
+            categoria: null | string;
+            disponible: null | boolean;
+            fotos: components["schemas"]["ImagenDto"][];
+            variantes: components["schemas"]["VariantePublicaDto"][];
+        };
+        ProductoPublicoResumenDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            /** Format: double */
+            precio: null | number;
+            portada: null | components["schemas"]["ImagenDto"];
+            categoria: null | string;
+            disponible: null | boolean;
         };
         ProductoResumenDto: {
             /** Format: uuid */
@@ -3194,6 +3454,18 @@ export interface components {
             color: string;
             logo: null | components["schemas"]["ImagenDto"];
         };
+        TiendaPublicaDto: {
+            nombre: string;
+            slug: string;
+            descripcion: null | string;
+            color: string;
+            fondo: components["schemas"]["FondoTienda"];
+            logo: null | components["schemas"]["ImagenDto"];
+            mostrarPrecios: boolean;
+            mostrarDisponibilidad: boolean;
+            whatsapp: null | string;
+            categorias: components["schemas"]["CategoriaPublicaDto"][];
+        };
         TiendaSesionDto: {
             /** Format: uuid */
             id: string;
@@ -3224,6 +3496,13 @@ export interface components {
             id: string;
             color: null | string;
             talla: null | string;
+        };
+        VariantePublicaDto: {
+            /** Format: uuid */
+            id: string;
+            color: null | string;
+            talla: null | string;
+            disponible: null | boolean;
         };
         VarianteStockDto: {
             /** Format: uuid */

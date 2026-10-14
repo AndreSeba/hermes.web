@@ -10,6 +10,7 @@ import { SubirFoto } from '../../componentes/SubirFoto'
 import { useSesion, useSesionActiva } from '../../sesion/contexto'
 import { colorDeTexto } from '../../util/color'
 import { iniciales } from '../../util/texto'
+import { TiendaEnInternet } from './TiendaEnInternet'
 
 type Formulario = {
   nombre: string
@@ -237,17 +238,7 @@ export function MiTienda() {
         </button>
       </section>
 
-      <section className="tarjeta en-construccion">
-        <span className="icono-caja icono-caja-ambar" aria-hidden="true">
-          <Icono nombre="obras" tamano={22} />
-        </span>
-        <div>
-          <h2 className="titulo-seccion">Próximamente</h2>
-          <p className="texto-suave">
-            El enlace para compartir, el código QR y el diseño de tu tienda llegan con la tienda pública.
-          </p>
-        </div>
-      </section>
+      <TiendaEnInternet slug={servidor.slug} nombre={servidor.nombre} tieneWhatsapp={!!servidor.whatsapp} />
 
       <CambiarDireccion
         abierto={dialogo}
