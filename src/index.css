@@ -23,3 +23,10 @@ body {
   color: var(--color-acento);
   margin: 0;
 }
+
+.inicio .lema {
+  color: var(--color-acento);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
