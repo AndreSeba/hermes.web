@@ -20,6 +20,13 @@ export const secciones: Seccion[] = [
     modulo: 'M6',
   },
   {
+    ruta: '/gastos',
+    titulo: 'Gastos',
+    icono: 'gastos',
+    descripcion: 'Alquiler, luz, publicidad: lo que gastás en tu negocio.',
+    modulo: 'M9',
+  },
+  {
     ruta: '/instagram',
     titulo: 'Desde Instagram',
     icono: 'instagram',

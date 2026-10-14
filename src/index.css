@@ -1698,6 +1698,86 @@ label.boton {
   color: var(--acento);
 }
 
+/* Inicio y gastos */
+.accesos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fila-gasto {
+  cursor: default;
+}
+.medidor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.medidor-barra {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--apagado);
+  overflow: hidden;
+}
+.medidor-relleno {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ambar);
+  transition: width 0.3s ease;
+}
+.medidor-completo {
+  background: var(--acento);
+}
+.medidor-enlace {
+  align-self: flex-start;
+}
+.atencion-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 10px;
+}
+.atencion-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+.atencion-lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.recientes {
+  gap: 4px;
+}
+.reciente {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.reciente-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+.icono-caja-chica {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
 /* Calculadora de precio */
 .calculadora {
   display: flex;

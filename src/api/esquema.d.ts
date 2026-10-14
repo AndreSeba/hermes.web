@@ -996,6 +996,159 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gastos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Desde?: string;
+                    Hasta?: string;
+                    IncluirAnulados?: boolean;
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeGastosDto"];
+                        "application/json": components["schemas"]["PaginaDeGastosDto"];
+                        "text/json": components["schemas"]["PaginaDeGastosDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RegistrarGastoDto"];
+                    "text/json": components["schemas"]["RegistrarGastoDto"];
+                    "application/*+json": components["schemas"]["RegistrarGastoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoDto"];
+                        "application/json": components["schemas"]["GastoDto"];
+                        "text/json": components["schemas"]["GastoDto"];
+                    };
+                };
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoDto"];
+                        "application/json": components["schemas"]["GastoDto"];
+                        "text/json": components["schemas"]["GastoDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/{id}/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoDto"];
+                        "application/json": components["schemas"]["GastoDto"];
+                        "text/json": components["schemas"]["GastoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/imagenes": {
         parameters: {
             query?: never;
@@ -1091,6 +1244,46 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inicio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Desde?: string;
+                    Hasta?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["InicioDto"];
+                        "application/json": components["schemas"]["InicioDto"];
+                        "text/json": components["schemas"]["InicioDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2463,6 +2656,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ActividadDto: {
+            tipo: components["schemas"]["TipoActividad"];
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            fecha: string;
+            titulo: string;
+            /** Format: double */
+            monto: number;
+        };
         ActualizarCategoriaDto: {
             nombre: string;
             activa: boolean;
@@ -2590,6 +2793,18 @@ export interface components {
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
         EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
+        GastoDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            fecha: string;
+            concepto: string;
+            /** Format: double */
+            monto: number;
+            anulado: boolean;
+            /** Format: date-time */
+            anuladoEn: null | string;
+        };
         GuardarCosteoDto: {
             /** Format: double */
             material: number;
@@ -2649,6 +2864,34 @@ export interface components {
             costoUnitario?: null | number;
             nota?: null | string;
         };
+        InicioDto: {
+            /** Format: int32 */
+            ventas: number;
+            /** Format: int32 */
+            unidades: number;
+            /** Format: double */
+            totalVendido: number;
+            /** Format: double */
+            ganancia: number;
+            /** Format: int32 */
+            unidadesSinCosto: number;
+            /** Format: double */
+            gastos: number;
+            /** Format: int32 */
+            porcentajeCubierto: null | number;
+            /** Format: double */
+            resultado: number;
+            /** Format: double */
+            porPagar: number;
+            /** Format: int32 */
+            enCamino: number;
+            /** Format: int32 */
+            agotados: number;
+            /** Format: int32 */
+            porAgotarse: number;
+            paraReponer: components["schemas"]["ProductoParaReponerDto"][];
+            recientes: components["schemas"]["ActividadDto"][];
+        };
         LineaAjusteDto: {
             /** Format: uuid */
             varianteId: string;
@@ -2703,6 +2946,13 @@ export interface components {
             items: components["schemas"]["CompraResumenDto"][];
             /** Format: uuid */
             siguiente: null | string;
+        };
+        PaginaDeGastosDto: {
+            items: components["schemas"]["GastoDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+            /** Format: double */
+            total: number;
         };
         PaginaDeMovimientosDto: {
             items: components["schemas"]["MovimientoDto"][];
@@ -2771,6 +3021,14 @@ export interface components {
             controlaStock: boolean;
             /** Format: int32 */
             stockMinimo: number;
+        };
+        ProductoParaReponerDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            estado: components["schemas"]["EstadoStock"];
+            /** Format: int32 */
+            stock: number;
         };
         ProductoResumenDto: {
             /** Format: uuid */
@@ -2856,6 +3114,15 @@ export interface components {
             /** @default false */
             pagada: boolean;
         };
+        RegistrarGastoDto: {
+            /** Format: uuid */
+            claveIdempotencia: string;
+            concepto: string;
+            /** Format: double */
+            monto: number;
+            /** Format: date-time */
+            fecha?: null | string;
+        };
         RegistrarVentaDto: {
             /** Format: uuid */
             claveIdempotencia: string;
@@ -2933,6 +3200,8 @@ export interface components {
             nombre: string;
             slug: string;
         };
+        /** @enum {unknown} */
+        TipoActividad: "Venta" | "Compra" | "Gasto";
         /** @enum {unknown} */
         TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion" | "Reversion";
         UltimoPrecioDto: {

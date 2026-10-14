@@ -13,6 +13,7 @@ import { Campo } from '../../componentes/Campo'
 import { Contador } from '../../componentes/Contador'
 import { Icono } from '../../componentes/Icono'
 import { bs, soloEnteros } from '../../util/dinero'
+import { rangoDelMes } from '../../util/periodo'
 import { etiquetaDeVariante } from '../stock/historial'
 import { MAXIMO_POR_LINEA, metodosDePago, nombreDePago } from './pagos'
 
@@ -52,6 +53,8 @@ export function NuevaVenta() {
   const [enviando, setEnviando] = useState(false)
   const [errorVenta, setErrorVenta] = useState<string | null>(null)
   const [hecha, setHecha] = useState<Venta | null>(null)
+  // "Este mes ya cubriste el X % de tus gastos": se pide después de vender, para que cuente esta venta.
+  const [cubierto, setCubierto] = useState<number | null>(null)
   const clave = useRef(crypto.randomUUID())
 
   useEffect(() => {
@@ -137,6 +140,10 @@ export function NuevaVenta() {
       }
       clave.current = crypto.randomUUID()
       setHecha(data)
+      api
+        .GET('/api/v1/inicio', { params: { query: rangoDelMes() } })
+        .then(({ data: inicio }) => setCubierto(inicio?.porcentajeCubierto ?? null))
+        .catch(() => undefined)
     } catch {
       // Sin señal: la clave se conserva, así que tocar de nuevo reintenta la MISMA venta.
       setErrorVenta(mensajeDeError(null))
@@ -147,6 +154,7 @@ export function NuevaVenta() {
 
   function otra() {
     setHecha(null)
+    setCubierto(null)
     setLineas({})
     setCliente('')
     setConCliente(false)
@@ -169,6 +177,11 @@ export function NuevaVenta() {
             {hecha.cliente ? ` · ${hecha.cliente}` : ''}
           </p>
           {hecha.ganancia !== null && <p className="texto-ok">Ganaste {bs(hecha.ganancia)}</p>}
+          {cubierto !== null && (
+            <p className="texto-suave texto-chico" role="status">
+              {cubierto >= 100 ? `Este mes ya cubriste tus gastos (${cubierto} %).` : `Este mes ya cubriste el ${cubierto} % de tus gastos.`}
+            </p>
+          )}
           <div className="venta-lista-acciones">
             <button type="button" className="boton boton-primario boton-grande" onClick={otra}>
               Registrar otra venta
