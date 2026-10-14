@@ -83,6 +83,8 @@ const helpers = `
   window.__fila = (nombre) => [...document.querySelectorAll('.fila-stock')].find(li => li.querySelector('.fila-stock-nombre').textContent === nombre);
   window.__botonEn = (raiz, txt) => [...raiz.querySelectorAll('button')].find(b => b.textContent.trim().startsWith(txt));
   window.__estado = (url) => fetch(url, { cache: 'reload' }).then(r => r.status);
+  window.__vender = (nombre) => [...document.querySelectorAll('.fila-vender')].find(li => li.querySelector('.fila-stock-nombre').textContent === nombre);
+  window.__ventas = () => [...document.querySelectorAll('.fila-venta')];
   window.__clic = (txt) => { const el = [...document.querySelectorAll('a,button')].find(x => x.textContent.trim().startsWith(txt) || x.getAttribute('aria-label') === txt); el.click(); return !!el };
 `
 await cdp('Page.enable')
@@ -152,7 +154,11 @@ try {
   await captura('m4-01-catalogo-vacio-celular.png')
   await evaluar(`__clic('Nueva venta')`)
   await esperar(`location.pathname === '/venta'`, 'botón central → Nueva venta')
-  ok('Nueva venta (M6) todavía muestra "en construcción"', (await texto()).includes('Estamos construyendo esta sección'))
+  await esperar(`document.querySelector('h1')?.textContent === 'Nueva venta'`, 'Nueva venta carga su pantalla')
+  ok('Nueva venta ya no está "en construcción"', !(await texto()).includes('Estamos construyendo esta sección'))
+  await evaluar(`__clic('Ventas')`)
+  await esperar(`location.pathname === '/ventas'`, 'Ventas desde el menú')
+  await esperar(`document.body.innerText.includes('Hoy todavía no vendiste')`, 'una tienda nueva no vendió nada hoy')
 
   // 8. Escritorio
   await escritorio()
@@ -329,6 +335,7 @@ try {
   await evaluar(`[...document.querySelectorAll('.tarjeta-producto')].find(a => a.innerText.includes('Cartera')).click()`)
   await esperar(`/^\\/catalogo\\/[0-9a-f-]{36}$/.test(location.pathname) && __campo('Nombre')?.value === 'Cartera de cuero Mía'`, 'abre el producto para editar')
   const rutaProducto = await evaluar(`location.pathname`)
+  await esperar(`__campo('Categoría')?.selectedOptions[0]?.textContent === 'Carteras'`, 'la categoría del producto llega (se pide aparte)')
   ok('el formulario trae lo guardado', await evaluar(`__campo('Precio').value === '180' && __campo('Tu costo').value === '110' && __campo('Colores (separados por coma)').value === 'café, Negro' && __campo('Tallas (separadas por coma)').value === 'S, M' && __campo('Descripción').value === 'Hecha a mano en Cochabamba.' && __campo('Categoría').selectedOptions[0].textContent === 'Carteras'`))
   ok('trae sus dos fotos en el orden guardado (B primera)', (await evaluar(`document.querySelectorAll('.galeria-foto img')[0].getAttribute('src')`)) === fotoB && (await evaluar(`document.querySelectorAll('.galeria-foto img').length`)) === 2)
   ok('Guardar está desactivado sin cambios', await evaluar(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Guardar cambios').disabled`))
@@ -511,6 +518,126 @@ try {
   await ir('/stock')
   await esperar(`__filas().length === 24`, 'Stock en escritorio')
   await captura('m5-04-stock-escritorio.png')
+
+  // 8e. M6 · Ventas: venta rápida, tope por stock, ganancia, anular, historial e idempotencia
+  await celular()
+  await ir('/venta')
+  await esperar(`document.querySelectorAll('.fila-vender').length === 20`, 'Nueva venta lista 20 productos')
+  const primeros = await evaluar(`[...document.querySelectorAll('.fila-vender')].slice(0, 3).map(li => li.querySelector('.fila-stock-nombre').textContent).join(' | ')`)
+  // Dentro de lo vendible, lo último que cargaste va primero (como el catálogo).
+  ok(`primero lo vendible (bolso y collar) y después los agotados (${primeros})`, primeros.startsWith('Bolso por encargo | Collar Salar turquesa | '))
+  ok('los agotados no tienen contador', await evaluar(`(() => { const a = [...document.querySelectorAll('.fila-vender-agotada')]; return a.length === 18 && a.every(li => !li.querySelector('.contador') && li.innerText.includes('Agotado')) })()`))
+  ok('el collar muestra sus variantes con lo que queda', await evaluar(`(() => { const t = __vender('Collar Salar turquesa').innerText; return t.includes('azul') && t.includes('Quedan 1') && t.includes('verde') && t.includes('Quedan 2') })()`))
+  ok('el botón de registrar está desactivado sin productos', await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'Registrar venta').disabled`))
+  await captura('m6-01-nueva-venta-celular.png')
+
+  await evaluar(`__poner(document.querySelector('[aria-label="Cantidad de Collar Salar turquesa (azul)"]'), '1')`)
+  await evaluar(`__poner(document.querySelector('[aria-label="Cantidad de Collar Salar turquesa (verde)"]'), '5')`)
+  await esperar(`document.querySelector('.pie-venta-monto').textContent === 'Bs 360'`, 'el total suma 3 collares')
+  ok('no deja vender más de lo que queda (5 → 2)', (await evaluar(`document.querySelector('[aria-label="Cantidad de Collar Salar turquesa (verde)"]').value`)) === '2')
+  ok('muestra cuánto se gana (3 × 64,50)', (await evaluar(`document.querySelector('.pie-venta').innerText`)).includes('Ganás Bs 193,50'))
+  await evaluar(`__vender('Bolso por encargo').querySelector('[aria-label="Uno más"]').click()`)
+  await esperar(`document.querySelector('.pie-venta-monto').textContent === 'Bs 580'`, 'con el bolso el total es 580')
+  ok('con un producto sin costo no se inventa la ganancia', !(await evaluar(`document.querySelector('.pie-venta').innerText`)).includes('Ganás'))
+  await evaluar(`__poner(document.querySelector('[aria-label="Cantidad de Bolso por encargo"]'), '0')`)
+  await esperar(`document.querySelector('.pie-venta-monto').textContent === 'Bs 360' && document.querySelector('.pie-venta').innerText.includes('Ganás Bs 193,50')`, 'sacar el bolso vuelve a mostrar la ganancia')
+
+  await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'QR').click()`)
+  ok('el chip QR queda marcado', await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'QR').getAttribute('aria-pressed') === 'true' && __botonEn(document.querySelector('.pie-venta'), 'Efectivo').getAttribute('aria-pressed') === 'false'`))
+  ok('el cliente no estorba: arranca escondido tras "Agregar cliente"', await evaluar(`!__campo('Cliente (opcional)') && !!__botonEn(document.querySelector('.pie-venta'), '+ Agregar cliente')`))
+  await evaluar(`__botonEn(document.querySelector('.pie-venta'), '+ Agregar cliente').click()`)
+  await esperar(`!!__campo('Cliente (opcional)')`, 'aparece el campo de cliente')
+  await evaluar(`__escribir('Cliente (opcional)', 'Doña Rosa')`)
+  await captura('m6-02-venta-armada-celular.png')
+  await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'Registrar venta').click()`)
+  await esperar(`document.body.innerText.includes('¡Venta registrada!')`, 'la venta se registra')
+  ok('la pantalla de éxito resume la venta', await evaluar(`(() => { const t = document.querySelector('.venta-lista').innerText; return t.includes('Bs 360') && t.includes('3 unidades') && t.includes('QR') && t.includes('Doña Rosa') && t.includes('Ganaste Bs 193,50') })()`))
+  ok('ofrece registrar otra, ver las ventas y volver al inicio', await evaluar(`(() => { const t = document.querySelector('.venta-lista').innerText; return t.includes('Registrar otra venta') && t.includes('Ver mis ventas') && t.includes('Volver al inicio') })()`))
+  ok('recuerda el último método de pago', (await evaluar(`localStorage.getItem('venta.pago')`)) === 'Qr')
+  await captura('m6-03-venta-registrada-celular.png')
+
+  await evaluar(`__clic('Registrar otra venta')`)
+  // La lista vieja se ve hasta que llega la nueva: se espera a que el collar figure agotado.
+  await esperar(`document.querySelector('h1')?.textContent === 'Nueva venta' && !!__vender('Collar Salar turquesa')?.innerText.includes('Agotado')`, 'otra venta vuelve a la lista con el stock al día')
+  const primero = await evaluar(`document.querySelector('.fila-vender .fila-stock-nombre').textContent`)
+  ok(`el bolso quedó primero (${primero})`, primero === 'Bolso por encargo')
+  ok('y el collar quedó agotado, sin contador', await evaluar(`__vender('Collar Salar turquesa').innerText.includes('Agotado') && !__vender('Collar Salar turquesa').querySelector('.contador')`))
+  ok('arranca vacía: sin cliente ni total', await evaluar(`document.querySelector('.pie-venta-monto').textContent === 'Bs 0' && !__campo('Cliente (opcional)')`))
+
+  // Segunda venta: bolso × 2 en efectivo, sin cliente
+  await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'Efectivo').click()`)
+  await evaluar(`__poner(document.querySelector('[aria-label="Cantidad de Bolso por encargo"]'), '2')`)
+  await esperar(`document.querySelector('.pie-venta-monto').textContent === 'Bs 440'`, 'dos bolsos: 440')
+  await evaluar(`__botonEn(document.querySelector('.pie-venta'), 'Registrar venta').click()`)
+  await esperar(`document.body.innerText.includes('¡Venta registrada!')`, 'segunda venta registrada')
+  ok('sin costo no dice cuánto ganaste', !(await evaluar(`document.querySelector('.venta-lista').innerText`)).includes('Ganaste'))
+  await evaluar(`__clic('Ver mis ventas')`)
+  await esperar(`location.pathname === '/ventas' && __ventas().length === 2`, 'Ventas lista las dos')
+
+  // Historial del día
+  const resumenVentas = await evaluar(`document.querySelector('.resumen-stock').innerText`)
+  ok('el resumen suma Bs 800, 2 ventas y 5 unidades', resumenVentas.includes('Bs 800') && resumenVentas.includes('2 ventas') && resumenVentas.includes('5 unidades'))
+  ok('la ganancia solo cuenta lo que tiene costo y avisa lo que falta', resumenVentas.includes('Ganaste Bs 193,50') && resumenVentas.includes('2 unidades sin costo cargado'))
+  ok('la más nueva va primero, con su método de pago', await evaluar(`__ventas()[0].innerText.includes('Bolso por encargo') && __ventas()[0].innerText.includes('Efectivo') && __ventas()[1].innerText.includes('QR') && __ventas()[1].innerText.includes('Doña Rosa')`))
+  await captura('m6-04-ventas-celular.png')
+  await evaluar(`__ventas()[1].querySelector('.fila-stock-cabecera').click()`)
+  await esperar(`__ventas()[1].innerText.includes('Anular venta')`, 'se abre el detalle de la venta del collar')
+  ok('el detalle lista las líneas con su variante y la ganancia', await evaluar(`(() => { const t = __ventas()[1].innerText; return t.includes('1 × Collar Salar turquesa (azul)') && t.includes('2 × Collar Salar turquesa (verde)') && t.includes('Ganaste Bs 193,50') })()`))
+
+  // Anular: confirmar, arrepentirse y anular de verdad
+  await evaluar(`__botonEn(__ventas()[1], 'Anular venta').click()`)
+  await esperar(`!!document.querySelector('dialog[open]') && document.querySelector('dialog[open]').innerText.includes('¿Anular esta venta?')`, 'pide confirmar la anulación')
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'No, dejarla').click()`)
+  await esperar(`!document.querySelector('dialog[open]')`, 'arrepentirse cierra el diálogo')
+  ok('al arrepentirse la venta sigue vigente', await evaluar(`__ventas().length === 2 && !__ventas()[1].classList.contains('fila-venta-anulada')`))
+  await dormir(400)
+  await evaluar(`__botonEn(__ventas()[1], 'Anular venta').click()`)
+  await esperar(`!!document.querySelector('dialog[open]')`, 'se vuelve a pedir confirmar')
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Sí, anular').click()`)
+  await esperar(`!document.querySelector('dialog[open]') && document.body.innerText.includes('Venta anulada.')`, 'la venta se anula y avisa')
+  await esperar(`__ventas().length === 1 && document.querySelector('.resumen-stock').innerText.includes('Bs 440')`, 'la anulada sale de la lista y del resumen')
+  ok('el resumen ya no cuenta la anulada', await evaluar(`document.querySelector('.resumen-stock').innerText.includes('1 venta') && !document.querySelector('.resumen-stock').innerText.includes('Ganaste Bs 193')`))
+  await evaluar(`__botonEn(document.querySelector('.chips'), 'Mostrar anuladas').click()`)
+  await esperar(`__ventas().length === 2`, '"Mostrar anuladas" trae la anulada')
+  ok('la anulada se ve marcada', await evaluar(`__ventas()[1].classList.contains('fila-venta-anulada') && __ventas()[1].innerText.includes('Anulada') && location.search.includes('anuladas=1')`))
+  await evaluar(`__clic('Semana')`)
+  await esperar(`location.search.includes('periodo=semana')`, 'el período vive en la dirección')
+  await esperar(`__ventas().length === 2`, 'la semana incluye las ventas de hoy')
+
+  // El stock volvió al anular
+  await ir('/stock?q=collar')
+  await esperar(`__filas().length === 1`, 'collar en Stock tras anular')
+  ok('el collar volvió a 3 ("Por agotarse")', await evaluar(`(() => { const f = __fila('Collar Salar turquesa'); return f.querySelector('.fila-stock-total').textContent === '3' && f.innerText.includes('Por agotarse') })()`))
+  await evaluar(`__fila('Collar Salar turquesa').querySelector('.fila-stock-cabecera').click()`)
+  await esperar(`__fila('Collar Salar turquesa').innerText.includes('Devolvieron')`, 'el historial del collar muestra la devolución')
+  ok('y el historial muestra la venta y la devolución', await evaluar(`(() => { const t = __fila('Collar Salar turquesa').innerText; return t.includes('Vendiste') && t.includes('Devolvieron') })()`))
+
+  // Por la API: el reintento con la misma clave no duplica y sin stock suficiente se rechaza con un mensaje claro
+  const reintento = await evaluar(`(async () => {
+    const m = await import('/src/api/cliente.ts');
+    const bolso = (await m.api.GET('/api/v1/ventas/productos', { params: { query: { Buscar: 'bolso' } } })).data.items[0];
+    const body = { claveIdempotencia: crypto.randomUUID(), lineas: [{ varianteId: bolso.variantes[0].id, cantidad: 1 }], metodoPago: 'Efectivo' };
+    const a = await m.api.POST('/api/v1/ventas', { body });
+    const b = await m.api.POST('/api/v1/ventas', { body });
+    return [a.response.status, b.response.status, a.data.id === b.data.id];
+  })()`)
+  ok(`reintentar la misma venta devuelve la misma (${reintento})`, reintento.join() === '201,200,true')
+  const sinStock = await evaluar(`(async () => {
+    const m = await import('/src/api/cliente.ts');
+    const collar = (await m.api.GET('/api/v1/ventas/productos', { params: { query: { Buscar: 'collar' } } })).data.items[0];
+    const verde = collar.variantes.find(v => v.color === 'verde');
+    const r = await m.api.POST('/api/v1/ventas', { body: { claveIdempotencia: crypto.randomUUID(), lineas: [{ varianteId: verde.id, cantidad: 9 }], metodoPago: 'Efectivo' } });
+    return [r.response.status, r.error?.detail ?? ''];
+  })()`)
+  ok(`vender más de lo que hay responde 409 con el motivo (${sinStock[1]})`, sinStock[0] === 409 && sinStock[1].includes('se necesitan 9'))
+
+  await escritorio()
+  await ir('/ventas')
+  await esperar(`__ventas().length >= 1`, 'Ventas en escritorio')
+  await captura('m6-05-ventas-escritorio.png')
+  await ir('/venta')
+  await esperar(`document.querySelectorAll('.fila-vender').length === 20`, 'Nueva venta en escritorio')
+  await captura('m6-06-nueva-venta-escritorio.png')
 
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()

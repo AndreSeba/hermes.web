@@ -50,6 +50,17 @@ export function Inicio() {
         </p>
       </section>
 
+      <Link to="/ventas" className="tarjeta paso">
+        <span className="icono-caja" aria-hidden="true">
+          <Icono nombre="ventas" />
+        </span>
+        <span className="paso-texto">
+          <strong>Mis ventas</strong>
+          <span className="texto-suave">Lo que vendiste hoy, esta semana y este mes.</span>
+        </span>
+        <Icono nombre="chevron" />
+      </Link>
+
       <ol className="lista-pasos">
         {primerosPasos.map((p) => (
           <li key={p.ruta}>

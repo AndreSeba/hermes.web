@@ -1588,6 +1588,146 @@ label.boton {
   border-radius: 14px;
 }
 
+/* Nueva venta */
+.lista-vender,
+.lista-ventas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fila-vender,
+.fila-venta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+.fila-vender-agotada {
+  opacity: 0.6;
+}
+.fila-vender-cabecera {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fila-vender-cabecera .fila-stock-datos {
+  flex: 1 1 140px;
+}
+.variantes-vender {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--borde-suave);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.variante-vender {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+/* El cobro queda a la vista mientras se eligen productos; en el celular, justo encima de la barra inferior */
+.pie-venta {
+  position: sticky;
+  bottom: calc(78px + env(safe-area-inset-bottom) + 8px);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 18px;
+  box-shadow: 0 -6px 20px rgba(23, 24, 28, 0.08);
+}
+.pie-venta-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pie-venta-total > div {
+  display: flex;
+  flex-direction: column;
+}
+.pie-venta-total > div {
+  flex-shrink: 0;
+}
+.pie-venta-total .boton {
+  flex: 1;
+}
+.pie-venta-agregar {
+  align-self: flex-start;
+}
+.pie-venta-monto {
+  font-family: var(--fuente-titulo);
+  font-size: 24px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.venta-lista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.venta-lista-total {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 34px;
+}
+.venta-lista-acciones {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.icono-ok {
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+
+/* Ventas */
+.fila-venta-anulada {
+  opacity: 0.65;
+}
+.fila-venta-anulada .fila-venta-total strong {
+  text-decoration: line-through;
+}
+.fila-venta-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-family: var(--fuente-titulo);
+  font-size: 16px;
+}
+.lineas-venta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lineas-venta li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
 /* En el celular los diálogos de "hoja" suben desde abajo, a todo el ancho */
 @media (max-width: 899px) {
   .dialogo-hoja {
@@ -1601,6 +1741,13 @@ label.boton {
 }
 
 @media (min-width: 900px) {
+  .pie-venta {
+    bottom: 12px;
+  }
+  .venta-lista-acciones {
+    flex-direction: row;
+    justify-content: center;
+  }
   .lista-stock {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

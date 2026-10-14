@@ -13,6 +13,13 @@ export type Seccion = {
 export const secciones: Seccion[] = [
   { ruta: '/', titulo: 'Inicio', icono: 'inicio', descripcion: 'Cómo va tu negocio.' },
   {
+    ruta: '/ventas',
+    titulo: 'Ventas',
+    icono: 'ventas',
+    descripcion: 'Lo que vendiste hoy, esta semana y este mes.',
+    modulo: 'M6',
+  },
+  {
     ruta: '/instagram',
     titulo: 'Desde Instagram',
     icono: 'instagram',
