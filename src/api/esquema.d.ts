@@ -1289,6 +1289,333 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/instagram/leer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LeerTextoDto"];
+                    "text/json": components["schemas"]["LeerTextoDto"];
+                    "application/*+json": components["schemas"]["LeerTextoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["LecturaDto"];
+                        "application/json": components["schemas"]["LecturaDto"];
+                        "text/json": components["schemas"]["LecturaDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/importar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LeerTextoDto"];
+                    "text/json": components["schemas"]["LeerTextoDto"];
+                    "application/*+json": components["schemas"]["LeerTextoDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BorradorDto"][];
+                        "application/json": components["schemas"]["BorradorDto"][];
+                        "text/json": components["schemas"]["BorradorDto"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/borradores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Estado?: components["schemas"]["EstadoBorrador"];
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeBorradoresDto"];
+                        "application/json": components["schemas"]["PaginaDeBorradoresDto"];
+                        "text/json": components["schemas"]["PaginaDeBorradoresDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/borradores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BorradorDto"];
+                        "application/json": components["schemas"]["BorradorDto"];
+                        "text/json": components["schemas"]["BorradorDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/borradores/{id}/publicar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PublicarBorradorDto"];
+                    "text/json": components["schemas"]["PublicarBorradorDto"];
+                    "application/*+json": components["schemas"]["PublicarBorradorDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PublicacionDto"];
+                        "application/json": components["schemas"]["PublicacionDto"];
+                        "text/json": components["schemas"]["PublicacionDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/borradores/{id}/descartar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BorradorDto"];
+                        "application/json": components["schemas"]["BorradorDto"];
+                        "text/json": components["schemas"]["BorradorDto"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/productos": {
         parameters: {
             query?: never;
@@ -2914,6 +3241,30 @@ export interface components {
             costo: number;
             estado: components["schemas"]["EstadoPrecio"];
         };
+        BorradorDto: {
+            /** Format: uuid */
+            id: string;
+            estado: components["schemas"]["EstadoBorrador"];
+            origen: string;
+            texto: string;
+            nombre: string;
+            /** Format: double */
+            precio: null | number;
+            /** Format: double */
+            precioAnterior: null | number;
+            colores: string[];
+            tallas: string[];
+            /** Format: int32 */
+            stock: null | number;
+            categoria: null | string;
+            descripcion: null | string;
+            avisos: string[];
+            faltan: string[];
+            /** Format: uuid */
+            productoId: null | string;
+            /** Format: date-time */
+            creadoEn: string;
+        };
         CambiarDireccionDto: {
             slug: string;
         };
@@ -3019,6 +3370,8 @@ export interface components {
         CrearCategoriaDto: {
             nombre: string;
         };
+        /** @enum {unknown} */
+        EstadoBorrador: "Pendiente" | "Publicado" | "Descartado";
         /** @enum {unknown} */
         EstadoCompra: "EnCamino" | "Recibida" | "Anulada";
         /** @enum {unknown} */
@@ -3126,6 +3479,13 @@ export interface components {
             paraReponer: components["schemas"]["ProductoParaReponerDto"][];
             recientes: components["schemas"]["ActividadDto"][];
         };
+        LecturaDto: {
+            productos: components["schemas"]["ProductoLeidoDto"][];
+            hashtags: string[];
+        };
+        LeerTextoDto: {
+            texto: string;
+        };
         LineaAjusteDto: {
             /** Format: uuid */
             varianteId: string;
@@ -3175,6 +3535,13 @@ export interface components {
             costoUnitario: null | number;
             /** Format: date-time */
             fecha: string;
+        };
+        PaginaDeBorradoresDto: {
+            items: components["schemas"]["BorradorDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+            /** Format: int32 */
+            pendientes: number;
         };
         PaginaDeComprasDto: {
             items: components["schemas"]["CompraResumenDto"][];
@@ -3259,6 +3626,21 @@ export interface components {
             controlaStock: boolean;
             /** Format: int32 */
             stockMinimo: number;
+        };
+        ProductoLeidoDto: {
+            nombre: null | string;
+            /** Format: double */
+            precio: null | number;
+            /** Format: double */
+            precioAnterior: null | number;
+            colores: string[];
+            tallas: string[];
+            /** Format: int32 */
+            stock: null | number;
+            categoria: null | string;
+            descripcion: null | string;
+            avisos: string[];
+            faltan: string[];
         };
         ProductoParaReponerDto: {
             /** Format: uuid */
@@ -3361,6 +3743,16 @@ export interface components {
             enCamino: number;
             /** Format: int32 */
             compras: number;
+        };
+        PublicacionDto: {
+            producto: components["schemas"]["ProductoDto"];
+            stockCargado: boolean;
+            avisoStock: null | string;
+        };
+        PublicarBorradorDto: {
+            producto: components["schemas"]["GuardarProductoDto"];
+            /** Format: int32 */
+            stock?: null | number;
         };
         RegistrarCompraDto: {
             /** Format: uuid */

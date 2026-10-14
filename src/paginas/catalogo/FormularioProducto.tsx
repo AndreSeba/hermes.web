@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { api, mensajeDeError, type Categoria, type ImagenSubida, type Producto } from '../../api/cliente'
+import { api, mensajeDeError, type Borrador, type Categoria, type ImagenSubida, type Producto } from '../../api/cliente'
 import { AreaTexto } from '../../componentes/AreaTexto'
 import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
@@ -56,10 +56,27 @@ const borrarFoto = (id: string) => void api.DELETE('/api/v1/imagenes/{id}', { pa
 
 // Crear y editar un producto: la misma pantalla. Sin `inicial` es un producto nuevo.
 // `costoBloqueado`: el producto tiene costeo, así que su costo es el total de la calculadora (no se escribe acá).
-export function FormularioProducto({ inicial, costoBloqueado = false }: { inicial?: Producto; costoBloqueado?: boolean }) {
+// `borrador`: es la revisión de un producto leído de una publicación de Instagram. El formulario arranca con lo que se
+// entendió, y al guardar se publica DESDE la bandeja (el borrador queda publicado) en vez de crear un producto suelto.
+// `alPublicar`: avisa a la pantalla de revisión para que saque lo suyo (el texto original, "Descartar").
+type PropsFormulario = { inicial?: Producto; costoBloqueado?: boolean; borrador?: Borrador; alPublicar?: () => void }
+
+const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+
+const desdeBorrador = (b: Borrador): Estado => ({
+  ...vacio,
+  nombre: b.nombre,
+  descripcion: b.descripcion ?? '',
+  precio: b.precio ? String(b.precio) : '',
+  colores: b.colores.join(', '),
+  tallas: b.tallas.join(', '),
+})
+
+export function FormularioProducto({ inicial, costoBloqueado = false, borrador, alPublicar }: PropsFormulario) {
   const [servidor, setServidor] = useState<Producto | null>(inicial ?? null)
-  const [form, setForm] = useState<Estado>(inicial ? desdeProducto(inicial) : vacio)
+  const [form, setForm] = useState<Estado>(inicial ? desdeProducto(inicial) : borrador ? desdeBorrador(borrador) : vacio)
   const [creado, setCreado] = useState<Producto | null>(null)
+  const [avisoStock, setAvisoStock] = useState<{ cargado: boolean; aviso: string | null } | null>(null)
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [nuevaCategoria, setNuevaCategoria] = useState<string | null>(null) // null = no se está creando una
   const [errorCategoria, setErrorCategoria] = useState<string | null>(null)
@@ -75,15 +92,20 @@ export function FormularioProducto({ inicial, costoBloqueado = false }: { inicia
     setForm((f) => ({ ...f, ...parte }))
   }
 
+  const categoriaSugerida = borrador?.categoria ?? null
   useEffect(() => {
     let cancelado = false
     api.GET('/api/v1/categorias', { params: { query: {} } }).then(({ data }) => {
-      if (!cancelado && data) setCategorias(data)
+      if (cancelado || !data) return
+      setCategorias(data)
+      // Desde Instagram: si el hashtag coincide con una categoría que ya tenés (sin importar tildes ni mayúsculas), la elige.
+      const sugerida = categoriaSugerida ? data.find((c) => sinTildes(c.nombre) === sinTildes(categoriaSugerida)) : undefined
+      if (sugerida) setForm((f) => (f.categoriaId ? f : { ...f, categoriaId: sugerida.id }))
     })
     return () => {
       cancelado = true
     }
-  }, [])
+  }, [categoriaSugerida])
 
   // Fotos subidas que todavía no se guardaron con el producto: si se sacan, se descartan o se sale de la
   // pantalla, se borran del servidor para no dejar fotos huérfanas (cerrar la pestaña sí deja alguna:
@@ -142,6 +164,20 @@ export function FormularioProducto({ inicial, costoBloqueado = false }: { inicia
         fotoIds: form.fotos.map((f) => f.id),
         controlaStock: form.controlaStock,
         stockMinimo: minimo ?? 3, // apagado el control, el campo no cuenta: se manda el valor por defecto
+      }
+      // Desde la bandeja: se publica el borrador (una sola vez, el servidor lo reserva) y se manda lo de "Quedan N".
+      if (borrador && !servidor) {
+        const r = await api.POST('/api/v1/instagram/borradores/{id}/publicar', {
+          params: { path: { id: borrador.id } },
+          body: { producto: body, stock: borrador.stock },
+        })
+        if (!r.data) return setError(mensajeDeError(r.error, r.response))
+        setServidor(r.data.producto)
+        setForm(desdeProducto(r.data.producto))
+        setCreado(r.data.producto)
+        setAvisoStock({ cargado: r.data.stockCargado, aviso: r.data.avisoStock })
+        alPublicar?.()
+        return
       }
       const { data, error, response } = servidor
         ? await api.PUT('/api/v1/productos/{id}', { params: { path: { id: servidor.id } }, body })
@@ -213,18 +249,27 @@ export function FormularioProducto({ inicial, costoBloqueado = false }: { inicia
           </span>
           <h1 className="titulo-pagina">¡Guardado!</h1>
           <p className="texto-suave">{creado.nombre} ya está en tu catálogo.</p>
+          {avisoStock?.cargado && <p className="texto-ok">Cargamos las unidades que decía la publicación.</p>}
+          {avisoStock?.aviso && <Aviso tipo="advertencia">{avisoStock.aviso}</Aviso>}
           <div className="exito-acciones">
-            {creado.controlaStock && (
+            {borrador && (
+              <Link to="/instagram" className="boton boton-primario boton-grande">
+                Seguir con la bandeja
+              </Link>
+            )}
+            {creado.controlaStock && !avisoStock?.cargado && (
               <Link to={`/stock?llegaron=${creado.id}`} className="boton boton-primario boton-grande">
                 Cargar cuántas tenés
               </Link>
             )}
-            <Link to="/catalogo" className={`boton boton-grande ${creado.controlaStock ? 'boton-secundario' : 'boton-primario'}`}>
+            <Link to="/catalogo" className={`boton boton-grande ${creado.controlaStock || borrador ? 'boton-secundario' : 'boton-primario'}`}>
               Ver mi catálogo
             </Link>
-            <button type="button" className="boton boton-texto" onClick={otroProducto}>
-              Cargar otro producto
-            </button>
+            {!borrador && (
+              <button type="button" className="boton boton-texto" onClick={otroProducto}>
+                Cargar otro producto
+              </button>
+            )}
           </div>
         </section>
       </div>
@@ -235,10 +280,10 @@ export function FormularioProducto({ inicial, costoBloqueado = false }: { inicia
   return (
     <form className="pagina pagina-angosta" onSubmit={guardar} noValidate>
       <header className="cabecera-formulario">
-        <Link to="/catalogo" className="boton-icono" aria-label="Volver al catálogo">
+        <Link to={borrador ? '/instagram' : '/catalogo'} className="boton-icono" aria-label={borrador ? 'Volver a la bandeja' : 'Volver al catálogo'}>
           <Icono nombre="atras" tamano={22} />
         </Link>
-        <h1 className="titulo-pagina titulo-chico">{esNuevo ? 'Nuevo producto' : 'Editar producto'}</h1>
+        <h1 className="titulo-pagina titulo-chico">{borrador ? 'Revisar producto' : esNuevo ? 'Nuevo producto' : 'Editar producto'}</h1>
       </header>
 
       {servidor?.archivado && (

@@ -1698,6 +1698,61 @@ label.boton {
   color: var(--acento);
 }
 
+/* Desde Instagram */
+.lector,
+.bandeja {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.guia-formato {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  padding: 10px 14px;
+  background: var(--apagado);
+  font-size: 14px;
+}
+.guia-formato summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.guia-formato ul {
+  margin: 8px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.texto-original {
+  margin: 8px 0 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.panel-borrador {
+  padding-bottom: 0;
+}
+.entendido dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.entendido-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.entendido-fila dt {
+  color: var(--texto-suave);
+}
+.entendido-fila dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
 /* Tu tienda en internet */
 .tienda-internet {
   display: flex;
