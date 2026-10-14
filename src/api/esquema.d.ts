@@ -836,6 +836,340 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Buscar?: string;
+                    Vista?: components["schemas"]["VistaStock"];
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeStockDto"];
+                        "application/json": components["schemas"]["PaginaDeStockDto"];
+                        "text/json": components["schemas"]["PaginaDeStockDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResumenStockDto"];
+                        "application/json": components["schemas"]["ResumenStockDto"];
+                        "text/json": components["schemas"]["ResumenStockDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock/{productoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoStockDto"];
+                        "application/json": components["schemas"]["ProductoStockDto"];
+                        "text/json": components["schemas"]["ProductoStockDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock/{productoId}/movimientos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path: {
+                    productoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeMovimientosDto"];
+                        "application/json": components["schemas"]["PaginaDeMovimientosDto"];
+                        "text/json": components["schemas"]["PaginaDeMovimientosDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock/ingresos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["IngresoDto"];
+                    "text/json": components["schemas"]["IngresoDto"];
+                    "application/*+json": components["schemas"]["IngresoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoStockDto"];
+                        "application/json": components["schemas"]["ProductoStockDto"];
+                        "text/json": components["schemas"]["ProductoStockDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock/ajustes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AjusteDto"];
+                    "text/json": components["schemas"]["AjusteDto"];
+                    "application/*+json": components["schemas"]["AjusteDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductoStockDto"];
+                        "application/json": components["schemas"]["ProductoStockDto"];
+                        "text/json": components["schemas"]["ProductoStockDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tienda": {
         parameters: {
             query?: never;
@@ -1003,6 +1337,12 @@ export interface components {
             /** Format: uuid */
             logoImagenId: null | string;
         };
+        AjusteDto: {
+            /** Format: uuid */
+            productoId: string;
+            lineas: components["schemas"]["LineaAjusteDto"][];
+            motivo?: null | string;
+        };
         CambiarDireccionDto: {
             slug: string;
         };
@@ -1017,6 +1357,8 @@ export interface components {
         };
         /** @enum {unknown} */
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
+        /** @enum {unknown} */
+        EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
         GuardarProductoDto: {
             nombre: string;
             descripcion: null | string;
@@ -1030,6 +1372,13 @@ export interface components {
             colores: null | string[];
             tallas: null | string[];
             fotoIds: null | string[];
+            /** @default true */
+            controlaStock: boolean;
+            /**
+             * Format: int32
+             * @default 3
+             */
+            stockMinimo: number;
         };
         /** Format: binary */
         IFormFile: string;
@@ -1044,13 +1393,60 @@ export interface components {
             catalogo: string;
             detalle: string;
         };
+        IngresoDto: {
+            /** Format: uuid */
+            productoId: string;
+            lineas: components["schemas"]["LineaIngresoDto"][];
+            /** Format: double */
+            costoUnitario?: null | number;
+            nota?: null | string;
+        };
+        LineaAjusteDto: {
+            /** Format: uuid */
+            varianteId: string;
+            /** Format: int32 */
+            nuevoTotal: number;
+        };
+        LineaIngresoDto: {
+            /** Format: uuid */
+            varianteId: string;
+            /** Format: int32 */
+            cantidad: number;
+        };
         LoginDto: {
             email: string;
             password: string;
         };
+        MovimientoDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            varianteId: string;
+            color: null | string;
+            talla: null | string;
+            tipo: components["schemas"]["TipoMovimiento"];
+            /** Format: int32 */
+            cantidad: number;
+            /** Format: int32 */
+            saldo: number;
+            nota: null | string;
+            /** Format: double */
+            costoUnitario: null | number;
+            /** Format: date-time */
+            fecha: string;
+        };
+        PaginaDeMovimientosDto: {
+            items: components["schemas"]["MovimientoDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+        };
         PaginaDeProductosDto: {
             items: components["schemas"]["ProductoResumenDto"][];
             /** Format: uuid */
+            siguiente: null | string;
+        };
+        PaginaDeStockDto: {
+            items: components["schemas"]["ProductoStockDto"][];
             siguiente: null | string;
         };
         PerfilDto: {
@@ -1083,6 +1479,9 @@ export interface components {
             archivado: boolean;
             variantes: components["schemas"]["VarianteDto"][];
             fotos: components["schemas"]["ImagenDto"][];
+            controlaStock: boolean;
+            /** Format: int32 */
+            stockMinimo: number;
         };
         ProductoResumenDto: {
             /** Format: uuid */
@@ -1103,6 +1502,26 @@ export interface components {
             archivado: boolean;
             /** Format: int32 */
             variantes: number;
+            /** Format: int32 */
+            stock: null | number;
+            estadoStock: components["schemas"]["EstadoStock"];
+        };
+        ProductoStockDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            /** Format: double */
+            precio: number;
+            /** Format: double */
+            costo: number;
+            portada: null | components["schemas"]["ImagenDto"];
+            controlaStock: boolean;
+            /** Format: int32 */
+            stockMinimo: number;
+            /** Format: int32 */
+            stock: null | number;
+            estado: components["schemas"]["EstadoStock"];
+            variantes: components["schemas"]["VarianteStockDto"][];
         };
         RegistroDto: {
             nombre: string;
@@ -1110,6 +1529,18 @@ export interface components {
             password: string;
             nombreTienda: string;
             slug: string;
+        };
+        ResumenStockDto: {
+            /** Format: double */
+            valorCosto: number;
+            /** Format: double */
+            valorVenta: number;
+            /** Format: int32 */
+            agotados: number;
+            /** Format: int32 */
+            porAgotarse: number;
+            /** Format: int32 */
+            sinControl: number;
         };
         SesionDto: {
             accessToken: string;
@@ -1134,6 +1565,8 @@ export interface components {
             nombre: string;
             slug: string;
         };
+        /** @enum {unknown} */
+        TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion";
         UsuarioSesionDto: {
             /** Format: uuid */
             id: string;
@@ -1146,6 +1579,16 @@ export interface components {
             color: null | string;
             talla: null | string;
         };
+        VarianteStockDto: {
+            /** Format: uuid */
+            id: string;
+            color: null | string;
+            talla: null | string;
+            /** Format: int32 */
+            stock: number;
+        };
+        /** @enum {unknown} */
+        VistaStock: "Todos" | "AReponer" | "PorEncargo";
     };
     responses: never;
     parameters: never;

@@ -1277,7 +1277,336 @@ label.boton {
   font-size: 16px;
 }
 
+/* ───────────── Stock (M5) ───────────── */
+.pestanas {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radio-chico);
+  background: var(--apagado);
+}
+.pestanas a {
+  flex: 1;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.pestanas a.active {
+  background: var(--superficie);
+  color: var(--texto);
+}
+.resumen-stock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--texto);
+  color: #fff;
+}
+.resumen-stock-chico {
+  font-size: 13px;
+  color: #c9cace;
+}
+.resumen-stock-valor {
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+.resumen-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.resumen-chip {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.resumen-chip-rojo {
+  background: var(--peligro-suave);
+  color: var(--peligro);
+}
+.resumen-chip-ambar {
+  background: var(--ambar-suave);
+  color: #7a4f08;
+}
+.resumen-chip-verde {
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+.segmentos {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: var(--radio-chico);
+  background: var(--apagado);
+}
+.segmento {
+  flex: 1;
+  min-height: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+.segmento[aria-pressed='true'] {
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+.lista-stock {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fila-stock {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+.fila-stock-agotado {
+  border-color: #f3c1bb;
+}
+.fila-stock-pocos {
+  border-color: #f3d3a1;
+}
+.fila-stock-cabecera {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--texto);
+}
+.fila-stock-foto {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ece8df;
+  color: #8a7f6c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fila-stock-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.fila-stock-datos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fila-stock-nombre {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.fila-stock-linea {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fila-stock-total {
+  min-width: 40px;
+  text-align: right;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 20px;
+}
+.etiqueta-stock {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.etiqueta-stock-agotado {
+  background: var(--peligro-suave);
+  color: var(--peligro);
+}
+.etiqueta-stock-pocos {
+  background: var(--ambar-suave);
+  color: #7a4f08;
+}
+.etiqueta-stock-ok {
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+.etiqueta-stock-sincontrol {
+  background: #f1efea;
+  color: #4a4c52;
+}
+.fila-stock-detalle {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borde-suave);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.variantes-stock {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.variantes-stock li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.variantes-stock .variante-poca {
+  color: #7a4f08;
+}
+.historial {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.historial-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+.historial-linea {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--texto-medio);
+}
+.historial-cuando {
+  min-width: 54px;
+  color: var(--texto-suave);
+}
+.producto-stock {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: rgba(23, 24, 28, 0.78);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.producto-stock-agotado {
+  background: var(--peligro);
+}
+
+/* Contador (− número +) */
+.contador {
+  display: flex;
+  align-items: center;
+  background: #f1efea;
+  border-radius: var(--radio-chico);
+}
+.contador-boton {
+  width: 44px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--texto-medio);
+  cursor: pointer;
+}
+.contador-boton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.contador-mas {
+  color: var(--acento);
+}
+.contador-campo {
+  width: 64px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 20px;
+}
+.contador-campo:focus {
+  outline: 0;
+  background: var(--superficie);
+}
+.contador-campo[aria-invalid='true'] {
+  color: var(--peligro);
+}
+.llegaron-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.llegaron-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.llegaron-nombre {
+  font-weight: 700;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.acciones-hoja {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+.acciones-hoja .boton {
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+/* En el celular los diálogos de "hoja" suben desde abajo, a todo el ancho */
+@media (max-width: 899px) {
+  .dialogo-hoja {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    border-radius: 24px 24px 0 0;
+    max-height: 92dvh;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (min-width: 900px) {
+  .lista-stock {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+  }
   .grilla-productos {
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 16px;

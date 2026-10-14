@@ -15,6 +15,11 @@ export function leerMonto(texto: string): number | null {
   return /^\d+(\.\d{1,2})?$/.test(limpio) ? Number(limpio) : null
 }
 
+// "12" → 12; "" → null; "12,5" o "abc" → null. Solo enteros: no se cuentan medias unidades.
+export function soloEnteros(texto: string): number | null {
+  return /^\d+$/.test(texto.trim()) ? Number(texto.trim()) : null
+}
+
 // "café, Negro,  café" → ["café", "Negro"]: sin vacíos ni repetidos (sin distinguir mayúsculas), como
 // Validacion.ListaDeTextos del backend.
 export function listaDeTextos(texto: string): string[] {

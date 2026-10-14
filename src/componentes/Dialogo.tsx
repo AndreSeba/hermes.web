@@ -5,11 +5,16 @@ type Props = {
   titulo: string
   alCerrar: () => void
   children: ReactNode
+  // En el celular sube desde abajo y ocupa todo el ancho (como las hojas del prototipo); en escritorio
+  // es un cuadro centrado igual que los demás.
+  hoja?: boolean
+  // Debajo del título, en gris (por ejemplo el nombre del producto).
+  subtitulo?: string
 }
 
 // Cuadro de diálogo con el <dialog> nativo: el navegador ya se ocupa de atrapar el foco, cerrar
 // con Escape y avisar a los lectores de pantalla. No reinventar esto con un div.
-export function Dialogo({ abierto, titulo, alCerrar, children }: Props) {
+export function Dialogo({ abierto, titulo, alCerrar, children, hoja, subtitulo }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
   const idTitulo = useId()
 
@@ -21,10 +26,11 @@ export function Dialogo({ abierto, titulo, alCerrar, children }: Props) {
   }, [abierto])
 
   return (
-    <dialog ref={ref} className="dialogo" aria-labelledby={idTitulo} onClose={alCerrar}>
+    <dialog ref={ref} className={`dialogo${hoja ? ' dialogo-hoja' : ''}`} aria-labelledby={idTitulo} onClose={alCerrar}>
       <h2 id={idTitulo} className="titulo-seccion">
         {titulo}
       </h2>
+      {subtitulo && <p className="texto-suave">{subtitulo}</p>}
       {abierto && children}
     </dialog>
   )

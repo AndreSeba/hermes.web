@@ -78,6 +78,10 @@ const helpers = `
   window.__elegir = (etiqueta, v) => { const el = __campo(etiqueta); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
   window.__subirYEsperar = async (color) => { const antes = document.querySelectorAll('.galeria-foto img').length; await __subirPng(color); for (let i = 0; i < 100; i++) { if (document.querySelectorAll('.galeria-foto img').length > antes) return true; await new Promise(r => setTimeout(r, 100)); } return false; };
   window.__tarjetas = () => [...document.querySelectorAll('.tarjeta-producto')].map(a => a.querySelector('.producto-nombre').textContent);
+  window.__poner = (el, v) => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+  window.__filas = () => [...document.querySelectorAll('.fila-stock')].map(li => li.querySelector('.fila-stock-nombre').textContent);
+  window.__fila = (nombre) => [...document.querySelectorAll('.fila-stock')].find(li => li.querySelector('.fila-stock-nombre').textContent === nombre);
+  window.__botonEn = (raiz, txt) => [...raiz.querySelectorAll('button')].find(b => b.textContent.trim().startsWith(txt));
   window.__estado = (url) => fetch(url, { cache: 'reload' }).then(r => r.status);
   window.__clic = (txt) => { const el = [...document.querySelectorAll('a,button')].find(x => x.textContent.trim().startsWith(txt) || x.getAttribute('aria-label') === txt); el.click(); return !!el };
 `
@@ -248,7 +252,7 @@ try {
   await ir('/catalogo')
   await esperar(`document.body.innerText.includes('Todavía no cargaste productos')`, 'catálogo vacío')
   await evaluar(`__clic('Cargar mi primer producto')`)
-  await esperar(`location.pathname === '/catalogo/nuevo'`, 'abre el formulario de producto nuevo')
+  await esperar(`location.pathname === '/catalogo/nuevo' && !!__campo('Categoría')`, 'abre el formulario de producto nuevo')
 
   // Categoría nueva desde el mismo formulario
   await evaluar(`__elegir('Categoría', '__nueva')`)
@@ -402,6 +406,111 @@ try {
   await ir(rutaProducto)
   await esperar(`__campo('Nombre')?.value === 'Cartera de cuero Mía'`, 'editar en escritorio')
   await captura('m4-07-editar-producto-escritorio.png')
+
+  // 8d. M5 · Stock: llegaron más, corregir, historial, por encargo, orden por urgencia y paginación
+  await celular()
+  await ir('/catalogo/nuevo')
+  await esperar(`!!__campo('Nombre')`, 'formulario de producto para el stock')
+  await evaluar(`__escribir('Nombre', 'Collar Salar turquesa')`)
+  await evaluar(`__escribir('Precio', '120')`)
+  await evaluar(`__escribir('Tu costo', '58')`)
+  await evaluar(`__escribir('Colores (separados por coma)', 'azul, verde')`)
+  ok('el control de stock viene encendido por defecto', await evaluar(`(() => { const s = [...document.querySelectorAll('[role=switch]')].find(b => b.innerText.includes('Llevar control de stock')); return s.getAttribute('aria-checked') === 'true' && !!__campo('Avisarme cuando queden') && __campo('Avisarme cuando queden').value === '3' })()`))
+  await evaluar(`__clic('Guardar producto')`)
+  await esperar(`document.body.innerText.includes('¡Guardado!')`, 'collar guardado')
+  ok('la pantalla de éxito ofrece cargar cuántas tenés', await evaluar(`!![...document.querySelectorAll('a')].find(a => a.textContent.trim() === 'Cargar cuántas tenés')`))
+  await evaluar(`__clic('Cargar cuántas tenés')`)
+  await esperar(`location.pathname === '/stock' && !!document.querySelector('dialog[open]')`, 'abre Stock con "Llegaron más" ya abierto')
+  ok('el diálogo pregunta cuántas llegaron del collar', await evaluar(`(() => { const d = document.querySelector('dialog[open]'); return d.innerText.includes('¿Cuántas llegaron?') && d.innerText.includes('Collar Salar turquesa') && d.innerText.includes('azul') && d.innerText.includes('verde') })()`))
+  ok('el parámetro ?llegaron se limpió de la dirección', !(await evaluar(`location.search`)).includes('llegaron'))
+  ok('"Sumar" está desactivado mientras no haya cantidades', await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Sumar').disabled`))
+  await captura('m5-02-llegaron-mas-celular.png')
+  await evaluar(`__poner(document.querySelector('dialog[open] [aria-label="Cantidad que llegó de azul"]'), '4')`)
+  // Dos toques en "+" separados (como una persona): dos clics dentro de la misma tarea no dejan que React redibuje entre uno y otro.
+  await evaluar(`document.querySelectorAll('dialog[open] .llegaron-fila')[1].querySelector('[aria-label="Uno más"]').click()`)
+  await dormir(150)
+  await evaluar(`document.querySelectorAll('dialog[open] .llegaron-fila')[1].querySelector('[aria-label="Uno más"]').click()`)
+  await esperar(`__botonEn(document.querySelector('dialog[open]'), 'Sumar').textContent.trim() === 'Sumar 6'`, 'el botón suma 4 + 2 = 6')
+  ok('el costo viene con el del producto', (await evaluar(`__campo('Costo por unidad (opcional)').value`)) === '58')
+  await evaluar(`__escribir('Costo por unidad (opcional)', '55,5')`)
+  await evaluar(`__escribir('Costo por unidad (opcional)', '55,555')`)
+  await esperar(`document.querySelector('dialog[open]').innerText.includes('hasta 2 decimales') && __botonEn(document.querySelector('dialog[open]'), 'Sumar').disabled`, 'un costo con 3 decimales bloquea el botón')
+  await evaluar(`__escribir('Costo por unidad (opcional)', '55,5')`)
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Sumar').click()`)
+  await esperar(`!document.querySelector('dialog[open]') && document.body.innerText.includes('Sumaste 6 a Collar Salar turquesa.')`, 'sumar cierra el diálogo y avisa')
+  await evaluar(`__escribir('Buscar producto', 'collar')`)
+  await esperar(`__filas().length === 1 && __filas()[0] === 'Collar Salar turquesa'`, 'buscar el collar en Stock')
+  ok('el collar quedó con 6 y "Bien"', await evaluar(`(() => { const f = __fila('Collar Salar turquesa'); return f.querySelector('.fila-stock-total').textContent === '6' && f.innerText.includes('Bien') })()`))
+  await evaluar(`__fila('Collar Salar turquesa').querySelector('.fila-stock-cabecera').click()`)
+  await esperar(`__fila('Collar Salar turquesa').innerText.includes('Llegaron 4 (azul)')`, 'el historial muestra lo que llegó')
+  ok('el detalle muestra las variantes y las dos llegadas', await evaluar(`(() => { const t = __fila('Collar Salar turquesa').innerText; return t.includes('azul') && t.includes('Llegaron 2 (verde)') && t.includes('Hoy') })()`))
+  await captura('m5-01-stock-celular.png')
+
+  // Resumen y catálogo reflejan lo cargado
+  ok('el resumen valora la mercadería (6 × 55,50 = 333; 6 × 120 = 720)', await evaluar(`(() => { const t = document.querySelector('.resumen-stock').innerText; return t.includes('Bs 333') && t.includes('Bs 720') })()`))
+  await ir('/catalogo?q=collar')
+  await esperar(`__tarjetas().length === 1`, 'collar en el catálogo')
+  ok('la tarjeta dice "Quedan 6" y el margen con el costo nuevo (Bs 64,50)', await evaluar(`(() => { const t = document.querySelector('.tarjeta-producto').innerText; return t.includes('Quedan 6') && t.includes('Ganás Bs 64,50') })()`))
+
+  // Corregir lo que se contó
+  await ir('/stock?q=collar')
+  await esperar(`__filas().length === 1`, 'de vuelta en Stock')
+  await evaluar(`__fila('Collar Salar turquesa').querySelector('.fila-stock-cabecera').click()`)
+  await evaluar(`__botonEn(__fila('Collar Salar turquesa'), 'Corregir').click()`)
+  await esperar(`!!document.querySelector('dialog[open]') && document.querySelector('dialog[open]').innerText.includes('Corregir el stock')`, 'abre Corregir')
+  ok('trae lo que hay ahora (azul 4, verde 2) y Guardar está desactivado sin cambios', await evaluar(`(() => { const d = document.querySelector('dialog[open]'); return d.querySelector('[aria-label="Cuántas hay de azul"]').value === '4' && d.querySelector('[aria-label="Cuántas hay de verde"]').value === '2' && __botonEn(d, 'Guardar').disabled })()`))
+  await evaluar(`__poner(document.querySelector('dialog[open] [aria-label="Cuántas hay de azul"]'), '1')`)
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Dañado').click()`)
+  ok('el motivo "Dañado" queda en el campo', (await evaluar(`__campo('O escribí otro').value`)) === 'Dañado')
+  await captura('m5-03-corregir-celular.png')
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Guardar').click()`)
+  await esperar(`!document.querySelector('dialog[open]') && document.body.innerText.includes('Corregiste el stock de Collar Salar turquesa.')`, 'corregir guarda y avisa')
+  ok('quedó en 3 y "Por agotarse" (3 ≤ mínimo 3)', await evaluar(`(() => { const f = __fila('Collar Salar turquesa'); return f.querySelector('.fila-stock-total').textContent === '3' && f.innerText.includes('Por agotarse') })()`))
+  await esperar(`__fila('Collar Salar turquesa').innerText.includes('Corregiste a 1 (azul) · Dañado')`, 'el historial muestra la corrección con su motivo')
+
+  // Sacar una variante con stock se rechaza con un mensaje claro
+  await ir('/catalogo?q=collar')
+  await esperar(`__tarjetas().length === 1`, 'collar para editar')
+  await evaluar(`document.querySelector('.tarjeta-producto').click()`)
+  await esperar(`__campo('Colores (separados por coma)')?.value === 'azul, verde'`, 'editar el collar')
+  await evaluar(`__escribir('Colores (separados por coma)', 'azul')`)
+  await evaluar(`__clic('Guardar cambios')`)
+  await esperar(`document.querySelector('[role=alert]')?.textContent.includes('Todavía quedan 2 de verde')`, 'rechaza sacar el verde con 2 en stock')
+  ok('y el formulario no pierde lo escrito', (await evaluar(`__campo('Colores (separados por coma)').value`)) === 'azul')
+
+  // Por encargo: sin control de stock
+  await ir('/catalogo/nuevo')
+  await esperar(`!!__campo('Nombre')`, 'formulario para el producto por encargo')
+  await evaluar(`__escribir('Nombre', 'Bolso por encargo')`)
+  await evaluar(`__escribir('Precio', '220')`)
+  await evaluar(`[...document.querySelectorAll('[role=switch]')].find(b => b.innerText.includes('Llevar control de stock')).click()`)
+  await esperar(`!__campo('Avisarme cuando queden') && document.body.innerText.includes('Por encargo: no se cuentan unidades')`, 'apagar el control oculta el mínimo y explica')
+  await evaluar(`__clic('Guardar producto')`)
+  await esperar(`document.body.innerText.includes('¡Guardado!')`, 'bolso guardado')
+  ok('sin control no se ofrece cargar cuántas tenés', await evaluar(`![...document.querySelectorAll('a')].find(a => a.textContent.trim() === 'Cargar cuántas tenés')`))
+  await ir('/stock?vista=encargo')
+  await esperar(`__filas().includes('Bolso por encargo')`, 'el bolso aparece en "Por encargo"')
+  ok('muestra "—" y "No lleva stock", sin cantidad', await evaluar(`(() => { const f = __fila('Bolso por encargo'); return f.querySelector('.fila-stock-total').textContent === '—' && f.innerText.includes('Por encargo') && f.innerText.includes('No lleva stock') })()`))
+  await evaluar(`__fila('Bolso por encargo').querySelector('.fila-stock-cabecera').click()`)
+  ok('al abrirlo explica que no cuenta unidades y no ofrece "Llegaron más"', await evaluar(`(() => { const f = __fila('Bolso por encargo'); return f.innerText.includes('no cuenta unidades') && !__botonEn(f, 'Llegaron más') })()`))
+  await ir('/catalogo?q=bolso')
+  await esperar(`__tarjetas().length === 1`, 'bolso en el catálogo')
+  ok('en el catálogo no tiene etiqueta de stock', await evaluar(`!document.querySelector('.tarjeta-producto .producto-stock')`))
+
+  // "A reponer" y el orden por urgencia con paginación real (30 productos: 28 agotados, 1 por agotarse, 1 por encargo)
+  await ir('/stock?vista=areponer&q=collar')
+  await esperar(`__filas().length === 1 && __filas()[0] === 'Collar Salar turquesa'`, '"A reponer" trae el collar (por agotarse)')
+  await ir('/stock')
+  await esperar(`__filas().length === 24`, 'primera página de Stock: 24')
+  ok('la primera página son todos agotados (lo más urgente primero)', await evaluar(`[...document.querySelectorAll('.fila-stock')].every(li => li.innerText.includes('Agotado'))`))
+  await evaluar(`__clic('Ver más productos')`)
+  await esperar(`__filas().length === 30`, 'segunda página completa los 30')
+  ok('sin repetidos', await evaluar(`new Set(__filas()).size === 30`))
+  ok('el orden sigue entre páginas: ... agotados, collar (por agotarse), bolso (por encargo)', await evaluar(`__filas().at(-2) === 'Collar Salar turquesa' && __filas().at(-1) === 'Bolso por encargo'`))
+  await escritorio()
+  await ir('/stock')
+  await esperar(`__filas().length === 24`, 'Stock en escritorio')
+  await captura('m5-04-stock-escritorio.png')
 
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()

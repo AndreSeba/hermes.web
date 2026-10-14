@@ -20,9 +20,16 @@ type Estado = {
   tallas: string
   visible: boolean
   fotos: ImagenSubida[]
+  controlaStock: boolean
+  stockMinimo: string // "3": texto del campo; se valida como entero
 }
 
-const vacio: Estado = { nombre: '', descripcion: '', precio: '', costo: '', categoriaId: '', colores: '', tallas: '', visible: true, fotos: [] }
+const MINIMO_POR_DEFECTO = '3' // el mismo que ReglaStock.MinimoPorDefecto del backend
+
+const vacio: Estado = {
+  nombre: '', descripcion: '', precio: '', costo: '', categoriaId: '', colores: '', tallas: '', visible: true, fotos: [],
+  controlaStock: true, stockMinimo: MINIMO_POR_DEFECTO,
+}
 
 const unicos = (valores: (string | null)[]) => [...new Set(valores.filter((v): v is string => !!v))].join(', ')
 
@@ -36,6 +43,8 @@ const desdeProducto = (p: Producto): Estado => ({
   tallas: unicos(p.variantes.map((v) => v.talla)),
   visible: p.visibleEnTienda,
   fotos: p.fotos,
+  controlaStock: p.controlaStock,
+  stockMinimo: String(p.stockMinimo),
 })
 
 const firma = (e: Estado) => JSON.stringify({ ...e, fotos: e.fotos.map((f) => f.id) })
@@ -106,8 +115,10 @@ export function FormularioProducto({ inicial }: { inicial?: Producto }) {
   const avisoPrecio = form.precio.trim() && (precio === null || precio <= 0) ? 'Escribí un precio mayor a 0 (hasta 2 decimales).' : null
   const avisoCosto = costo === null ? 'Escribí un monto válido (hasta 2 decimales) o dejalo vacío.' : null
   const avisoVariantes = variantes > MAXIMO_VARIANTES ? `Son demasiadas combinaciones (${variantes}). El máximo es ${MAXIMO_VARIANTES}.` : null
+  const minimo = /^\d+$/.test(form.stockMinimo.trim()) ? Number(form.stockMinimo) : null
+  const avisoMinimo = form.controlaStock && (minimo === null || minimo > 100_000) ? 'Escribí un número entero (0 o más).' : null
   const puedeGuardar =
-    !guardando && form.nombre.trim() !== '' && precio !== null && precio > 0 && costo !== null && !avisoVariantes && hayCambios
+    !guardando && form.nombre.trim() !== '' && precio !== null && precio > 0 && costo !== null && !avisoVariantes && !avisoMinimo && hayCambios
 
   // Aritmética pura (no la regla de "ganás poco"): esa la decide el servidor y se ve en el catálogo.
   const ganancia = precio !== null && precio > 0 && costo !== null && costo > 0 ? precio - costo : null
@@ -128,6 +139,8 @@ export function FormularioProducto({ inicial }: { inicial?: Producto }) {
         colores,
         tallas,
         fotoIds: form.fotos.map((f) => f.id),
+        controlaStock: form.controlaStock,
+        stockMinimo: minimo ?? 3, // apagado el control, el campo no cuenta: se manda el valor por defecto
       }
       const { data, error, response } = servidor
         ? await api.PUT('/api/v1/productos/{id}', { params: { path: { id: servidor.id } }, body })
@@ -200,7 +213,12 @@ export function FormularioProducto({ inicial }: { inicial?: Producto }) {
           <h1 className="titulo-pagina">¡Guardado!</h1>
           <p className="texto-suave">{creado.nombre} ya está en tu catálogo.</p>
           <div className="exito-acciones">
-            <Link to="/catalogo" className="boton boton-primario boton-grande">
+            {creado.controlaStock && (
+              <Link to={`/stock?llegaron=${creado.id}`} className="boton boton-primario boton-grande">
+                Cargar cuántas tenés
+              </Link>
+            )}
+            <Link to="/catalogo" className={`boton boton-grande ${creado.controlaStock ? 'boton-secundario' : 'boton-primario'}`}>
               Ver mi catálogo
             </Link>
             <button type="button" className="boton boton-texto" onClick={otroProducto}>
@@ -356,7 +374,29 @@ export function FormularioProducto({ inicial }: { inicial?: Producto }) {
         />
       </section>
 
-      <section className="tarjeta">
+      <section className="tarjeta seccion">
+        <Interruptor
+          etiqueta="Llevar control de stock"
+          ayuda={
+            form.controlaStock
+              ? esNuevo
+                ? 'Después de guardar cargás cuántas tenés.'
+                : 'Las ventas descuentan solas y te avisamos cuando se acaba.'
+              : 'Por encargo: no se cuentan unidades y figura siempre disponible.'
+          }
+          activo={form.controlaStock}
+          alCambiar={(controlaStock) => cambiar({ controlaStock })}
+        />
+        {form.controlaStock && (
+          <Campo
+            etiqueta="Avisarme cuando queden"
+            inputMode="numeric"
+            value={form.stockMinimo}
+            onChange={(e) => cambiar({ stockMinimo: e.target.value.replace(/[^\d]/g, '') })}
+            aria-invalid={!!avisoMinimo}
+            ayuda={avisoMinimo ?? 'Con esta cantidad o menos, figura "por agotarse".'}
+          />
+        )}
         <Interruptor
           etiqueta="Mostrar en mi tienda"
           ayuda="Apagado, queda solo en tu catálogo."

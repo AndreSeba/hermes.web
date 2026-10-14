@@ -11,6 +11,11 @@ export type Producto = components['schemas']['ProductoDto']
 export type ProductoResumen = components['schemas']['ProductoResumenDto']
 export type EstadoPrecio = components['schemas']['EstadoPrecio']
 export type Categoria = components['schemas']['CategoriaDto']
+export type ProductoStock = components['schemas']['ProductoStockDto']
+export type VarianteStock = components['schemas']['VarianteStockDto']
+export type ResumenStock = components['schemas']['ResumenStockDto']
+export type Movimiento = components['schemas']['MovimientoDto']
+export type EstadoStock = components['schemas']['EstadoStock']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 

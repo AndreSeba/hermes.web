@@ -204,6 +204,11 @@ export function Catalogo() {
                       <Icono nombre="bolsa" tamano={38} />
                     )}
                     {!p.visibleEnTienda && <span className="producto-oculto">Oculto</span>}
+                    {p.estadoStock !== 'SinControl' && (
+                      <span className={`producto-stock${p.estadoStock === 'Agotado' ? ' producto-stock-agotado' : ''}`}>
+                        {p.estadoStock === 'Agotado' ? 'Agotado' : `Quedan ${p.stock}`}
+                      </span>
+                    )}
                   </span>
                   <span className="producto-datos">
                     <span className="producto-nombre">{p.nombre}</span>
