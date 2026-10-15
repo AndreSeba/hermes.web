@@ -1,0 +1,3 @@
+# El panel es privado: no tiene nada para indexar (las tiendas públicas están en el otro dominio).
+User-agent: *
+Disallow: /

@@ -122,6 +122,9 @@ export function Registro() {
           <button type="submit" className="boton boton-primario boton-grande" disabled={enviando || !completo}>
             {enviando ? 'Creando tu cuenta…' : 'Crear mi cuenta'}
           </button>
+          <p className="texto-suave texto-centro texto-chico">
+            Al crear tu cuenta aceptás los <Link to="/terminos">términos de uso</Link> y la <Link to="/privacidad">política de privacidad</Link>.
+          </p>
           <p className="texto-suave texto-centro">
             ¿Ya tenés cuenta? <Link to="/ingresar">Entrá acá</Link>
           </p>

@@ -1,0 +1,21 @@
+{
+  "name": "Tu negocio, simple.",
+  "short_name": "Mi negocio",
+  "description": "Catálogo, stock, ventas y tu tienda online, desde el celular.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F5F1",
+  "theme_color": "#F6F5F1",
+  "icons": [
+    { "src": "/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nueva venta", "url": "/venta", "icons": [{ "src": "/icono-192.png", "sizes": "192x192" }] },
+    { "name": "Pedidos", "url": "/pedidos", "icons": [{ "src": "/icono-192.png", "sizes": "192x192" }] }
+  ]
+}

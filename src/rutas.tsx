@@ -20,6 +20,7 @@ import { Ventas } from './paginas/ventas/Ventas'
 import { Ingresar } from './paginas/acceso/Ingresar'
 import { Registro } from './paginas/acceso/Registro'
 import { NoEncontrada } from './paginas/NoEncontrada'
+import { Privacidad, Terminos } from './paginas/legal/Legal'
 import { EnConstruccion } from './paginas/panel/EnConstruccion'
 import { Inicio } from './paginas/panel/Inicio'
 import { MiTienda } from './paginas/panel/MiTienda'
@@ -67,5 +68,8 @@ export const rutas = createBrowserRouter([
       },
     ],
   },
+  // Se ven con o sin sesión (el registro y la tienda pública enlazan acá).
+  { path: '/terminos', element: <Terminos /> },
+  { path: '/privacidad', element: <Privacidad /> },
   { path: '*', element: <NoEncontrada /> },
 ])

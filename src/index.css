@@ -2099,3 +2099,20 @@ label.boton {
   align-items: center;
   justify-content: center;
 }
+/* ───────────── Términos y privacidad ───────────── */
+.legal section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legal p,
+.legal ul {
+  margin: 0;
+  line-height: 1.55;
+}
+.legal ul {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

@@ -47,7 +47,8 @@ const cdp = (method, params = {}) => new Promise((res, rej) => {
 })
 const evaluar = async (expr) => {
   const r = await cdp('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true })
-  if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text)
+  // Con la expresión que falló: una carrera intermitente se encuentra mucho más rápido sabiendo en qué paso fue.
+  if (r.exceptionDetails) throw new Error(`${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}\n    en: ${expr.slice(0, 160)}`)
   return r.result.value
 }
 const esperar = async (expr, desc, ms = 10000) => {
@@ -57,12 +58,25 @@ const esperar = async (expr, desc, ms = 10000) => {
   return false
 }
 const ir = async (ruta) => { await cdp('Page.navigate', { url: BASE + ruta }); await dormir(300) }
+// Recargar y esperar a que la página VIEJA se haya ido: si no, la próxima espera puede cumplirse todavía en la vieja (que ya
+// tenía los datos) y la lectura siguiente cae en la nueva a medio cargar (era la carrera intermitente "reading 'value'").
+const recargar = async () => {
+  await evaluar('window.__paginaVieja = true')
+  await cdp('Page.reload')
+  const fin = Date.now() + 15000
+  while (Date.now() < fin) { try { if (!(await evaluar('window.__paginaVieja === true'))) break } catch {} ; await dormir(100) }
+}
 const ruta = () => evaluar('location.pathname')
 const texto = () => evaluar('document.body.innerText')
 const captura = async (nombre) => {
   await dormir(350) // fuentes y transiciones
   const { data } = await cdp('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false })
-  writeFileSync(join(salida, nombre), Buffer.from(data, 'base64'))
+  // En Windows el archivo viejo puede estar tomado un instante (indexador, antivirus, una vista previa abierta): se reintenta
+  // y, si igual no se puede, se avisa sin fallar la prueba (una captura no es una verificación).
+  for (let intento = 1; ; intento++) {
+    try { writeFileSync(join(salida, nombre), Buffer.from(data, 'base64')); return }
+    catch (e) { if (intento >= 5) { console.log(`AVISO no se pudo guardar la captura ${nombre}: ${e.code ?? e.message}`); return } await dormir(300) }
+  }
 }
 const celular = () => cdp('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true })
 const escritorio = () => cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false })
@@ -115,6 +129,8 @@ try {
   await evaluar(`__escribir('Nombre de tu negocio', 'Ñandú Accesorios ${n}')`)
   await esperar(`__campo('Dirección de tu tienda').value === 'nandu-accesorios-${n}'`, 'dirección automática')
   ok('dirección se arma sola sin tildes ni ñ', (await evaluar(`__campo('Dirección de tu tienda').value`)) === `nandu-accesorios-${n}`)
+  ok('el registro enlaza los términos y la privacidad', await evaluar(`!!document.querySelector('a[href="/terminos"]') && !!document.querySelector('a[href="/privacidad"]')`))
+  ok('el panel se puede instalar (manifiesto y ícono)', await evaluar(`fetch('/manifest.webmanifest').then(r => r.json()).then(m => m.display === 'standalone' && m.icons.length === 3 && !/hermes/i.test(JSON.stringify(m)))`))
   await captura('m1-02-registro-celular.png')
 
   // 3. Crear cuenta → Inicio
@@ -128,7 +144,7 @@ try {
   await captura('m1-03-inicio-celular.png')
 
   // 4. Recargar: la sesión sigue (cookie HttpOnly + refresh)
-  await cdp('Page.reload')
+  await recargar()
   await esperar(`document.querySelector('h1')?.textContent === 'Hola, Andrea'`, 'tras recargar sigue la sesión')
   ok('tras recargar sigue en el panel', (await ruta()) === '/')
   ok('el refresh token no es visible para JavaScript', !(await evaluar('document.cookie')).includes('hermes_refresh'))
@@ -195,7 +211,7 @@ try {
   await esperar(`document.body.innerText.includes('Guardado. Ya está actualizado.')`, 'guardar muestra confirmación')
   ok('el menú ya muestra el nombre nuevo sin recargar', await evaluar(`document.querySelector('.menu-tienda-nombre').textContent === 'Luna ${n}'`))
 
-  await cdp('Page.reload')
+  await recargar()
   await esperar(`__campo('Nombre de la tienda')?.value === 'Luna ${n}'`, 'tras recargar, el nombre guardado sigue')
   ok('persiste la descripción', (await evaluar(`__campo('Descripción corta').value`)) === 'Accesorios hechos a mano · Cochabamba')
   ok('persiste el WhatsApp (solo los 8 dígitos, el +591 va fijo)', (await evaluar(`__campo('WhatsApp donde recibís los pedidos').value`)) === '71234567')
@@ -304,7 +320,9 @@ try {
 
   // Segundo producto: pierde plata
   await evaluar(`__clic('Producto')`)
-  await esperar(`location.pathname === '/catalogo/nuevo'`, 'Producto → formulario nuevo')
+  // Esperar el CAMPO, no solo la dirección: el formulario se arma después de cargar las categorías (era la carrera
+  // intermitente "reading 'value'/'tagName'" de esta parte).
+  await esperar(`location.pathname === '/catalogo/nuevo' && !!__campo('Nombre') && !!__campo('Tu costo')`, 'Producto → formulario nuevo')
   await evaluar(`__escribir('Nombre', 'Billetera Tunari')`)
   await evaluar(`__escribir('Precio', '60')`)
   await evaluar(`__escribir('Tu costo', '62')`)
@@ -345,8 +363,8 @@ try {
   await esperar(`document.body.innerText.includes('2 variantes (1 × 2)')`, 'el resumen de variantes se actualiza')
   await evaluar(`__clic('Guardar cambios')`)
   await esperar(`document.body.innerText.includes('Guardado. Ya está actualizado.')`, 'guardar cambios del producto')
-  await cdp('Page.reload')
-  await esperar(`__campo('Precio')?.value === '200'`, 'el cambio persiste tras recargar')
+  await recargar()
+  await esperar(`__campo('Precio')?.value === '200' && !!__campo('Colores (separados por coma)')`, 'el cambio persiste tras recargar')
   ok('persisten los colores (el que se sacó ya no está)', (await evaluar(`__campo('Colores (separados por coma)').value`)) === 'café')
   await captura('m4-04-editar-producto-celular.png')
 
@@ -1193,7 +1211,7 @@ try {
   await captura('m1-06-mi-tienda-celular.png')
   await evaluar(`__clic('Cerrar sesión')`)
   await esperar(`location.pathname === '/bienvenida'`, 'cerrar sesión → bienvenida')
-  await cdp('Page.reload')
+  await recargar()
   await dormir(1500)
   ok('tras cerrar sesión y recargar, no vuelve a entrar', (await ruta()) === '/bienvenida')
 
@@ -1215,6 +1233,15 @@ try {
   await esperar(`location.pathname === '/'`, 'con sesión /ingresar → /')
   await ir('/no-existe')
   await esperar(`document.body.innerText.includes('No encontramos esta página')`, 'ruta inexistente → página 404')
+
+  // 12. Términos y privacidad: se ven con sesión (y sin ella, desde el registro)
+  await ir('/terminos')
+  await esperar(`document.querySelector('h1')?.textContent === 'Términos de uso'`, 'términos de uso')
+  await ir('/privacidad')
+  await esperar(`document.querySelector('h1')?.textContent === 'Política de privacidad'`, 'política de privacidad')
+  ok('la privacidad explica qué pasa con los datos de los clientes de los pedidos', (await texto()).includes('De los clientes que te hacen pedidos'))
+  ok('ningún texto legal menciona "hermes"', !/hermes/i.test(await texto()))
+  await captura('legal-privacidad-celular.png')
 
   ok(`sin errores de JavaScript en la consola (${errores.length})`, errores.length === 0)
   if (errores.length) console.log(errores.slice(0, 5).join('\n'))
