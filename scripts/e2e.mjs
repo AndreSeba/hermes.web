@@ -3,7 +3,7 @@
 // Uso: pnpm e2e [carpeta-de-capturas]   (por defecto ../Hermes/docs/capturas)
 // Cubre M1 (sesión y armazón). Cada módulo nuevo agrega sus pasos acá.
 import { spawn } from 'node:child_process'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -99,7 +99,7 @@ try {
   // 1. Sin sesión, una ruta del panel lleva a la bienvenida
   await celular()
   await ir('/catalogo')
-  await esperar(`location.pathname === '/bienvenida'`, 'sin sesión /catalogo → /bienvenida')
+  await esperar(`location.pathname === '/bienvenida'`, 'sin sesión /catalogo → /bienvenida', 60000) // la primera carga de Vite en frío tarda
   ok('sin sesión /catalogo → /bienvenida', (await ruta()) === '/bienvenida')
   await captura('m1-01-bienvenida-celular.png')
 
@@ -1058,6 +1058,106 @@ try {
   await evaluar(`__botonEn(document.querySelector('.lector'), 'Ver qué entendió').click()`)
   await esperar(`document.querySelectorAll('.entendido').length === 3`, 'un carrusel se lee como tres productos')
   await captura('m11-04-carrusel-escritorio.png')
+
+  // 8k. M13 · Planes: límite del Gratis, pedir un plan con comprobante, el administrador lo aprueba
+  const API = 'http://localhost:5013'
+  const cred = JSON.parse(readFileSync('../Hermes/scripts/admin.local.json', 'utf8').replace(/^﻿/, ''))
+  const llamar = async (metodo, ruta, token, cuerpo) => {
+    const r = await fetch(API + ruta, { method: metodo, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: cuerpo ? JSON.stringify(cuerpo) : undefined })
+    return { estado: r.status, datos: r.headers.get('content-type')?.includes('json') ? await r.json() : null }
+  }
+  const tokenAdmin = (await llamar('POST', '/api/v1/auth/login', null, cred)).datos.accessToken
+  // El nombre y la dirección cambiaron más arriba (prueba de Mi tienda): se leen los de ahora.
+  const { slug: slugDuena, nombre: nombreDuena } = await evaluar(`import('/src/api/cliente.ts').then(m => m.api.GET('/api/v1/tienda')).then(r => r.data)`)
+  const tiendaDuena = (await llamar('GET', `/api/v1/admin/tiendas?Buscar=${slugDuena}`, tokenAdmin)).datos.items[0].id
+  const planesAdmin = (await llamar('GET', '/api/v1/admin/planes', tokenAdmin)).datos
+  const idPlan = (codigo) => planesAdmin.find((p) => p.codigo === codigo).id
+
+  await celular()
+  await ir('/mi-plan')
+  await esperar(`document.body.innerText.includes('Plan Negocio')`, 'Mi plan con el plan por defecto de desarrollo')
+  ok('muestra los planes de pago con su precio por mes', await evaluar(`(() => { const t = document.body.innerText; return t.includes('Emprendedor') && t.includes('Bs 39') && t.includes('por mes') && t.includes('sin límite') })()`))
+  await captura('m13-01-mi-plan-celular.png')
+  await ir('/admin')
+  await esperar(`location.pathname === '/'`, 'una dueña común no entra a /admin')
+  ok('el menú de una dueña no tiene Administración', !(await evaluar(`document.body.innerText.includes('Administración')`)))
+
+  // Pasarla al plan Gratis y llenar el límite de 15 productos
+  ok('el administrador la pasa al Gratis', (await llamar('PUT', `/api/v1/admin/tiendas/${tiendaDuena}/plan`, tokenAdmin, { planId: idPlan('gratis'), meses: null })).estado === 200)
+  const topeado = await evaluar(`import('/src/api/cliente.ts').then(async (m) => { for (let i = 0; i < 40; i++) { const r = await m.api.POST('/api/v1/productos', { body: { nombre: 'Relleno ' + i, descripcion: null, precio: 10, costo: 0, categoriaId: null, visibleEnTienda: true, colores: null, tallas: null, fotoIds: null, controlaStock: false } }); if (r.response.status === 402) return i; if (!r.data) return -1 } return -2 })`)
+  ok('el plan Gratis corta la creación de productos con un 402', topeado >= 0)
+  await ir('/catalogo/nuevo')
+  await esperar(`!!__campo('Nombre')`, 'formulario de producto nuevo')
+  await evaluar(`__escribir('Nombre', 'Uno de más')`)
+  await evaluar(`__escribir('Precio', '30')`)
+  await evaluar(`__clic('Guardar producto')`)
+  await esperar(`document.querySelector('[role=alert]')?.textContent.includes('límite de tu plan')`, 'el formulario explica el límite')
+  ok('el aviso del límite trae el enlace a Mi plan', await evaluar(`!!document.querySelector('[role=alert] a[href="/mi-plan"]')`))
+  await captura('m13-02-limite-celular.png')
+
+  // Pedir el plan Emprendedor por 3 meses
+  await evaluar(`document.querySelector('[role=alert] a[href="/mi-plan"]').click()`)
+  await esperar(`location.pathname === '/mi-plan' && document.body.innerText.includes('Plan Gratis')`, 'Mi plan en Gratis')
+  ok('muestra el uso lleno del Gratis', await evaluar(`/\\d+ de 15 productos/.test(document.body.innerText) && !!document.querySelector('.medidor-lleno')`))
+  await evaluar(`document.querySelector('[aria-label="Pedir el plan Emprendedor"]').click()`)
+  await esperar(`!!document.querySelector('dialog[open]') && document.querySelector('dialog[open]').innerText.includes('Foto del comprobante')`, 'el pedido abre su formulario')
+  await evaluar(`[...document.querySelectorAll('dialog[open] .chip')].find(b => b.textContent.trim() === '3 meses').click()`)
+  await esperar(`document.querySelector('[data-prueba=plan-total]').innerText.includes('Bs 117')`, 'el total cambia con los meses')
+  ok('sin comprobante no se puede enviar', await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Enviar pedido').disabled`))
+  await captura('m13-03-pedir-plan-celular.png')
+  await evaluar(`__subirPng('#0b7a57')`)
+  await esperar(`!__botonEn(document.querySelector('dialog[open]'), 'Enviar pedido').disabled`, 'subido el comprobante, se puede enviar')
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Enviar pedido').click()`)
+  await esperar(`document.body.innerText.includes('Recibimos tu comprobante') && document.body.innerText.includes('Estamos revisando tu pago del plan Emprendedor')`, 'el pedido queda en revisión')
+  ok('mientras hay un pedido, no se puede pedir otro', await evaluar(`document.querySelector('[aria-label="Pedir el plan Negocio"]').disabled`))
+  await captura('m13-04-en-revision-celular.png')
+
+  // El administrador entra por la pantalla de ingreso, revisa y aprueba
+  await escritorio()
+  await ir('/mi-plan')
+  await esperar(`!!document.querySelector('[aria-label="Cerrar sesión"]')`, 'menú con cerrar sesión')
+  await evaluar(`__clic('Cerrar sesión')`)
+  await esperar(`location.pathname === '/bienvenida'`, 'la dueña sale')
+  await ir('/ingresar')
+  await esperar(`!!__campo('Email')`, 'ingresar como administrador')
+  await evaluar(`__escribir('Email', ${JSON.stringify(cred.email)})`)
+  await evaluar(`__escribir('Contraseña', ${JSON.stringify(cred.password)})`)
+  await evaluar(`__clic('Entrar')`)
+  await esperar(`document.body.innerText.includes('Administración')`, 'el menú del administrador tiene Administración')
+  await evaluar(`__clic('Administración')`)
+  const filaPago = `[...document.querySelectorAll('.pago-revisar')].find(x => x.innerText.includes(${JSON.stringify(nombreDuena)}))`
+  await esperar(`location.pathname === '/admin' && !!${filaPago}`, 'el pedido aparece en la cola')
+  ok('la cola muestra plan, meses, monto y el comprobante', await evaluar(`(() => { const li = ${filaPago}; return li.innerText.includes('Emprendedor') && li.innerText.includes('3 meses') && li.innerText.includes('Bs 117') && !!li.querySelector('img') })()`))
+  await captura('m13-05-admin-pagos-escritorio.png')
+  await evaluar(`${filaPago}.querySelector('[aria-label^="Aprobar"]').click()`)
+  await esperar(`document.body.innerText.includes('Activaste el plan Emprendedor de ' + ${JSON.stringify(nombreDuena)})`, 'aprobar')
+  ok('lo aprobado sale de la cola', await evaluar(`!${filaPago}`))
+  await evaluar(`__clic('Tiendas')`)
+  await esperar(`!!__campo('Buscar tienda')`, 'pestaña Tiendas')
+  await evaluar(`__escribir('Buscar tienda', '${slugDuena}')`)
+  await esperar(`document.querySelectorAll('[aria-label=Tiendas] li').length === 1 && document.querySelector('[aria-label=Tiendas]').innerText.includes('Emprendedor hasta el')`, 'la tienda figura con su plan nuevo y vencimiento')
+  await captura('m13-06-admin-tiendas-escritorio.png')
+  await evaluar(`__clic('Planes')`)
+  await esperar(`!!document.querySelector('[aria-label=Planes]')`, 'pestaña Planes')
+  ok('los tres planes figuran con su precio', await evaluar(`(() => { const t = document.querySelector('[aria-label=Planes]').innerText; return t.includes('Gratis') && t.includes('Bs 39 por mes') && t.includes('Negocio') })()`))
+
+  // La dueña vuelve: ya tiene el plan y puede seguir creando
+  await evaluar(`__clic('Cerrar sesión')`)
+  await esperar(`location.pathname === '/bienvenida'`, 'sale el administrador')
+  await ir('/ingresar')
+  await esperar(`!!__campo('Email')`, 'ingresar como dueña')
+  await evaluar(`__escribir('Email', '${email}')`)
+  await evaluar(`__escribir('Contraseña', '${password}')`)
+  await evaluar(`__clic('Entrar')`)
+  await esperar(`document.querySelector('h1')?.textContent === 'Hola, Andrea'`, 'la dueña entra')
+  await ir('/mi-plan')
+  await esperar(`document.body.innerText.includes('Plan Emprendedor') && document.body.innerText.includes('Vigente hasta')`, 'Mi plan ya es Emprendedor')
+  ok('ya no hay pedido pendiente y el pago figura aprobado', await evaluar(`!document.body.innerText.includes('Estamos revisando') && document.body.innerText.includes('Aprobado')`))
+  ok('ahora sí puede crear más de 15 productos', await evaluar(`import('/src/api/cliente.ts').then(m => m.api.POST('/api/v1/productos', { body: { nombre: 'El dieciséis', descripcion: null, precio: 10, costo: 0, categoriaId: null, visibleEnTienda: true, colores: null, tallas: null, fotoIds: null, controlaStock: false } })).then(r => r.response.status === 201)`))
+  await celular()
+  await ir('/mi-plan')
+  await esperar(`document.body.innerText.includes('Plan Emprendedor')`, 'Mi plan en celular')
+  await captura('m13-07-mi-plan-emprendedor-celular.png')
 
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()

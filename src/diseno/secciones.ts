@@ -75,6 +75,13 @@ export const secciones: Seccion[] = [
     descripcion: 'Los datos y el diseño de la tienda que ven tus clientes.',
     modulo: 'M3',
   },
+  {
+    ruta: '/mi-plan',
+    titulo: 'Mi plan',
+    icono: 'estrella',
+    descripcion: 'Qué plan tenés, cuánto usás y cómo pasar a uno más grande.',
+    modulo: 'M13',
+  },
 ]
 
 export const nuevaVenta: Seccion = {

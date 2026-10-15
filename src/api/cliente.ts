@@ -37,6 +37,12 @@ export type CompraResumen = components['schemas']['CompraResumenDto']
 export type ResumenCompras = components['schemas']['ResumenComprasDto']
 export type AvisoMargen = components['schemas']['AvisoMargenDto']
 export type PrecioProveedor = components['schemas']['PrecioProveedorDto']
+export type Plan = components['schemas']['PlanDto']
+export type PlanesOfrecidos = components['schemas']['PlanesDto']
+export type MiPlan = components['schemas']['MiPlanDto']
+export type PagoPlan = components['schemas']['PagoPlanDto']
+export type PagoParaRevisar = components['schemas']['PagoParaRevisarDto']
+export type TiendaAdmin = components['schemas']['AdminTiendaDto']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 

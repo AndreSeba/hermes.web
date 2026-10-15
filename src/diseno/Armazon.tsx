@@ -33,6 +33,12 @@ export function Armazon() {
               {s.titulo}
             </NavLink>
           ))}
+          {usuario.esAdmin && (
+            <NavLink to="/admin" className="menu-enlace">
+              <Icono nombre="precios" />
+              Administración
+            </NavLink>
+          )}
         </nav>
 
         <div className="menu-usuario">

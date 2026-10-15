@@ -12,11 +12,13 @@ type Props = {
   alCambiar: (nueva: ImagenSubida | null) => void
   // Lo que se ve mientras no hay foto.
   vacio: { iniciales: string; fondo: string; texto: string }
+  // Comprobante de pago de un plan: no cuenta en el espacio de fotos (si no, una tienda llena no podría pagar para tener más).
+  comprobante?: boolean
 }
 
 // Elegir una foto (galería o cámara, lo decide el celular) y subirla en el momento: el servidor la
 // procesa y devuelve las urls. La foto queda sin usar hasta que la pantalla que la contiene guarde.
-export function SubirFoto({ etiqueta, imagen, alCambiar, vacio }: Props) {
+export function SubirFoto({ etiqueta, imagen, alCambiar, vacio, comprobante }: Props) {
   const id = useId()
   const entrada = useRef<HTMLInputElement>(null)
   const [subiendo, setSubiendo] = useState(false)
@@ -38,6 +40,7 @@ export function SubirFoto({ etiqueta, imagen, alCambiar, vacio }: Props) {
       const formulario = new FormData()
       formulario.append('archivo', archivo)
       const { data, error, response } = await api.POST('/api/v1/imagenes', {
+        params: { query: { comprobante: comprobante ?? false } },
         body: {},
         bodySerializer: () => formulario,
       })

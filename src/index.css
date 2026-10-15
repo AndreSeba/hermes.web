@@ -1977,3 +1977,51 @@ label.boton {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* ───────────── Planes y administración (M13) ───────────── */
+.planes-grilla {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.tarjeta-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.plan-precio {
+  margin: 0;
+  font-size: 18px;
+}
+.plan-lista {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--texto-medio);
+  font-size: 14px;
+  flex: 1;
+}
+.plan-total {
+  margin: 0;
+  font-size: 16px;
+}
+.medidor-lleno {
+  background: var(--peligro);
+}
+.pago-revisar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pago-comprobante img {
+  display: block;
+  max-width: 140px;
+  height: auto;
+  border-radius: var(--radio-chico);
+  border: 1px solid var(--borde);
+}
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}

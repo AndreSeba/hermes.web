@@ -4,6 +4,387 @@
  */
 
 export interface paths {
+    "/api/v1/admin/pagos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Estado?: components["schemas"]["EstadoPago"];
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDePagosDto"];
+                        "application/json": components["schemas"]["PaginaDePagosDto"];
+                        "text/json": components["schemas"]["PaginaDePagosDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pagos/{id}/aprobar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagoParaRevisarDto"];
+                        "application/json": components["schemas"]["PagoParaRevisarDto"];
+                        "text/json": components["schemas"]["PagoParaRevisarDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pagos/{id}/rechazar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RechazarPagoDto"];
+                    "text/json": components["schemas"]["RechazarPagoDto"];
+                    "application/*+json": components["schemas"]["RechazarPagoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagoParaRevisarDto"];
+                        "application/json": components["schemas"]["PagoParaRevisarDto"];
+                        "text/json": components["schemas"]["PagoParaRevisarDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tiendas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Buscar?: string;
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDeTiendasDto"];
+                        "application/json": components["schemas"]["PaginaDeTiendasDto"];
+                        "text/json": components["schemas"]["PaginaDeTiendasDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tiendas/{id}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AsignarPlanDto"];
+                    "text/json": components["schemas"]["AsignarPlanDto"];
+                    "application/*+json": components["schemas"]["AsignarPlanDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminTiendaDto"];
+                        "application/json": components["schemas"]["AdminTiendaDto"];
+                        "text/json": components["schemas"]["AdminTiendaDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/planes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PlanDto"][];
+                        "application/json": components["schemas"]["PlanDto"][];
+                        "text/json": components["schemas"]["PlanDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/planes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ActualizarPlanDto"];
+                    "text/json": components["schemas"]["ActualizarPlanDto"];
+                    "application/*+json": components["schemas"]["ActualizarPlanDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PlanDto"];
+                        "application/json": components["schemas"]["PlanDto"];
+                        "text/json": components["schemas"]["PlanDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/archivos/{clave}": {
         parameters: {
             query?: never;
@@ -1160,7 +1541,9 @@ export interface paths {
         put?: never;
         post: {
             parameters: {
-                query?: never;
+                query?: {
+                    comprobante?: boolean;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -1610,6 +1993,182 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PlanesDto"];
+                        "application/json": components["schemas"]["PlanesDto"];
+                        "text/json": components["schemas"]["PlanesDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MiPlanDto"];
+                        "application/json": components["schemas"]["MiPlanDto"];
+                        "text/json": components["schemas"]["MiPlanDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/solicitar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SolicitarPlanDto"];
+                    "text/json": components["schemas"]["SolicitarPlanDto"];
+                    "application/*+json": components["schemas"]["SolicitarPlanDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagoPlanDto"];
+                        "application/json": components["schemas"]["PagoPlanDto"];
+                        "text/json": components["schemas"]["PagoPlanDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/pagos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagoPlanDto"][];
+                        "application/json": components["schemas"]["PagoPlanDto"][];
+                        "text/json": components["schemas"]["PagoPlanDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3217,6 +3776,15 @@ export interface components {
             nombre: string;
             activa: boolean;
         };
+        ActualizarPlanDto: {
+            /** Format: double */
+            precioMensual: number;
+            /** Format: int32 */
+            maxProductos: null | number;
+            /** Format: int32 */
+            maxAlmacenamientoMb: null | number;
+            activo: boolean;
+        };
         ActualizarTiendaDto: {
             nombre: string;
             descripcion: null | string;
@@ -3225,11 +3793,32 @@ export interface components {
             /** Format: uuid */
             logoImagenId: null | string;
         };
+        AdminTiendaDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            slug: string;
+            email: string;
+            activa: boolean;
+            plan: string;
+            /** Format: date-time */
+            hasta: null | string;
+            /** Format: int32 */
+            productos: number;
+            /** Format: double */
+            almacenamientoMb: number;
+        };
         AjusteDto: {
             /** Format: uuid */
             productoId: string;
             lineas: components["schemas"]["LineaAjusteDto"][];
             motivo?: null | string;
+        };
+        AsignarPlanDto: {
+            /** Format: uuid */
+            planId: string;
+            /** Format: int32 */
+            meses?: null | number;
         };
         AvisoMargenDto: {
             /** Format: uuid */
@@ -3375,6 +3964,8 @@ export interface components {
         /** @enum {unknown} */
         EstadoCompra: "EnCamino" | "Recibida" | "Anulada";
         /** @enum {unknown} */
+        EstadoPago: "Pendiente" | "Aprobado" | "Rechazado";
+        /** @enum {unknown} */
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
         EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
@@ -3518,6 +4109,16 @@ export interface components {
         };
         /** @enum {unknown} */
         MetodoPago: "Efectivo" | "Qr" | "Tarjeta" | "Transferencia";
+        MiPlanDto: {
+            plan: components["schemas"]["PlanDto"];
+            /** Format: date-time */
+            hasta: null | string;
+            /** Format: int32 */
+            productos: number;
+            /** Format: double */
+            almacenamientoMb: number;
+            pendiente: null | components["schemas"]["PagoPlanDto"];
+        };
         MovimientoDto: {
             /** Format: uuid */
             id: string;
@@ -3560,6 +4161,11 @@ export interface components {
             /** Format: uuid */
             siguiente: null | string;
         };
+        PaginaDePagosDto: {
+            items: components["schemas"]["PagoParaRevisarDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+        };
         PaginaDeProductosDto: {
             items: components["schemas"]["ProductoResumenDto"][];
             /** Format: uuid */
@@ -3567,6 +4173,11 @@ export interface components {
         };
         PaginaDeStockDto: {
             items: components["schemas"]["ProductoStockDto"][];
+            siguiente: null | string;
+        };
+        PaginaDeTiendasDto: {
+            items: components["schemas"]["AdminTiendaDto"][];
+            /** Format: uuid */
             siguiente: null | string;
         };
         PaginaDeVendiblesDto: {
@@ -3582,9 +4193,54 @@ export interface components {
             items: components["schemas"]["ProductoPublicoResumenDto"][];
             siguiente: null | string;
         };
+        PagoParaRevisarDto: {
+            pago: components["schemas"]["PagoPlanDto"];
+            /** Format: uuid */
+            tiendaId: string;
+            tienda: string;
+            slug: string;
+            email: string;
+        };
+        PagoPlanDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            planId: string;
+            plan: string;
+            /** Format: int32 */
+            meses: number;
+            /** Format: double */
+            monto: number;
+            metodo: string;
+            estado: components["schemas"]["EstadoPago"];
+            motivo: null | string;
+            comprobante: null | components["schemas"]["ImagenDto"];
+            /** Format: date-time */
+            creadoEn: string;
+            /** Format: date-time */
+            resueltoEn: null | string;
+        };
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
+        };
+        PlanDto: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            nombre: string;
+            /** Format: double */
+            precioMensual: number;
+            /** Format: int32 */
+            maxProductos: null | number;
+            /** Format: int32 */
+            maxAlmacenamientoMb: null | number;
+            activo: boolean;
+        };
+        PlanesDto: {
+            planes: components["schemas"]["PlanDto"][];
+            meses: number[];
+            instruccionesDePago: string;
         };
         PrecioProveedorDto: {
             /** Format: uuid */
@@ -3754,6 +4410,9 @@ export interface components {
             /** Format: int32 */
             stock?: null | number;
         };
+        RechazarPagoDto: {
+            motivo: string;
+        };
         RegistrarCompraDto: {
             /** Format: uuid */
             claveIdempotencia: string;
@@ -3836,6 +4495,15 @@ export interface components {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
         };
+        SolicitarPlanDto: {
+            /** Format: uuid */
+            planId: string;
+            /** Format: int32 */
+            meses: number;
+            metodo: string;
+            /** Format: uuid */
+            comprobanteImagenId: string;
+        };
         TiendaDto: {
             /** Format: uuid */
             id: string;
@@ -3882,6 +4550,8 @@ export interface components {
             id: string;
             nombre: string;
             email: string;
+            /** @default false */
+            esAdmin: boolean;
         };
         VarianteDto: {
             /** Format: uuid */
