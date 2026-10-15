@@ -1159,6 +1159,33 @@ try {
   await esperar(`document.body.innerText.includes('Plan Emprendedor')`, 'Mi plan en celular')
   await captura('m13-07-mi-plan-emprendedor-celular.png')
 
+  // 8l. Carrito de la tienda pública → Pedidos del panel (el cliente pide en el sitio público; la dueña entrega y cobra)
+  await escritorio()
+  const pulsera = await evaluar(`import('/src/api/cliente.ts').then(m => m.api.POST('/api/v1/productos', { body: { nombre: 'Pulsera del carrito', descripcion: null, precio: 75, costo: 30, categoriaId: null, visibleEnTienda: true, colores: null, tallas: null, fotoIds: null, controlaStock: false } })).then(r => r.data.variantes[0].id)`)
+  const pedidoCliente = await fetch(`http://localhost:5014/${slugDuena}/pedido`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ claveIdempotencia: crypto.randomUUID(), articulos: [{ varianteId: pulsera, unidades: 2 }], nombre: 'Cliente E2E', celular: '70000001', entrega: 'Envio', direccion: 'Calle Falsa 123', sitio: '' }),
+  })
+  const enviado = await pedidoCliente.json()
+  ok('el sitio público recibe el pedido del carrito (201) con su enlace de WhatsApp', pedidoCliente.status === 201 && enviado.whatsapp.startsWith('https://wa.me/591'))
+  await ir('/')
+  await esperar(`!!document.querySelector('.menu-insignia')`, 'el menú avisa el pedido nuevo')
+  ok('el Inicio avisa el pedido esperando', await evaluar(`document.body.innerText.includes('pedido esperando') || document.body.innerText.includes('pedidos esperando')`))
+  await evaluar(`__clic('Pedidos')`)
+  await esperar(`location.pathname === '/pedidos' && document.body.innerText.includes('#${enviado.numero} · Cliente E2E')`, 'el pedido aparece en Pedidos')
+  await captura('pedidos-01-lista-escritorio.png')
+  await evaluar(`document.querySelector('[aria-label="Ver el pedido #${enviado.numero} de Cliente E2E"]').click()`)
+  await esperar(`!!document.querySelector('dialog[open]') && document.querySelector('dialog[open]').innerText.includes('Calle Falsa 123')`, 'el detalle muestra la entrega')
+  ok('el detalle trae las líneas, el total y el botón para escribirle', await evaluar(`(() => { const d = document.querySelector('dialog[open]'); return d.innerText.includes('2 × Pulsera del carrito') && d.innerText.includes('Bs 150') && !!d.querySelector('a[href^="https://wa.me/59170000001"]') })()`))
+  await captura('pedidos-02-detalle-escritorio.png')
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Entregar y cobrar').click()`)
+  await esperar(`!!__botonEn(document.querySelector('dialog[open]'), 'Registrar venta')`, 'paso de cobro')
+  await evaluar(`[...document.querySelectorAll('dialog[open] .chip')].find(b => b.textContent.trim() === 'QR').click()`)
+  await evaluar(`__botonEn(document.querySelector('dialog[open]'), 'Registrar venta').click()`)
+  await esperar(`document.body.innerText.includes('entregado: la venta quedó registrada')`, 'entregar registra la venta')
+  await esperar(`!document.querySelector('.menu-insignia')`, 'la insignia del menú se apaga al atenderlo')
+  ok('la venta del pedido figura en Ventas', await evaluar(`import('/src/api/cliente.ts').then(m => m.api.GET('/api/v1/ventas', { params: { query: { Limite: 5 } } })).then(r => r.data.items.some(v => v.cliente === 'Cliente E2E' && v.total === 150))`))
+
   // 9. Cerrar sesión (Mi tienda, celular)
   await celular()
   await ir('/mi-tienda')

@@ -55,7 +55,8 @@ export function Inicio() {
     }
   }, [])
 
-  const sinActividad = datos !== null && datos.ventas === 0 && datos.recientes.length === 0 && datos.gastos === 0
+  // Un pedido de la tienda pública también es actividad: si no, una tienda nueva con su primer pedido no lo vería acá.
+  const sinActividad = datos !== null && datos.ventas === 0 && datos.recientes.length === 0 && datos.gastos === 0 && datos.pedidosPendientes === 0
 
   return (
     <div className="pagina">
@@ -174,11 +175,22 @@ function Resumen({ datos: d }: { datos: DatosInicio }) {
         </Link>
       </section>
 
-      {(d.paraReponer.length > 0 || d.porPagar > 0 || d.enCamino > 0) && (
+      {(d.pedidosPendientes > 0 || d.paraReponer.length > 0 || d.porPagar > 0 || d.enCamino > 0) && (
         <section className="tarjeta" aria-labelledby="atencion-titulo">
           <h2 id="atencion-titulo" className="titulo-seccion">
             Para atender
           </h2>
+          {d.pedidosPendientes > 0 && (
+            <div className="atencion-bloque">
+              <span className="historial-titulo">Pedidos de tu tienda</span>
+              <p className="texto-chico">
+                {d.pedidosPendientes === 1 ? 'Tenés 1 pedido esperando' : `Tenés ${d.pedidosPendientes} pedidos esperando`}
+              </p>
+              <Link to="/pedidos" className="boton boton-primario boton-chico">
+                Ver pedidos
+              </Link>
+            </div>
+          )}
           {d.paraReponer.length > 0 && (
             <div className="atencion-bloque">
               <span className="historial-titulo">

@@ -1,4 +1,4 @@
-﻿/* ───────────── Tokens (del prototipo) ─────────────
+/* ───────────── Tokens (del prototipo) ─────────────
    Colores de la APP. El color de cada tienda pública (por defecto #7C5CFC) es otra cosa. */
 :root {
   --fondo: #f6f5f1;
@@ -2024,4 +2024,78 @@ label.boton {
   align-items: center;
   gap: 8px;
   min-height: 44px;
+}
+
+/* ───────────── Pedidos de la tienda pública ───────────── */
+.fila-pedido {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.fila-pedido-derecha {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.etiqueta-pedido-nuevo {
+  background: var(--ambar-suave);
+  color: var(--ambar-oscuro);
+}
+.etiqueta-pedido-confirmado {
+  background: var(--acento-suave);
+  color: var(--acento-oscuro);
+}
+.etiqueta-pedido-entregado {
+  background: var(--apagado);
+  color: var(--texto-medio);
+}
+.etiqueta-pedido-cancelado {
+  background: var(--peligro-suave);
+  color: var(--peligro);
+}
+.detalle-pedido-cabecera {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 17px;
+}
+.detalle-pedido-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.detalle-pedido-bloque p {
+  margin: 0;
+}
+.lineas-venta-total {
+  border-top: 1px solid var(--borde);
+  padding-top: 8px;
+  font-size: 15px !important;
+}
+.acciones-pedido {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.acciones-pedido .acciones-fila > .boton {
+  flex: 1;
+}
+.menu-insignia {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--ambar);
+  color: var(--ambar-oscuro);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -43,6 +43,9 @@ export type MiPlan = components['schemas']['MiPlanDto']
 export type PagoPlan = components['schemas']['PagoPlanDto']
 export type PagoParaRevisar = components['schemas']['PagoParaRevisarDto']
 export type TiendaAdmin = components['schemas']['AdminTiendaDto']
+export type Pedido = components['schemas']['PedidoDto']
+export type PedidoResumen = components['schemas']['PedidoResumenDto']
+export type VistaPedidos = components['schemas']['VistaPedidos']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 

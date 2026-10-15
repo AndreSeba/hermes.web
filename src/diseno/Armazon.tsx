@@ -1,8 +1,10 @@
-import { NavLink, Outlet } from 'react-router'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router'
+import { api } from '../api/cliente'
 import { Icono } from '../componentes/Icono'
 import { useSesion, useSesionActiva } from '../sesion/contexto'
 import { iniciales } from '../util/texto'
-import { nuevaVenta, secciones, seccionesCelular } from './secciones'
+import { nuevaVenta, PEDIDOS_CAMBIARON, secciones, seccionesCelular } from './secciones'
 
 // Escritorio: menú lateral. Celular: barra inferior con el botón central de venta.
 // Las dos navegaciones están en el DOM y el CSS muestra una u otra (ver .menu-lateral / .barra-inferior).
@@ -10,6 +12,27 @@ import { nuevaVenta, secciones, seccionesCelular } from './secciones'
 export function Armazon() {
   const { usuario, tienda } = useSesionActiva()
   const { salir } = useSesion()
+  const ubicacion = useLocation()
+  const [pedidos, setPedidos] = useState(0)
+
+  // Cuántos pedidos esperan (insignia del menú). Se vuelve a preguntar al cambiar de pantalla y cuando la pantalla de
+  // Pedidos avisa que atendió uno (evento PEDIDOS_CAMBIARON).
+  const [revision, setRevision] = useState(0)
+  useEffect(() => {
+    const alCambiar = () => setRevision((n) => n + 1)
+    window.addEventListener(PEDIDOS_CAMBIARON, alCambiar)
+    return () => window.removeEventListener(PEDIDOS_CAMBIARON, alCambiar)
+  }, [])
+  useEffect(() => {
+    let cancelado = false
+    api
+      .GET('/api/v1/pedidos/resumen')
+      .then(({ data }) => !cancelado && data && setPedidos(data.nuevos + data.confirmados))
+      .catch(() => {})
+    return () => {
+      cancelado = true
+    }
+  }, [ubicacion.pathname, revision])
 
   return (
     <div className="armazon">
@@ -31,6 +54,11 @@ export function Armazon() {
             <NavLink key={s.ruta} to={s.ruta} end={s.ruta === '/'} className="menu-enlace">
               <Icono nombre={s.icono} />
               {s.titulo}
+              {s.ruta === '/pedidos' && pedidos > 0 && (
+                <span className="menu-insignia" aria-label={`${pedidos} por atender`}>
+                  {pedidos}
+                </span>
+              )}
             </NavLink>
           ))}
           {usuario.esAdmin && (

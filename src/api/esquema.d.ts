@@ -1999,6 +1999,340 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pedidos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Vista?: components["schemas"]["VistaPedidos"];
+                    Cursor?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginaDePedidosDto"];
+                        "application/json": components["schemas"]["PaginaDePedidosDto"];
+                        "text/json": components["schemas"]["PaginaDePedidosDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pedidos/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResumenPedidosDto"];
+                        "application/json": components["schemas"]["ResumenPedidosDto"];
+                        "text/json": components["schemas"]["ResumenPedidosDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pedidos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PedidoDto"];
+                        "application/json": components["schemas"]["PedidoDto"];
+                        "text/json": components["schemas"]["PedidoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pedidos/{id}/confirmar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PedidoDto"];
+                        "application/json": components["schemas"]["PedidoDto"];
+                        "text/json": components["schemas"]["PedidoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pedidos/{id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CancelarPedidoDto"];
+                    "text/json": components["schemas"]["CancelarPedidoDto"];
+                    "application/*+json": components["schemas"]["CancelarPedidoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PedidoDto"];
+                        "application/json": components["schemas"]["PedidoDto"];
+                        "text/json": components["schemas"]["PedidoDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pedidos/{id}/entregar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EntregarPedidoDto"];
+                    "text/json": components["schemas"]["EntregarPedidoDto"];
+                    "application/*+json": components["schemas"]["EntregarPedidoDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PedidoDto"];
+                        "application/json": components["schemas"]["PedidoDto"];
+                        "text/json": components["schemas"]["PedidoDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/planes": {
         parameters: {
             query?: never;
@@ -3857,6 +4191,9 @@ export interface components {
         CambiarDireccionDto: {
             slug: string;
         };
+        CancelarPedidoDto: {
+            motivo: null | string;
+        };
         CategoriaDto: {
             /** Format: uuid */
             id: string;
@@ -3960,11 +4297,18 @@ export interface components {
             nombre: string;
         };
         /** @enum {unknown} */
+        EntregaPedido: "Retiro" | "Envio";
+        EntregarPedidoDto: {
+            metodoPago: components["schemas"]["MetodoPago"];
+        };
+        /** @enum {unknown} */
         EstadoBorrador: "Pendiente" | "Publicado" | "Descartado";
         /** @enum {unknown} */
         EstadoCompra: "EnCamino" | "Recibida" | "Anulada";
         /** @enum {unknown} */
         EstadoPago: "Pendiente" | "Aprobado" | "Rechazado";
+        /** @enum {unknown} */
+        EstadoPedido: "Nuevo" | "Confirmado" | "Entregado" | "Cancelado";
         /** @enum {unknown} */
         EstadoPrecio: "SinCosto" | "Pierde" | "Bajo" | "Ok";
         /** @enum {unknown} */
@@ -4069,6 +4413,11 @@ export interface components {
             porAgotarse: number;
             paraReponer: components["schemas"]["ProductoParaReponerDto"][];
             recientes: components["schemas"]["ActividadDto"][];
+            /**
+             * Format: int32
+             * @default 0
+             */
+            pedidosPendientes: number;
         };
         LecturaDto: {
             productos: components["schemas"]["ProductoLeidoDto"][];
@@ -4166,6 +4515,11 @@ export interface components {
             /** Format: uuid */
             siguiente: null | string;
         };
+        PaginaDePedidosDto: {
+            items: components["schemas"]["PedidoResumenDto"][];
+            /** Format: uuid */
+            siguiente: null | string;
+        };
         PaginaDeProductosDto: {
             items: components["schemas"]["ProductoResumenDto"][];
             /** Format: uuid */
@@ -4219,6 +4573,62 @@ export interface components {
             creadoEn: string;
             /** Format: date-time */
             resueltoEn: null | string;
+        };
+        PedidoDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            numero: number;
+            /** Format: date-time */
+            fecha: string;
+            estado: components["schemas"]["EstadoPedido"];
+            clienteNombre: string;
+            clienteCelular: string;
+            entrega: components["schemas"]["EntregaPedido"];
+            direccion: null | string;
+            referencia: null | string;
+            nota: null | string;
+            /** Format: double */
+            total: number;
+            /** Format: int32 */
+            unidades: number;
+            lineas: components["schemas"]["PedidoLineaDto"][];
+            /** Format: uuid */
+            ventaId: null | string;
+            motivoCancelacion: null | string;
+            /** Format: date-time */
+            resueltoEn: null | string;
+        };
+        PedidoLineaDto: {
+            /** Format: uuid */
+            varianteId: string;
+            /** Format: uuid */
+            productoId: string;
+            descripcion: string;
+            /** Format: int32 */
+            cantidad: number;
+            /** Format: double */
+            precioUnitario: number;
+            /** Format: double */
+            subtotal: number;
+            /** Format: double */
+            precioActual: number;
+        };
+        PedidoResumenDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            numero: number;
+            /** Format: date-time */
+            fecha: string;
+            estado: components["schemas"]["EstadoPedido"];
+            clienteNombre: string;
+            entrega: components["schemas"]["EntregaPedido"];
+            /** Format: double */
+            total: number;
+            /** Format: int32 */
+            unidades: number;
+            detalle: string;
         };
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
@@ -4462,6 +4872,12 @@ export interface components {
             /** Format: double */
             valorEnCamino: number;
         };
+        ResumenPedidosDto: {
+            /** Format: int32 */
+            nuevos: number;
+            /** Format: int32 */
+            confirmados: number;
+        };
         ResumenStockDto: {
             /** Format: double */
             valorCosto: number;
@@ -4637,6 +5053,8 @@ export interface components {
         };
         /** @enum {unknown} */
         VistaCompras: "Todas" | "EnCamino" | "PorPagar";
+        /** @enum {unknown} */
+        VistaPedidos: "Pendientes" | "Entregados" | "Cancelados" | "Todos";
         /** @enum {unknown} */
         VistaStock: "Todos" | "AReponer" | "PorEncargo";
     };

@@ -20,6 +20,12 @@ export const secciones: Seccion[] = [
     modulo: 'M6',
   },
   {
+    ruta: '/pedidos',
+    titulo: 'Pedidos',
+    icono: 'bolsa',
+    descripcion: 'Lo que tus clientes piden desde el carrito de tu tienda.',
+  },
+  {
     ruta: '/gastos',
     titulo: 'Gastos',
     icono: 'gastos',
@@ -91,6 +97,9 @@ export const nuevaVenta: Seccion = {
   descripcion: 'Anotá una venta en segundos; el stock se descuenta solo.',
   modulo: 'M6',
 }
+
+// Evento de `window` que dispara la pantalla de Pedidos al atender uno: el menú actualiza su insignia.
+export const PEDIDOS_CAMBIARON = 'pedidos-cambiaron'
 
 // En el celular la barra inferior tiene 4 secciones + el botón central de venta.
 export const seccionesCelular = ['/', '/catalogo', '/stock', '/mi-tienda']

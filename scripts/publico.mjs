@@ -90,7 +90,7 @@ try {
   await dormir(150)
   ok('la cantidad nunca baja de 1', (await evaluar(`document.getElementById('cantidad').textContent`)) === '1')
   ok('el mensaje incluye el enlace del producto para la dueña', (await mensaje()).includes('/p/'))
-  ok('el enlace abre WhatsApp en otra pestaña sin pasarle la página (noopener)', await evaluar(`(() => { const a = document.getElementById('pedir'); return a.target === '_blank' && a.rel.includes('noopener') && a.href.startsWith('https://wa.me/59171234567?text=') })()`))
+  ok('el enlace abre WhatsApp en otra pestaña sin pasarle la página (noopener)', await evaluar(`(() => { const a = document.getElementById('pedir'); return a.target === '_blank' && a.rel.includes('noopener') && a.href.startsWith('https://wa.me/' + document.getElementById('pedido').dataset.wa.replace(/\\D/g, '') + '?text=') })()`))
   await captura('m10-02-producto-publico-celular.png')
 
   await escritorio()
