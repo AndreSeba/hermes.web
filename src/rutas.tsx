@@ -12,6 +12,7 @@ import { Pedidos } from './paginas/pedidos/Pedidos'
 import { Gastos } from './paginas/gastos/Gastos'
 import { Instagram } from './paginas/instagram/Instagram'
 import { RevisarBorrador } from './paginas/instagram/RevisarBorrador'
+import { ConectadoInstagram } from './paginas/instagram/ConectadoInstagram'
 import { Compras } from './paginas/compras/Compras'
 import { NuevaCompra } from './paginas/compras/NuevaCompra'
 import { Proveedores } from './paginas/compras/Proveedores'
@@ -57,6 +58,7 @@ export const rutas = createBrowserRouter([
           { path: '/gastos', element: <Gastos /> },
           { path: '/instagram', element: <Instagram /> },
           { path: '/instagram/revisar/:id', element: <RevisarBorrador /> },
+          { path: '/instagram/conectado', element: <ConectadoInstagram /> },
           { path: '/compras', element: <Compras /> },
           { path: '/compras/nueva', element: <NuevaCompra /> },
           { path: '/proveedores', element: <Proveedores /> },

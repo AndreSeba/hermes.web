@@ -1149,7 +1149,7 @@ try {
   await captura('m13-05-admin-pagos-escritorio.png')
   await evaluar(`${filaPago}.querySelector('[aria-label^="Aprobar"]').click()`)
   await esperar(`document.body.innerText.includes('Activaste el plan Emprendedor de ' + ${JSON.stringify(nombreDuena)})`, 'aprobar')
-  ok('lo aprobado sale de la cola', await evaluar(`!${filaPago}`))
+  await esperar(`!${filaPago}`, 'lo aprobado sale de la cola') // la cola se vuelve a pedir después del aviso
   await evaluar(`__clic('Tiendas')`)
   await esperar(`!!__campo('Buscar tienda')`, 'pestaña Tiendas')
   await evaluar(`__escribir('Buscar tienda', '${slugDuena}')`)
@@ -1176,6 +1176,48 @@ try {
   await ir('/mi-plan')
   await esperar(`document.body.innerText.includes('Plan Emprendedor')`, 'Mi plan en celular')
   await captura('m13-07-mi-plan-emprendedor-celular.png')
+
+  // 8m. M12 · Conectar Instagram. Con la API apuntando al Meta FALSO (../Hermes/scripts/meta_falso.py en :5099, ver su
+  // encabezado) se recorre todo con clics; si no, se verifica que el panel diga que la conexión todavía no está activada.
+  await escritorio()
+  await ir('/instagram')
+  await esperar(`!!document.querySelector('.conexion-ig')`, 'la tarjeta de conexión con Instagram')
+  const conexionIg = await evaluar(`import('/src/api/cliente.ts').then(m => m.api.GET('/api/v1/instagram/conexion')).then(r => r.data)`)
+  const metaFalso = await fetch('http://localhost:5099/_prueba/pedidos').then(() => true).catch(() => false)
+  if (!conexionIg.configurada || !metaFalso) {
+    ok('sin app de Meta, el panel dice que la conexión todavía no está activada', await evaluar(`document.querySelector('.conexion-ig').innerText.includes('todavía no está activada')`))
+  } else {
+    await evaluar(`__clic('Conectar con Instagram')`)
+    await esperar(`location.pathname === '/instagram' && document.body.innerText.includes('Tu cuenta quedó conectada')`, 'Instagram (falso) autoriza y vuelve conectada', 20000)
+    await esperar(`document.querySelector('.conexion-ig').innerText.includes('Conectada: @tienda.falsa')`, 'la tarjeta muestra la cuenta')
+    await fetch('http://localhost:5099/_prueba/publicar', { method: 'POST', body: JSON.stringify({ id: `e2e-${n}`, caption: `Bolso Andino ${n}\nBs 210\n#bolsos`, fotos: 1 }) })
+    await evaluar(`__clic('Traer lo nuevo')`)
+    // Bajar y procesar la foto lleva unos segundos.
+    // El Meta falso guarda lo publicado en corridas anteriores: una tienda nueva lo trae todo la primera vez (cuántos, varía).
+    if (!(await esperar(`/Lleg(ó 1 producto|aron \\d+ productos) a la bandeja/.test(document.querySelector('.conexion-ig').innerText)`, 'traer lo nuevo', 30000)))
+      console.log('    la tarjeta decía:', JSON.stringify(await evaluar(`document.querySelector('.conexion-ig').innerText`)))
+    await esperar(`[...document.querySelectorAll('.fila-venta')].some(li => li.innerText.includes('Bolso Andino ${n}') && li.innerText.includes('Llegó de tu Instagram') && !!li.querySelector('img.borrador-foto'))`, 'el borrador llega con su foto')
+    await captura('m12-01-conectada-escritorio.png')
+    const filaBolso = `[...document.querySelectorAll('.fila-venta')].find(li => li.innerText.includes('Bolso Andino ${n}'))`
+    await evaluar(`[...${filaBolso}.querySelectorAll('a')].find(a => a.textContent.trim() === 'Revisar').click()`)
+    await esperar(`__campo('Nombre')?.value === 'Bolso Andino ${n}' && document.querySelectorAll('.galeria-foto img').length === 1`, 'la revisión trae la foto de Instagram')
+    const idBolso = await evaluar('location.pathname.split("/").pop()')
+    ok('la revisión enlaza a la publicación', await evaluar(`!!document.querySelector('a[href^="https://www.instagram.com/p/"]')`))
+    // Salir sin publicar NO borra la foto del borrador (es suya, no una subida a medio guardar).
+    await ir('/instagram')
+    await esperar(`!!document.querySelector('.conexion-ig')`, 'de vuelta en la bandeja')
+    await dormir(800)
+    await ir(`/instagram/revisar/${idBolso}`)
+    await esperar(`__campo('Nombre')?.value === 'Bolso Andino ${n}' && document.querySelectorAll('.galeria-foto img').length === 1`, 'la foto sigue ahí al volver')
+    ok('la foto del borrador sigue existiendo en el servidor', (await evaluar(`__estado(document.querySelector('.galeria-foto img').src)`)) === 200)
+    await evaluar(`__clic('Guardar producto')`)
+    await esperar(`document.body.innerText.includes('¡Guardado!')`, 'publicar el borrador de Instagram')
+    ok('el producto quedó con la foto de Instagram', await evaluar(`import('/src/api/cliente.ts').then(m => m.api.GET('/api/v1/productos', { params: { query: { Buscar: 'Bolso Andino ${n}' } } })).then(r => !!r.data.items[0]?.portada)`))
+    await ir('/instagram')
+    await esperar(`!!document.querySelector('.conexion-ig')`, 'Desde Instagram')
+    await evaluar(`__clic('Desconectar')`)
+    await esperar(`document.body.innerText.includes('Desconectaste tu cuenta')`, 'desconectar')
+  }
 
   // 8l. Carrito de la tienda pública → Pedidos del panel (el cliente pide en el sitio público; la dueña entrega y cobra)
   await escritorio()

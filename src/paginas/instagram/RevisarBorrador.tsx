@@ -5,8 +5,8 @@ import { Aviso } from '../../componentes/Aviso'
 import { Dialogo } from '../../componentes/Dialogo'
 import { FormularioProducto } from '../catalogo/FormularioProducto'
 
-// Revisar un producto de la bandeja: el formulario de siempre, con lo que se entendió ya escrito, las fotos para agregar
-// (Instagram no las trae todavía) y, arriba, el texto original y lo que el lector no estuvo seguro. Al guardar se publica.
+// Revisar un producto de la bandeja: el formulario de siempre, con lo que se entendió ya escrito (y las fotos, si vino de la
+// cuenta conectada: M12) y, arriba, el texto original y lo que el lector no estuvo seguro. Al guardar se publica.
 export function RevisarBorrador() {
   const { id } = useParams()
   const navegar = useNavigate()
@@ -81,6 +81,11 @@ export function RevisarBorrador() {
             <summary>Ver el texto original</summary>
             <p className="texto-original">{borrador.texto}</p>
           </details>
+          {borrador.enlace && (
+            <a href={borrador.enlace} target="_blank" rel="noopener noreferrer" className="boton boton-texto boton-chico">
+              Ver la publicación en Instagram
+            </a>
+          )}
           <div className="acciones-fila">
             <button type="button" className="boton boton-texto boton-chico" onClick={() => setDescartando(true)}>
               Descartar este producto

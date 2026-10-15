@@ -70,6 +70,8 @@ const desdeBorrador = (b: Borrador): Estado => ({
   precio: b.precio ? String(b.precio) : '',
   colores: b.colores.join(', '),
   tallas: b.tallas.join(', '),
+  // Las que vinieron de Instagram (M12): ya están en el servidor y son del borrador.
+  fotos: b.fotos ?? [],
 })
 
 export function FormularioProducto({ inicial, costoBloqueado = false, borrador, alPublicar }: PropsFormulario) {
@@ -109,8 +111,9 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
 
   // Fotos subidas que todavía no se guardaron con el producto: si se sacan, se descartan o se sale de la
   // pantalla, se borran del servidor para no dejar fotos huérfanas (cerrar la pestaña sí deja alguna:
-  // limpieza en M14). `guardadas` = las que ya son del producto.
-  const guardadas = new Set(servidor?.fotos.map((f) => f.id))
+  // limpieza en M14). `guardadas` = las que ya son del producto, o del borrador de Instagram que se está revisando: esas NO
+  // se borran al salir (si no, abrir y cerrar la revisión dejaría al borrador sin fotos); si se descarta, las limpia el servidor.
+  const guardadas = new Set([...(servidor?.fotos.map((f) => f.id) ?? []), ...(borrador?.fotos?.map((f) => f.id) ?? [])])
   const sinGuardar = useRef<string[]>([])
   useEffect(() => {
     sinGuardar.current = form.fotos.filter((f) => !guardadas.has(f.id)).map((f) => f.id)

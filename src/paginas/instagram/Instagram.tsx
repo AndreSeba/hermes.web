@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { api, mensajeDeError, type Borrador, type Lectura, type ProductoLeido } from '../../api/cliente'
 import { AreaTexto } from '../../componentes/AreaTexto'
 import { Aviso } from '../../componentes/Aviso'
 import { Dialogo } from '../../componentes/Dialogo'
 import { bs } from '../../util/dinero'
+import { ConexionInstagram } from './ConexionInstagram'
 
 const MAXIMO_TEXTO = 5000 // el mismo que ParserPublicacion.MaximoTexto del backend (que igual valida)
 const POR_PAGINA = 20
@@ -18,8 +19,10 @@ Quedan 5
 
 // "Desde Instagram": se pega el texto de una publicación, se ve qué entendió el lector ("Probá tu formato") y, si está bien,
 // se manda a la bandeja. **Nada llega al catálogo solo**: cada producto se revisa y se publica desde la bandeja.
-// (La conexión automática con Instagram llega después: acá la dueña pega el texto.)
+// Con la cuenta conectada (M12, ConexionInstagram), las publicaciones nuevas llegan solas a la misma bandeja, con sus fotos.
 export function Instagram() {
+  const [params] = useSearchParams()
+  const conectadaRecien = params.get('conectada') === '1'
   const [texto, setTexto] = useState('')
   const [lectura, setLectura] = useState<Lectura | null>(null)
   const [trabajando, setTrabajando] = useState(false)
@@ -118,6 +121,9 @@ export function Instagram() {
         <h1 className="titulo-pagina">Desde Instagram</h1>
       </header>
 
+      {conectadaRecien && <Aviso tipo="exito">¡Listo! Tu cuenta quedó conectada. Tocá «Traer lo nuevo» para ver tus publicaciones en la bandeja.</Aviso>}
+      <ConexionInstagram alTraer={() => setVersion((n) => n + 1)} />
+
       <section className="tarjeta lector" aria-labelledby="lector-titulo">
         <h2 id="lector-titulo" className="titulo-seccion">
           Pegá una publicación
@@ -192,8 +198,10 @@ export function Instagram() {
               {items.map((b) => (
                 <li key={b.id} className="fila-venta">
                   <div className="fila-stock-cabecera fila-gasto">
+                    {b.fotos && b.fotos.length > 0 && <img className="borrador-foto" src={b.fotos[0].miniatura} alt="" width={48} height={48} />}
                     <span className="fila-stock-datos">
                       <span className="fila-stock-nombre">{b.nombre}</span>
+                      {b.origen === 'Instagram' && <span className="texto-suave texto-chico">Llegó de tu Instagram</span>}
                       <span className="fila-stock-linea">
                         <span className="texto-suave texto-chico">{b.precio ? bs(b.precio) : 'Sin precio'}</span>
                         {b.categoria && <span className="texto-suave texto-chico">· #{b.categoria.toLowerCase()}</span>}

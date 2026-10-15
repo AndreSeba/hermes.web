@@ -4,6 +4,39 @@
  */
 
 export interface paths {
+    "/salud": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/pagos": {
         parameters: {
             query?: never;
@@ -1666,6 +1699,216 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/conexion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["InstagramConexionDto"];
+                        "application/json": components["schemas"]["InstagramConexionDto"];
+                        "text/json": components["schemas"]["InstagramConexionDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConectarInstagramDto"];
+                    "text/json": components["schemas"]["ConectarInstagramDto"];
+                    "application/*+json": components["schemas"]["ConectarInstagramDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["InstagramConexionDto"];
+                        "application/json": components["schemas"]["InstagramConexionDto"];
+                        "text/json": components["schemas"]["InstagramConexionDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/conexion/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UrlConexionDto"];
+                        "application/json": components["schemas"]["UrlConexionDto"];
+                        "text/json": components["schemas"]["UrlConexionDto"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instagram/conexion/sincronizar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SincronizacionDto"];
+                        "application/json": components["schemas"]["SincronizacionDto"];
+                        "text/json": components["schemas"]["SincronizacionDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -4187,6 +4430,8 @@ export interface components {
             productoId: null | string;
             /** Format: date-time */
             creadoEn: string;
+            fotos?: null | components["schemas"]["ImagenDto"][];
+            enlace?: null | string;
         };
         CambiarDireccionDto: {
             slug: string;
@@ -4259,6 +4504,10 @@ export interface components {
             /** Format: double */
             total: number;
             detalle: string;
+        };
+        ConectarInstagramDto: {
+            code: string;
+            state: string;
         };
         ConfiguracionPublicaDto: {
             publicada: boolean;
@@ -4418,6 +4667,17 @@ export interface components {
              * @default 0
              */
             pedidosPendientes: number;
+        };
+        InstagramConexionDto: {
+            configurada: boolean;
+            conectada: boolean;
+            usuario: null | string;
+            /** Format: date-time */
+            conectadaEn: null | string;
+            /** Format: date-time */
+            ultimaSincronizacion: null | string;
+            ultimoError: null | string;
+            necesitaReconectar: boolean;
         };
         LecturaDto: {
             productos: components["schemas"]["ProductoLeidoDto"][];
@@ -4911,6 +5171,15 @@ export interface components {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
         };
+        SincronizacionDto: {
+            /** Format: int32 */
+            publicaciones: number;
+            /** Format: int32 */
+            productos: number;
+            /** Format: int32 */
+            sinProductos: number;
+            avisos: string[];
+        };
         SolicitarPlanDto: {
             /** Format: uuid */
             planId: string;
@@ -4960,6 +5229,9 @@ export interface components {
             costoUnitario: number;
             /** Format: date-time */
             fecha: string;
+        };
+        UrlConexionDto: {
+            url: string;
         };
         UsuarioSesionDto: {
             /** Format: uuid */
