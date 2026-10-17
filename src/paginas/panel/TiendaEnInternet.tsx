@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { api, mensajeDeError, type ConfiguracionPublica } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Interruptor } from '../../componentes/Interruptor'
-import { urlDeTienda } from '../../util/tienda'
 
 const fondos: { id: ConfiguracionPublica['fondo']; etiqueta: string }[] = [
   { id: 'Claro', etiqueta: 'Claro' },
@@ -10,28 +9,20 @@ const fondos: { id: ConfiguracionPublica['fondo']; etiqueta: string }[] = [
   { id: 'Oscuro', etiqueta: 'Oscuro' },
 ]
 
-// "Tu tienda en internet": el enlace para compartir, qué ven tus clientes y el fondo. Cada cambio se guarda al tocarlo
-// (son interruptores, no un formulario largo). El color y el logo se eligen arriba, en "Cómo se ve".
-export function TiendaEnInternet({ slug, nombre, tieneWhatsapp }: { slug: string; nombre: string; tieneWhatsapp: boolean }) {
-  const [config, setConfig] = useState<ConfiguracionPublica | null>(null)
+type Props = {
+  config: ConfiguracionPublica
+  // La configuración vive en "Mi tienda" (la vista previa en vivo también la lee): al guardar un cambio se la devuelve.
+  alCambiarConfig: (config: ConfiguracionPublica) => void
+  tieneWhatsapp: boolean
+}
+
+// "Diseño y lo que ven tus clientes": publicar, precios, disponibilidad, pedidos por WhatsApp y el fondo. Cada cambio se guarda
+// al tocarlo (son interruptores, no un formulario largo). El enlace y el QR están en la tarjeta de arriba; el color y el logo se
+// eligen en "Cómo se ve".
+export function TiendaEnInternet({ config, alCambiarConfig, tieneWhatsapp }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
-
-  useEffect(() => {
-    let cancelado = false
-    api
-      .GET('/api/v1/tienda/publica')
-      .then(({ data, error, response }) => {
-        if (cancelado) return
-        if (data) setConfig(data)
-        else setError(mensajeDeError(error, response))
-      })
-      .catch(() => !cancelado && setError(mensajeDeError(null)))
-    return () => {
-      cancelado = true
-    }
-  }, [])
 
   useEffect(() => {
     if (!aviso) return
@@ -40,13 +31,13 @@ export function TiendaEnInternet({ slug, nombre, tieneWhatsapp }: { slug: string
   }, [aviso])
 
   async function cambiar(parte: Partial<ConfiguracionPublica>, mensaje: string) {
-    if (!config || guardando) return
+    if (guardando) return
     setGuardando(true)
     setError(null)
     try {
       const { data, error, response } = await api.PUT('/api/v1/tienda/publica', { body: { ...config, ...parte } })
       if (data) {
-        setConfig(data)
+        alCambiarConfig(data)
         setAviso(mensaje)
       } else setError(mensajeDeError(error, response))
     } catch {
@@ -56,30 +47,10 @@ export function TiendaEnInternet({ slug, nombre, tieneWhatsapp }: { slug: string
     }
   }
 
-  async function copiar() {
-    try {
-      await navigator.clipboard.writeText(urlDeTienda(slug))
-      setAviso('Copiaste el enlace de tu tienda.')
-    } catch {
-      setError('No pudimos copiarlo solo: mantené apretado el enlace de arriba y copialo.')
-    }
-  }
-
-  if (!config)
-    return error ? (
-      <Aviso>{error}</Aviso>
-    ) : (
-      <p className="texto-suave" role="status">
-        Cargando tu tienda en internet…
-      </p>
-    )
-
-  const enlace = urlDeTienda(slug)
-
   return (
-    <section className="seccion tarjeta tienda-internet" aria-labelledby="internet-titulo">
+    <section id="diseno" className="seccion tarjeta tienda-internet" aria-labelledby="internet-titulo">
       <h2 id="internet-titulo" className="seccion-titulo">
-        Tu tienda en internet
+        Diseño y lo que ven tus clientes
       </h2>
 
       <Interruptor
@@ -88,29 +59,6 @@ export function TiendaEnInternet({ slug, nombre, tieneWhatsapp }: { slug: string
         activo={config.publicada}
         alCambiar={(publicada) => cambiar({ publicada }, publicada ? 'Tu tienda está publicada.' : 'Tu tienda dejó de verse.')}
       />
-
-      <div className="enlace-tienda">
-        <span className="texto-suave texto-chico">Tu enlace para compartir</span>
-        <a className="direccion" href={enlace} target="_blank" rel="noopener noreferrer">
-          {enlace}
-        </a>
-        <div className="acciones-fila">
-          <a className="boton boton-primario boton-chico" href={enlace} target="_blank" rel="noopener noreferrer">
-            Ver mi tienda
-          </a>
-          <button type="button" className="boton boton-secundario boton-chico" onClick={copiar}>
-            Copiar enlace
-          </button>
-          <a
-            className="boton boton-secundario boton-chico"
-            href={`https://wa.me/?text=${encodeURIComponent(`Mirá mi tienda ${nombre}: ${enlace}`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Compartir por WhatsApp
-          </a>
-        </div>
-      </div>
 
       <h3 className="seccion-subtitulo">Qué ven tus clientes</h3>
       <Interruptor

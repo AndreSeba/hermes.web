@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, mensajeDeError, type ImagenSubida, type Tienda } from '../../api/cliente'
+import { api, mensajeDeError, type ConfiguracionPublica, type ImagenSubida, type ProductoResumen, type Tienda } from '../../api/cliente'
 import { AreaTexto } from '../../componentes/AreaTexto'
 import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
@@ -10,7 +10,10 @@ import { SubirFoto } from '../../componentes/SubirFoto'
 import { useSesion, useSesionActiva } from '../../sesion/contexto'
 import { colorDeTexto } from '../../util/color'
 import { iniciales } from '../../util/texto'
+import { TarjetaEnlace } from './TarjetaEnlace'
 import { TiendaEnInternet } from './TiendaEnInternet'
+import { VistaPreviaTienda } from './VistaPreviaTienda'
+import { urlDeTienda } from '../../util/tienda'
 
 type Formulario = {
   nombre: string
@@ -45,17 +48,23 @@ export function MiTienda() {
   const [guardado, setGuardado] = useState(false)
   const [dialogo, setDialogo] = useState(false)
 
+  // Lo de "qué ven tus clientes" (también lo lee la vista previa en vivo) y unos productos para mostrar en ella.
+  const [config, setConfig] = useState<ConfiguracionPublica | null>(null)
+  const [productos, setProductos] = useState<ProductoResumen[] | null>(null)
+
   // `intento` sube al tocar "Reintentar" y vuelve a disparar la carga.
   const [intento, setIntento] = useState(0)
   useEffect(() => {
     let cancelado = false // StrictMode monta dos veces: solo vale la respuesta de la última
-    api
-      .GET('/api/v1/tienda')
-      .then(({ data, error, response }) => {
+    Promise.all([api.GET('/api/v1/tienda'), api.GET('/api/v1/tienda/publica'), api.GET('/api/v1/productos', { params: { query: { Limite: 8 } } })])
+      .then(([t, c, p]) => {
         if (cancelado) return
-        if (!data) return setErrorCarga(mensajeDeError(error, response))
-        setServidor(data)
-        setForm(aFormulario(data))
+        if (!t.data) return setErrorCarga(mensajeDeError(t.error, t.response))
+        if (!c.data) return setErrorCarga(mensajeDeError(c.error, c.response))
+        setServidor(t.data)
+        setForm(aFormulario(t.data))
+        setConfig(c.data)
+        setProductos(p.data?.items ?? [])
       })
       .catch(() => !cancelado && setErrorCarga(mensajeDeError(null)))
     return () => {
@@ -93,7 +102,7 @@ export function MiTienda() {
         </button>
       </div>
     )
-  if (!servidor || !form)
+  if (!servidor || !form || !config)
     return (
       <div className="pagina" role="status" aria-live="polite">
         <h1 className="titulo-pagina">Mi tienda</h1>
@@ -146,68 +155,107 @@ export function MiTienda() {
   }
 
   return (
-    <div className="pagina pagina-angosta">
+    <div className="pagina pagina-media">
       <header className="pagina-cabecera">
         <h1 className="titulo-pagina">Mi tienda</h1>
+        <a className="boton boton-secundario boton-chico" href={urlDeTienda(servidor.slug)} target="_blank" rel="noopener noreferrer">
+          <Icono nombre="externo" tamano={16} />
+          Ver como cliente
+        </a>
       </header>
 
-      <form className="seccion tarjeta" onSubmit={guardar} noValidate>
-        <h2 className="seccion-titulo">Cómo se ve</h2>
+      <TarjetaEnlace slug={servidor.slug} nombre={servidor.nombre} />
 
-        <SubirFoto
-          etiqueta="logo"
-          imagen={form.logo}
-          alCambiar={(logo) => {
-            borrarSiNoSeGuardo(form.logo?.id)
-            cambiar({ logo })
-          }}
-          vacio={{ iniciales: iniciales(form.nombre) || '?', fondo: form.color, texto: colorDeTexto(form.color) }}
+      <form className="formulario-tienda" onSubmit={guardar} noValidate>
+        <section className="seccion tarjeta" aria-labelledby="como-se-ve-titulo">
+          <div className="seccion-cabecera">
+            <h2 id="como-se-ve-titulo" className="seccion-titulo">
+              Cómo se ve
+            </h2>
+            <button
+              type="button"
+              className="boton boton-oscuro boton-chico"
+              onClick={() => document.getElementById('diseno')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            >
+              Personalizar colores y diseño
+              <Icono nombre="flecha" tamano={16} />
+            </button>
+          </div>
+
+          <div className="fila-doble">
+            <Campo
+              etiqueta="Nombre de la tienda"
+              value={form.nombre}
+              onChange={(e) => cambiar({ nombre: e.target.value })}
+              maxLength={120}
+              autoComplete="organization"
+              required
+            />
+            <Campo
+              etiqueta="WhatsApp para pedidos"
+              prefijo="+591"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              placeholder="71234567"
+              value={form.whatsapp}
+              onChange={(e) => cambiar({ whatsapp: e.target.value })}
+              aria-invalid={!!avisoWhatsapp}
+              // Sin texto de ayuda cuando está bien (las dos columnas quedan parejas, como en el diseño): solo el aviso si falla.
+              ayuda={avisoWhatsapp ?? undefined}
+            />
+          </div>
+
+          <AreaTexto
+            etiqueta="Descripción corta"
+            rows={1}
+            value={form.descripcion}
+            onChange={(e) => cambiar({ descripcion: e.target.value })}
+            maxLength={500}
+            ayuda="Aparece debajo del nombre en tu tienda."
+          />
+
+          <div className="fila-logo-color">
+            <SubirFoto
+              etiqueta="logo"
+              imagen={form.logo}
+              alCambiar={(logo) => {
+                borrarSiNoSeGuardo(form.logo?.id)
+                cambiar({ logo })
+              }}
+              vacio={{ iniciales: iniciales(form.nombre) || '?', fondo: form.color, texto: colorDeTexto(form.color) }}
+            />
+            <SelectorColor etiqueta="Color de tu tienda" valor={form.color} alCambiar={(color) => cambiar({ color })} />
+          </div>
+        </section>
+
+        <VistaPreviaTienda
+          slug={servidor.slug}
+          nombre={form.nombre}
+          descripcion={form.descripcion}
+          color={form.color}
+          logo={form.logo}
+          tieneWhatsapp={soloDigitos(form.whatsapp) !== '' && !avisoWhatsapp}
+          config={config}
+          productos={productos}
         />
 
-        <Campo
-          etiqueta="Nombre de la tienda"
-          value={form.nombre}
-          onChange={(e) => cambiar({ nombre: e.target.value })}
-          maxLength={120}
-          autoComplete="organization"
-          required
-        />
-        <AreaTexto
-          etiqueta="Descripción corta"
-          value={form.descripcion}
-          onChange={(e) => cambiar({ descripcion: e.target.value })}
-          maxLength={500}
-          ayuda="Aparece debajo del nombre en tu tienda."
-        />
-        <SelectorColor etiqueta="Color de tu tienda" valor={form.color} alCambiar={(color) => cambiar({ color })} />
-
-        <Campo
-          etiqueta="WhatsApp donde recibís los pedidos"
-          prefijo="+591"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel-national"
-          placeholder="71234567"
-          value={form.whatsapp}
-          onChange={(e) => cambiar({ whatsapp: e.target.value })}
-          aria-invalid={!!avisoWhatsapp}
-          ayuda={avisoWhatsapp ?? 'Tus clientes te escriben a este número desde tu tienda.'}
-        />
+        <p className="texto-suave texto-chico">Los cambios se ven acá al instante. Tus clientes los ven cuando tocás Guardar.</p>
 
         {error && <Aviso>{error}</Aviso>}
         {guardado && <Aviso tipo="exito">Guardado. Ya está actualizado.</Aviso>}
 
-        <div className="acciones-fila">
-          <button type="submit" className="boton boton-primario" disabled={!puedeGuardar}>
-            {guardando ? 'Guardando…' : 'Guardar cambios'}
+        <button type="submit" className="boton boton-oscuro boton-grande" disabled={!puedeGuardar}>
+          {guardando ? 'Guardando…' : 'Guardar cambios'}
+        </button>
+        {hayCambios && !guardando && (
+          <button type="button" className="boton boton-texto" onClick={descartar}>
+            Descartar los cambios
           </button>
-          {hayCambios && !guardando && (
-            <button type="button" className="boton boton-texto" onClick={descartar}>
-              Descartar
-            </button>
-          )}
-        </div>
+        )}
       </form>
+
+      <TiendaEnInternet config={config} alCambiarConfig={setConfig} tieneWhatsapp={!!servidor.whatsapp} />
 
       <section className="seccion tarjeta">
         <h2 className="seccion-titulo">Dirección de tu tienda</h2>
@@ -237,8 +285,6 @@ export function MiTienda() {
           Cerrar sesión
         </button>
       </section>
-
-      <TiendaEnInternet slug={servidor.slug} nombre={servidor.nombre} tieneWhatsapp={!!servidor.whatsapp} />
 
       <CambiarDireccion
         abierto={dialogo}

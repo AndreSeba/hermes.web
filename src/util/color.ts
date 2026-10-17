@@ -7,6 +7,14 @@ export const coloresDeTienda = [
   { nombre: 'Grafito', hex: '#2E3036' },
 ] as const
 
+// Los colores del fondo de la tienda pública (los mismos de Hermes.Public/Tema.cs: la vista previa tiene que verse igual).
+export const paletaDeFondo = (fondo: 'Claro' | 'Crema' | 'Oscuro') =>
+  ({
+    Claro: { fondo: '#FFFFFF', superficie: '#F6F5F1', texto: '#17181C', suave: '#6B6E76', borde: '#E6E4DE' },
+    Crema: { fondo: '#F6F5F1', superficie: '#FFFFFF', texto: '#17181C', suave: '#6B6E76', borde: '#E6E4DE' },
+    Oscuro: { fondo: '#17181C', superficie: '#23252B', texto: '#F6F5F1', suave: '#A3A6AE', borde: '#34363D' },
+  })[fondo]
+
 // Texto claro u oscuro según el fondo, para que se lea (contraste WCAG: luminancia relativa).
 export function colorDeTexto(hex: string) {
   const canal = (i: number) => {
