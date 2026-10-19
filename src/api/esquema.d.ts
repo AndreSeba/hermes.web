@@ -4183,6 +4183,99 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ventas/por-dia": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Desde?: string;
+                    Dias?: number;
+                    DesfaseMinutos?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["VentaDiaDto"][];
+                        "application/json": components["schemas"]["VentaDiaDto"][];
+                        "text/json": components["schemas"]["VentaDiaDto"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventas/mas-vendidos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Desde?: string;
+                    Hasta?: string;
+                    Limite?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MasVendidoDto"][];
+                        "application/json": components["schemas"]["MasVendidoDto"][];
+                        "text/json": components["schemas"]["MasVendidoDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ventas/productos": {
         parameters: {
             query?: never;
@@ -4667,6 +4760,21 @@ export interface components {
              * @default 0
              */
             pedidosPendientes: number;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            borradoresListos: number;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            borradoresSinPrecio: number;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            unidadesDeLaTienda: number;
         };
         InstagramConexionDto: {
             configurada: boolean;
@@ -4715,6 +4823,15 @@ export interface components {
         LoginDto: {
             email: string;
             password: string;
+        };
+        MasVendidoDto: {
+            /** Format: uuid */
+            productoId: string;
+            nombre: string;
+            /** Format: int32 */
+            unidades: number;
+            /** Format: double */
+            ganancia: null | number;
         };
         /** @enum {unknown} */
         MetodoPago: "Efectivo" | "Qr" | "Tarjeta" | "Transferencia";
@@ -5269,6 +5386,14 @@ export interface components {
             talla: null | string;
             /** Format: int32 */
             stock: null | number;
+        };
+        VentaDiaDto: {
+            /** Format: date */
+            fecha: string;
+            /** Format: double */
+            total: number;
+            /** Format: int32 */
+            ventas: number;
         };
         VentaDto: {
             /** Format: uuid */

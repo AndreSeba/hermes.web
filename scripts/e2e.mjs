@@ -9,7 +9,7 @@ import { join } from 'node:path'
 
 const salida = process.argv[2] ?? '../Hermes/docs/capturas'
 mkdirSync(salida, { recursive: true })
-const BASE = 'http://localhost:5173'
+const BASE = process.env.E2E_BASE ?? 'http://localhost:5173'
 const PUERTO = 9333
 const edge = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
 const perfil = mkdtempSync(join(tmpdir(), 'e2e-edge-'))
@@ -139,7 +139,7 @@ try {
   ok('registro entra al Inicio', (await ruta()) === '/')
   await esperar(`document.body.innerText.includes('Tu cuenta está lista')`, 'el Inicio de una tienda sin actividad muestra los primeros pasos')
   const t = await texto()
-  ok('Inicio muestra la tienda y su dirección', t.includes(`Ñandú Accesorios ${n}`) && t.includes(`/nandu-accesorios-${n}`))
+  ok('Inicio muestra la dirección de la tienda', t.includes(`/nandu-accesorios-${n}`))
   ok('ningún texto visible menciona "hermes"', !/hermes/i.test(t) && !/hermes/i.test(await evaluar('document.title')))
   await captura('m1-03-inicio-celular.png')
 
@@ -875,13 +875,19 @@ try {
   // 8h. M9 · Inicio y gastos: resumen del mes, gastos, "ya cubriste el X %", para reponer y lo último que pasó
   await celular()
   await ir('/')
-  await esperar(`!!document.querySelector('.resumen-stock') && !!document.querySelector('.medidor')`, 'el Inicio con actividad muestra el resumen y el medidor')
-  const resumenInicio = await evaluar(`document.querySelector('.resumen-stock').innerText`)
-  ok('el resumen del mes suma lo vendido (2 ventas vigentes, la anulada no cuenta: Bs 660)', resumenInicio.includes('Bs 660') && resumenInicio.includes('2 ventas'))
+  await esperar(`!!document.querySelector('.kpis') && !!document.querySelector('.gastos-cubiertos') && document.querySelectorAll('.grafico-columna').length === 14`, 'el Inicio con actividad muestra las tarjetas, el gráfico de 14 días y los gastos')
+  const resumenInicio = await evaluar(`document.querySelector('.kpis').innerText`)
+  ok('las tarjetas suman lo vendido (2 ventas vigentes, la anulada no cuenta: Bs 660, ticket Bs 330)', resumenInicio.includes('Bs 660') && resumenInicio.includes('2 ventas') && resumenInicio.includes('ticket promedio Bs 330'))
   ok('avisa las unidades sin costo cargado', resumenInicio.includes('unidades sin costo cargado'))
-  ok('sin gastos explica qué hacer', await evaluar(`document.querySelector('.medidor').innerText.includes('Todavía no anotaste gastos este mes')`))
-  ok('«Para atender» trae los productos para reponer', await evaluar(`(() => { const t = document.body.innerText; return t.includes('Para reponer') && t.includes('Agotado') && !!document.querySelector('a[href="/stock?vista=areponer"]') })()`))
-  ok('«Lo último que pasó» mezcla ventas y compras', await evaluar(`(() => { const t = document.querySelector('.recientes').innerText; return t.includes('Vendiste') && t.includes('Compraste a Cueros Don Beto') })()`))
+  ok('sin gastos explica qué hacer', await evaluar(`document.querySelector('.gastos-cubiertos').innerText.includes('Todavía no anotaste gastos este mes')`))
+  ok('lo que hay que reponer aparece como aviso con enlace a Stock', await evaluar(`(() => { const a = document.querySelector('a[href="/stock?vista=areponer"]'); return !!a && a.innerText.includes('llegaron más') })()`))
+  ok('«Últimas ventas» lista las 2 ventas vigentes', await evaluar(`document.querySelectorAll('[aria-labelledby="ultimas-titulo"] tbody tr').length === 2`))
+  ok('«Lo que más se vende» lista los productos con sus unidades', await evaluar(`document.querySelectorAll('[aria-labelledby="mas-vendido-titulo"] tbody tr').length >= 1`))
+  ok('el gráfico marca el día de hoy y su monto', await evaluar(`document.querySelector('.grafico-dia-hoy') !== null && /Bs 660/.test(document.querySelector('.grafico-cabecera').innerText)`))
+  await evaluar(`[...document.querySelectorAll('.selector-periodo .segmento')].find(b => b.textContent.trim() === 'Semana').click()`)
+  await esperar(`document.querySelector('.gastos-cubiertos').innerText.includes('Gastos de la semana cubiertos') && location.search.includes('periodo=semana')`, 'el selector de período cambia a Semana')
+  await evaluar(`[...document.querySelectorAll('.selector-periodo .segmento')].find(b => b.textContent.trim() === 'Mes').click()`)
+  await esperar(`document.querySelector('.gastos-cubiertos').innerText.includes('Gastos de') && !location.search.includes('periodo')`, 'y vuelve al Mes')
   await captura('m9-01-inicio-celular.png')
 
   await evaluar(`document.querySelector('.accesos').querySelector('a[href="/gastos?nuevo=1"]').click()`)
@@ -913,9 +919,8 @@ try {
   // El Inicio cruza ganancia con gastos
   await ir('/')
   await esperar(`!!document.querySelector('.medidor-barra')`, 'el medidor con gastos')
-  ok('dice cuánto gastaste y que cubriste 0 % (todo se vendió sin costo cargado)', await evaluar(`(() => { const t = document.querySelector('.medidor').innerText; return t.includes('Gastaste Bs 800') && t.includes('cubriste el 0 %') && t.includes('Te faltan Bs 800') })()`))
+  ok('dice que cubriste 0 % (todo se vendió sin costo cargado) y cuánto falta', await evaluar(`(() => { const t = document.querySelector('.gastos-cubiertos').innerText; return t.includes('0 %') && t.includes('Te faltan Bs 800') && t.includes('(Bs 800)') })()`))
   ok('el medidor es una barra de progreso accesible', await evaluar(`document.querySelector('.medidor-barra').getAttribute('role') === 'progressbar' && document.querySelector('.medidor-barra').getAttribute('aria-valuenow') === '0'`))
-  ok('lo último incluye el gasto', await evaluar(`document.querySelector('.recientes').innerText.includes('Gastaste en Alquiler')`))
   await captura('m9-04-inicio-con-gastos-celular.png')
 
   // Vender y ver el medidor en la pantalla de éxito
@@ -1242,7 +1247,8 @@ try {
   ok('el sitio público recibe el pedido del carrito (201) con su enlace de WhatsApp', pedidoCliente.status === 201 && enviado.whatsapp.startsWith('https://wa.me/591'))
   await ir('/')
   await esperar(`!!document.querySelector('.menu-insignia')`, 'el menú avisa el pedido nuevo')
-  ok('el Inicio avisa el pedido esperando', await evaluar(`document.body.innerText.includes('pedido esperando') || document.body.innerText.includes('pedidos esperando')`))
+  await esperar(`document.body.innerText.includes('de tu tienda esperando')`, 'el Inicio carga el aviso del pedido')
+  ok('el Inicio avisa el pedido esperando', await evaluar(`document.body.innerText.includes('pedido de tu tienda esperando') || document.body.innerText.includes('pedidos de tu tienda esperando')`))
   await evaluar(`__clic('Pedidos')`)
   await esperar(`location.pathname === '/pedidos' && document.body.innerText.includes('#${enviado.numero} · Cliente E2E')`, 'el pedido aparece en Pedidos')
   await captura('pedidos-01-lista-escritorio.png')

@@ -56,7 +56,8 @@ const trazos = {
     </>
   ),
   obras:<path d="M2 20h20M5 20V9l7-5 7 5v11M9 20v-5h6v5" />,
-  externo: <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />,
+  alerta: <path d="M12 3l10 18H2zM12 10v5M12 18h.01" />,
+  externo:<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />,
   descargar: <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />,
 } as const
 
