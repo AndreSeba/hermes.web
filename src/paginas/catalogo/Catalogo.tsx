@@ -4,27 +4,33 @@ import { api, mensajeDeError, type Categoria, type ProductoResumen } from '../..
 import { Aviso } from '../../componentes/Aviso'
 import { EtiquetaMargen } from '../../componentes/EtiquetaMargen'
 import { Icono } from '../../componentes/Icono'
+import { Paginacion } from '../../componentes/Paginacion'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { DialogoCategorias } from './DialogoCategorias'
 
-const POR_PAGINA = 24
+const POR_PAGINA = 20
 
 // Los filtros viven en la dirección (?q=…&categoria=…&filtro=revisar&archivados=1): al volver desde un
 // producto el catálogo queda como estaba, y un enlace lleva a la misma vista.
 export function Catalogo() {
+  const { tiene } = usePermisos()
+  const veCostos = tiene(P.costosVer)
+  const puedeCrear = tiene(P.productosCrear)
   const [params, setParams] = useSearchParams()
   const q = params.get('q') ?? ''
   const categoria = params.get('categoria')
   const revisar = params.get('filtro') === 'revisar'
   const archivados = params.get('archivados') === '1'
   const hayFiltro = !!(q || categoria || revisar || archivados)
+  const pagina = Math.max(1, Number.parseInt(params.get('pagina') ?? '1', 10) || 1)
 
   const [texto, setTexto] = useState(q)
   const [items, setItems] = useState<ProductoResumen[] | null>(null)
-  const [siguiente, setSiguiente] = useState<string | null>(null)
+  const [totalPaginas, setTotalPaginas] = useState(1)
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [cargandoMas, setCargandoMas] = useState(false)
   const [dialogo, setDialogo] = useState(false)
   const [version, setVersion] = useState(0) // sube cuando cambian las categorías
 
@@ -35,6 +41,7 @@ export function Catalogo() {
     RevisarPrecio: revisar || undefined,
     Archivados: archivados || undefined,
     Limite: POR_PAGINA,
+    Pagina: pagina,
   }
 
   // La búsqueda espera 300 ms después de la última letra: no se pide al servidor en cada tecla. Mientras
@@ -50,7 +57,9 @@ export function Catalogo() {
             if (!data) return setError(mensajeDeError(error, response))
             setError(null)
             setItems(data.items)
-            setSiguiente(data.siguiente)
+            setTotalPaginas(data.totalPaginas)
+            // Una página fuera de rango (por ejemplo después de archivar productos) vuelve a la última que existe.
+            if (data.pagina !== pagina) cambiar({ pagina: data.pagina > 1 ? String(data.pagina) : null })
           })
           .catch(() => !cancelado && setError(mensajeDeError(null)))
       },
@@ -61,7 +70,7 @@ export function Catalogo() {
       clearTimeout(espera)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `consulta` se arma con estos mismos valores
-  }, [q, categoria, revisar, archivados, version])
+  }, [q, categoria, revisar, archivados, pagina, version])
 
   useEffect(() => {
     let cancelado = false
@@ -81,25 +90,12 @@ export function Catalogo() {
           if (valor) nuevos.set(clave, valor)
           else nuevos.delete(clave)
         }
+        // Cambiar un filtro o la búsqueda vuelve a la primera página.
+        if (!('pagina' in cambios)) nuevos.delete('pagina')
         return nuevos
       },
       { replace: true },
     )
-  }
-
-  async function verMas() {
-    if (!siguiente) return
-    setCargandoMas(true)
-    try {
-      const { data, error, response } = await api.GET('/api/v1/productos', { params: { query: { ...consulta, Cursor: siguiente } } })
-      if (!data) return setError(mensajeDeError(error, response))
-      setItems((previos) => [...(previos ?? []), ...data.items])
-      setSiguiente(data.siguiente)
-    } catch {
-      setError(mensajeDeError(null))
-    } finally {
-      setCargandoMas(false)
-    }
   }
 
   const sinFiltros = { categoria: null, filtro: null, archivados: null }
@@ -109,13 +105,17 @@ export function Catalogo() {
       <header className="pagina-cabecera">
         <h1 className="titulo-pagina">Catálogo</h1>
         <div className="cabecera-acciones">
-          <button type="button" className="boton boton-texto boton-chico" onClick={() => setDialogo(true)}>
-            Categorías
-          </button>
-          <Link to="/catalogo/nuevo" className="boton boton-oscuro boton-chico">
-            <Icono nombre="mas" tamano={16} />
-            Producto
-          </Link>
+          {tiene(P.categoriasGestionar) && (
+            <button type="button" className="boton boton-texto boton-chico" onClick={() => setDialogo(true)}>
+              Categorías
+            </button>
+          )}
+          {puedeCrear && (
+            <Link to="/catalogo/nuevo" className="boton boton-oscuro boton-chico">
+              <Icono nombre="mas" tamano={16} />
+              Producto
+            </Link>
+          )}
         </div>
       </header>
 
@@ -137,14 +137,16 @@ export function Catalogo() {
           <button type="button" className="chip" aria-pressed={!hayFiltro} onClick={() => cambiar(sinFiltros)}>
             Todos
           </button>
-          <button
-            type="button"
-            className="chip"
-            aria-pressed={revisar}
-            onClick={() => cambiar({ ...sinFiltros, filtro: revisar ? null : 'revisar' })}
-          >
-            Revisar precio
-          </button>
+          {veCostos && (
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={revisar}
+              onClick={() => cambiar({ ...sinFiltros, filtro: revisar ? null : 'revisar' })}
+            >
+              Revisar precio
+            </button>
+          )}
           {categorias.map((c) => (
             <button
               key={c.id}
@@ -184,10 +186,14 @@ export function Catalogo() {
               <Icono nombre="bolsa" tamano={22} />
             </span>
             <h2 className="titulo-seccion">Todavía no cargaste productos</h2>
-            <p className="texto-suave">Cargá el primero con sus fotos, colores y precio. Después aparece en tu tienda.</p>
-            <Link to="/catalogo/nuevo" className="boton boton-primario">
-              Cargar mi primer producto
-            </Link>
+            <p className="texto-suave">
+              {puedeCrear ? 'Cargá el primero con sus fotos, colores y precio. Después aparece en tu tienda.' : 'Cuando se carguen productos, los vas a ver acá.'}
+            </p>
+            {puedeCrear && (
+              <Link to="/catalogo/nuevo" className="boton boton-primario">
+                Cargar mi primer producto
+              </Link>
+            )}
           </section>
         ))}
 
@@ -213,17 +219,20 @@ export function Catalogo() {
                   <span className="producto-datos">
                     <span className="producto-nombre">{p.nombre}</span>
                     <span className="producto-precio">{bs(p.precio)}</span>
-                    <EtiquetaMargen estado={p.estadoPrecio} ganancia={p.ganancia} />
+                    {veCostos && <EtiquetaMargen estado={p.estadoPrecio} ganancia={p.ganancia} />}
                   </span>
                 </Link>
               </li>
             ))}
           </ul>
-          {siguiente && (
-            <button type="button" className="boton boton-secundario" onClick={verMas} disabled={cargandoMas}>
-              {cargandoMas ? 'Cargando…' : 'Ver más productos'}
-            </button>
-          )}
+          <Paginacion
+            pagina={pagina}
+            totalPaginas={totalPaginas}
+            alCambiar={(n) => {
+              cambiar({ pagina: n > 1 ? String(n) : null })
+              window.scrollTo({ top: 0 })
+            }}
+          />
         </>
       )}
 

@@ -190,6 +190,7 @@ function DetalleProveedor({
   return (
     <div className="fila-stock-detalle">
       {p.telefono && <span className="texto-suave texto-chico">WhatsApp {p.telefono.replace('+591', '+591 ')}</span>}
+      {p.correo && <span className="texto-suave texto-chico">Correo {p.correo}</span>}
       {p.notas && <span className="texto-chico">{p.notas}</span>}
 
       <div className="historial">
@@ -260,6 +261,7 @@ function FormularioProveedor({
 }) {
   const [nombre, setNombre] = useState(proveedor?.nombre ?? '')
   const [telefono, setTelefono] = useState(proveedor?.telefono?.replace('+591', '') ?? '')
+  const [correo, setCorreo] = useState(proveedor?.correo ?? '')
   const [notas, setNotas] = useState(proveedor?.notas ?? '')
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -270,7 +272,7 @@ function FormularioProveedor({
     setError(null)
     setEnviando(true)
     try {
-      const body = { nombre: nombre.trim(), telefono: telefono.trim() || null, notas: notas.trim() || null }
+      const body = { nombre: nombre.trim(), telefono: telefono.trim() || null, correo: correo.trim() || null, notas: notas.trim() || null }
       const { data, error, response } = proveedor
         ? await api.PUT('/api/v1/proveedores/{id}', { params: { path: { id: proveedor.id } }, body })
         : await api.POST('/api/v1/proveedores', { body })
@@ -294,6 +296,15 @@ function FormularioProveedor({
         maxLength={20}
         onChange={(e) => setTelefono(e.target.value)}
         ayuda="Para pedirle desde acá con un toque."
+      />
+      <Campo
+        etiqueta="Correo (opcional)"
+        type="email"
+        inputMode="email"
+        autoComplete="off"
+        value={correo}
+        maxLength={254}
+        onChange={(e) => setCorreo(e.target.value)}
       />
       <AreaTexto etiqueta="Notas (opcional)" value={notas} maxLength={300} onChange={(e) => setNotas(e.target.value)} />
 

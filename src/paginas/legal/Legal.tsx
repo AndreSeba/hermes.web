@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+﻿import type { ReactNode } from 'react'
 import { Link } from 'react-router'
+import { Icono } from '../../componentes/Icono'
 
 // Términos y privacidad. BORRADOR redactado sin abogado: antes de abrir al público, que lo revise un abogado en Bolivia
 // (ver docs/DECISIONES.md). Sin nombre de producto (src/marca.ts): se dice "la plataforma".
@@ -10,7 +11,8 @@ function Documento({ titulo, children }: { titulo: string; children: ReactNode }
     <div className="acceso">
       <article className="acceso-columna legal">
         <Link to="/" className="enlace-volver">
-          ← Volver
+          <Icono nombre="atras" tamano={18} />
+          Volver
         </Link>
         <header className="acceso-cabecera">
           <h1 className="titulo-grande">{titulo}</h1>

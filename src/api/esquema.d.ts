@@ -701,6 +701,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/cambiar-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CambiarPasswordDto"];
+                    "text/json": components["schemas"]["CambiarPasswordDto"];
+                    "application/*+json": components["schemas"]["CambiarPasswordDto"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/categorias": {
         parameters: {
             query?: never;
@@ -1400,6 +1450,292 @@ export interface paths {
                         "text/plain": components["schemas"]["CosteoDto"];
                         "application/json": components["schemas"]["CosteoDto"];
                         "text/json": components["schemas"]["CosteoDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/equipo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["EquipoDto"];
+                        "application/json": components["schemas"]["EquipoDto"];
+                        "text/json": components["schemas"]["EquipoDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CrearMiembroDto"];
+                    "text/json": components["schemas"]["CrearMiembroDto"];
+                    "application/*+json": components["schemas"]["CrearMiembroDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MiembroDto"];
+                        "application/json": components["schemas"]["MiembroDto"];
+                        "text/json": components["schemas"]["MiembroDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Payment Required */
+                402: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/equipo/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ActualizarMiembroDto"];
+                    "text/json": components["schemas"]["ActualizarMiembroDto"];
+                    "application/*+json": components["schemas"]["ActualizarMiembroDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MiembroDto"];
+                        "application/json": components["schemas"]["MiembroDto"];
+                        "text/json": components["schemas"]["MiembroDto"];
+                    };
+                };
+                /** @description Payment Required */
+                402: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/equipo/{id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RestablecerPasswordDto"];
+                    "text/json": components["schemas"]["RestablecerPasswordDto"];
+                    "application/*+json": components["schemas"]["RestablecerPasswordDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MiembroDto"];
+                        "application/json": components["schemas"]["MiembroDto"];
+                        "text/json": components["schemas"]["MiembroDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -2768,6 +3104,7 @@ export interface paths {
                     Archivados?: boolean;
                     Cursor?: string;
                     Limite?: number;
+                    Pagina?: number;
                 };
                 header?: never;
                 path?: never;
@@ -3388,6 +3725,7 @@ export interface paths {
                     CategoriaId?: string;
                     Cursor?: string;
                     Limite?: number;
+                    Pagina?: number;
                 };
                 header?: never;
                 path: {
@@ -3462,6 +3800,194 @@ export interface paths {
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    incluirInactivos?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RolesDto"];
+                        "application/json": components["schemas"]["RolesDto"];
+                        "text/json": components["schemas"]["RolesDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarRolDto"];
+                    "text/json": components["schemas"]["GuardarRolDto"];
+                    "application/*+json": components["schemas"]["GuardarRolDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RolDto"];
+                        "application/json": components["schemas"]["RolDto"];
+                        "text/json": components["schemas"]["RolDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarRolDto"];
+                    "text/json": components["schemas"]["GuardarRolDto"];
+                    "application/*+json": components["schemas"]["GuardarRolDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RolDto"];
+                        "application/json": components["schemas"]["RolDto"];
+                        "text/json": components["schemas"]["RolDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -4276,6 +4802,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ventas/por-vendedor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Desde?: string;
+                    Hasta?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["VentaVendedorDto"][];
+                        "application/json": components["schemas"]["VentaVendedorDto"][];
+                        "text/json": components["schemas"]["VentaVendedorDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ventas/productos": {
         parameters: {
             query?: never;
@@ -4432,6 +4998,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AccesoDto: {
+            esDueno: boolean;
+            rol: string;
+            permisos: string[];
+        };
         ActividadDto: {
             tipo: components["schemas"]["TipoActividad"];
             /** Format: uuid */
@@ -4446,6 +5017,11 @@ export interface components {
             nombre: string;
             activa: boolean;
         };
+        ActualizarMiembroDto: {
+            /** Format: uuid */
+            rolId: string;
+            activo: boolean;
+        };
         ActualizarPlanDto: {
             /** Format: double */
             precioMensual: number;
@@ -4454,6 +5030,8 @@ export interface components {
             /** Format: int32 */
             maxAlmacenamientoMb: null | number;
             activo: boolean;
+            /** Format: int32 */
+            maxUsuarios?: null | number;
         };
         ActualizarTiendaDto: {
             nombre: string;
@@ -4528,6 +5106,10 @@ export interface components {
         };
         CambiarDireccionDto: {
             slug: string;
+        };
+        CambiarPasswordDto: {
+            passwordActual: string;
+            passwordNueva: string;
         };
         CancelarPedidoDto: {
             motivo: null | string;
@@ -4638,10 +5220,25 @@ export interface components {
         CrearCategoriaDto: {
             nombre: string;
         };
+        CrearMiembroDto: {
+            nombre: string;
+            email: string;
+            password: string;
+            /** Format: uuid */
+            rolId: string;
+        };
         /** @enum {unknown} */
         EntregaPedido: "Retiro" | "Envio";
         EntregarPedidoDto: {
             metodoPago: components["schemas"]["MetodoPago"];
+        };
+        EquipoDto: {
+            miembros: components["schemas"]["MiembroDto"][];
+            /** Format: int32 */
+            usuarios: number;
+            /** Format: int32 */
+            maxUsuarios: null | number;
+            plan: string;
         };
         /** @enum {unknown} */
         EstadoBorrador: "Pendiente" | "Publicado" | "Descartado";
@@ -4706,6 +5303,14 @@ export interface components {
             nombre: string;
             telefono?: null | string;
             notas?: null | string;
+            correo?: null | string;
+        };
+        GuardarRolDto: {
+            nombre: string;
+            descripcion: null | string;
+            permisos: string[];
+            /** @default true */
+            activo: boolean;
         };
         /** Format: binary */
         IFormFile: string;
@@ -4835,6 +5440,23 @@ export interface components {
         };
         /** @enum {unknown} */
         MetodoPago: "Efectivo" | "Qr" | "Tarjeta" | "Transferencia";
+        MiembroDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            usuarioId: string;
+            nombre: string;
+            email: string;
+            esDueno: boolean;
+            /** Format: uuid */
+            rolId: null | string;
+            rol: string;
+            activo: boolean;
+            /** Format: date-time */
+            creadoEn: string;
+            /** Format: date-time */
+            ultimoLoginEn: null | string;
+        };
         MiPlanDto: {
             plan: components["schemas"]["PlanDto"];
             /** Format: date-time */
@@ -4901,6 +5523,21 @@ export interface components {
             items: components["schemas"]["ProductoResumenDto"][];
             /** Format: uuid */
             siguiente: null | string;
+            /**
+             * Format: int32
+             * @default 0
+             */
+            total: number;
+            /**
+             * Format: int32
+             * @default 1
+             */
+            pagina: number;
+            /**
+             * Format: int32
+             * @default 1
+             */
+            totalPaginas: number;
         };
         PaginaDeStockDto: {
             items: components["schemas"]["ProductoStockDto"][];
@@ -4923,6 +5560,16 @@ export interface components {
         PaginaPublicaDto: {
             items: components["schemas"]["ProductoPublicoResumenDto"][];
             siguiente: null | string;
+            /**
+             * Format: int32
+             * @default 1
+             */
+            pagina: number;
+            /**
+             * Format: int32
+             * @default 1
+             */
+            totalPaginas: number;
         };
         PagoParaRevisarDto: {
             pago: components["schemas"]["PagoPlanDto"];
@@ -5010,6 +5657,12 @@ export interface components {
         PerfilDto: {
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
+            acceso: components["schemas"]["AccesoDto"];
+        };
+        PermisoDto: {
+            codigo: string;
+            modulo: string;
+            descripcion: string;
         };
         PlanDto: {
             /** Format: uuid */
@@ -5023,6 +5676,8 @@ export interface components {
             /** Format: int32 */
             maxAlmacenamientoMb: null | number;
             activo: boolean;
+            /** Format: int32 */
+            maxUsuarios?: null | number;
         };
         PlanesDto: {
             planes: components["schemas"]["PlanDto"][];
@@ -5186,6 +5841,7 @@ export interface components {
             enCamino: number;
             /** Format: int32 */
             compras: number;
+            correo?: null | string;
         };
         PublicacionDto: {
             producto: components["schemas"]["ProductoDto"];
@@ -5235,6 +5891,9 @@ export interface components {
             nombreTienda: string;
             slug: string;
         };
+        RestablecerPasswordDto: {
+            password: string;
+        };
         ResultadoRecibirDto: {
             compra: components["schemas"]["CompraDto"];
             avisos: components["schemas"]["AvisoMargenDto"][];
@@ -5281,12 +5940,27 @@ export interface components {
             /** Format: int32 */
             anuladas: number;
         };
+        RolDto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            descripcion: null | string;
+            activo: boolean;
+            /** Format: int32 */
+            personas: number;
+            permisos: string[];
+        };
+        RolesDto: {
+            roles: components["schemas"]["RolDto"][];
+            permisos: components["schemas"]["PermisoDto"][];
+        };
         SesionDto: {
             accessToken: string;
             /** Format: date-time */
             expiraEn: string;
             usuario: components["schemas"]["UsuarioSesionDto"];
             tienda: components["schemas"]["TiendaSesionDto"];
+            acceso: components["schemas"]["AccesoDto"];
         };
         SincronizacionDto: {
             /** Format: int32 */
@@ -5337,7 +6011,7 @@ export interface components {
         /** @enum {unknown} */
         TipoActividad: "Venta" | "Compra" | "Gasto";
         /** @enum {unknown} */
-        TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion" | "Reversion";
+        TipoMovimiento: "Ingreso" | "Ajuste" | "Venta" | "Devolucion" | "Reversion" | "Reserva" | "LiberaReserva";
         UltimoPrecioDto: {
             /** Format: uuid */
             productoId: string;
@@ -5357,6 +6031,8 @@ export interface components {
             email: string;
             /** @default false */
             esAdmin: boolean;
+            /** @default false */
+            debeCambiarPassword: boolean;
         };
         VarianteDto: {
             /** Format: uuid */
@@ -5412,6 +6088,7 @@ export interface components {
             /** Format: double */
             ganancia: null | number;
             lineas: components["schemas"]["VentaLineaDto"][];
+            vendedor?: null | string;
         };
         VentaLineaDto: {
             /** Format: uuid */
@@ -5447,6 +6124,18 @@ export interface components {
             /** Format: double */
             ganancia: null | number;
             detalle: string;
+            vendedor?: null | string;
+        };
+        VentaVendedorDto: {
+            /** Format: uuid */
+            usuarioId: null | string;
+            vendedor: string;
+            /** Format: int32 */
+            ventas: number;
+            /** Format: int32 */
+            unidades: number;
+            /** Format: double */
+            total: number;
         };
         /** @enum {unknown} */
         VistaCompras: "Todas" | "EnCamino" | "PorPagar";

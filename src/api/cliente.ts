@@ -49,6 +49,11 @@ export type InstagramConexion =components['schemas']['InstagramConexionDto']
 export type Pedido = components['schemas']['PedidoDto']
 export type PedidoResumen = components['schemas']['PedidoResumenDto']
 export type VistaPedidos = components['schemas']['VistaPedidos']
+export type Miembro = components['schemas']['MiembroDto']
+export type EquipoDelNegocio = components['schemas']['EquipoDto']
+export type Rol = components['schemas']['RolDto']
+export type PermisoDelCatalogo = components['schemas']['PermisoDto']
+export type VentaPorVendedor = components['schemas']['VentaVendedorDto']
 
 const baseUrl = import.meta.env.VITE_API_URL ?? ''
 

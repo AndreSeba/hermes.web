@@ -8,6 +8,8 @@ import { Dialogo } from '../../componentes/Dialogo'
 import { GaleriaFotos } from '../../componentes/GaleriaFotos'
 import { Icono } from '../../componentes/Icono'
 import { Interruptor } from '../../componentes/Interruptor'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs, leerMonto, listaDeTextos } from '../../util/dinero'
 
 type Estado = {
@@ -75,6 +77,9 @@ const desdeBorrador = (b: Borrador): Estado => ({
 })
 
 export function FormularioProducto({ inicial, costoBloqueado = false, borrador, alPublicar }: PropsFormulario) {
+  const { tiene } = usePermisos()
+  const puedeCostos = tiene(P.costosEditar)
+  const puedeArchivar = tiene(P.productosArchivar)
   const [servidor, setServidor] = useState<Producto | null>(inicial ?? null)
   const [form, setForm] = useState<Estado>(inicial ? desdeProducto(inicial) : borrador ? desdeBorrador(borrador) : vacio)
   const [creado, setCreado] = useState<Producto | null>(null)
@@ -292,9 +297,11 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
       {servidor?.archivado && (
         <Aviso tipo="advertencia">
           Este producto está archivado: no se ve en tu catálogo ni en tu tienda.{' '}
-          <button type="button" className="enlace-boton" onClick={() => archivar(false)}>
-            Desarchivar
-          </button>
+          {puedeArchivar && (
+            <button type="button" className="enlace-boton" onClick={() => archivar(false)}>
+              Desarchivar
+            </button>
+          )}
         </Aviso>
       )}
 
@@ -326,19 +333,21 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
             ayuda={avisoPrecio ?? undefined}
             required
           />
-          <Campo
-            etiqueta="Tu costo"
-            prefijo="Bs"
-            inputMode="decimal"
-            placeholder="Opcional"
-            value={form.costo}
-            onChange={(e) => cambiar({ costo: e.target.value })}
-            aria-invalid={!!avisoCosto}
-            disabled={costoBloqueado}
-            ayuda={costoBloqueado ? 'Sale de tu costeo (calculadora de abajo).' : (avisoCosto ?? undefined)}
-          />
+          {puedeCostos && (
+            <Campo
+              etiqueta="Tu costo"
+              prefijo="Bs"
+              inputMode="decimal"
+              placeholder="Opcional"
+              value={form.costo}
+              onChange={(e) => cambiar({ costo: e.target.value })}
+              aria-invalid={!!avisoCosto}
+              disabled={costoBloqueado}
+              ayuda={costoBloqueado ? 'Sale de tu costeo (calculadora de abajo).' : (avisoCosto ?? undefined)}
+            />
+          )}
         </div>
-        {ganancia !== null && (
+        {puedeCostos && ganancia !== null && (
           <p className={`texto-chico ${ganancia > 0 ? 'texto-ok' : 'texto-peligro'}`} role="status">
             {ganancia > 0
               ? `Te quedan ${bs(ganancia)} de ganancia por unidad.`
@@ -347,7 +356,7 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
                 : `Con este precio perdés ${bs(Math.abs(ganancia))} por unidad.`}
           </p>
         )}
-        {ganancia === null && <p className="texto-suave texto-chico">Cargá tu costo y te avisamos si un precio te hace perder plata.</p>}
+        {puedeCostos && ganancia === null && <p className="texto-suave texto-chico">Cargá tu costo y te avisamos si un precio te hace perder plata.</p>}
 
         <div className="campo">
           <label htmlFor="categoria" className="campo-etiqueta">
@@ -455,7 +464,7 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
         />
       </section>
 
-      {!esNuevo && !servidor.archivado && (
+      {!esNuevo && !servidor.archivado && puedeArchivar && (
         <div>
           <button type="button" className="boton boton-texto" onClick={() => setDialogoArchivar(true)}>
             Archivar este producto

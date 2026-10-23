@@ -12,6 +12,8 @@ import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { Contador } from '../../componentes/Contador'
 import { Icono } from '../../componentes/Icono'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs, soloEnteros } from '../../util/dinero'
 import { rangoDelMes } from '../../util/periodo'
 import { etiquetaDeVariante } from '../stock/historial'
@@ -38,6 +40,9 @@ const tope = (p: ProductoVendible, v: VarianteVendible) => (p.controlaStock ? (v
 // Cada intento de registrar lleva una clave propia (generada acá): si el celular reenvía por mala señal,
 // el servidor devuelve la misma venta en vez de duplicarla.
 export function NuevaVenta() {
+  const { tiene } = usePermisos()
+  const veCostos = tiene(P.costosVer)
+  const veInicio = tiene(P.inicioVer)
   const [texto, setTexto] = useState('')
   const [q, setQ] = useState('')
   const [items, setItems] = useState<ProductoVendible[] | null>(null)
@@ -109,8 +114,9 @@ export function NuevaVenta() {
   const elegidas = Object.values(lineas)
   const unidades = elegidas.reduce((n, l) => n + l.cantidad, 0)
   const total = elegidas.reduce((n, l) => n + l.cantidad * l.producto.precio, 0)
-  // Si algún producto no tiene costo cargado, no se inventa la ganancia.
-  const ganancia = elegidas.some((l) => l.producto.costo <= 0)
+  // Si algún producto no tiene costo cargado, no se inventa la ganancia. Sin permiso de costos, tampoco se muestra
+  // (el servidor ya manda el costo en 0).
+  const ganancia = !veCostos || elegidas.some((l) => l.producto.costo <= 0)
     ? null
     : elegidas.reduce((n, l) => n + l.cantidad * (l.producto.precio - l.producto.costo), 0)
 
@@ -140,10 +146,12 @@ export function NuevaVenta() {
       }
       clave.current = crypto.randomUUID()
       setHecha(data)
-      api
-        .GET('/api/v1/inicio', { params: { query: rangoDelMes() } })
-        .then(({ data: inicio }) => setCubierto(inicio?.porcentajeCubierto ?? null))
-        .catch(() => undefined)
+      if (veInicio) {
+        api
+          .GET('/api/v1/inicio', { params: { query: rangoDelMes() } })
+          .then(({ data: inicio }) => setCubierto(inicio?.porcentajeCubierto ?? null))
+          .catch(() => undefined)
+      }
     } catch {
       // Sin señal: la clave se conserva, así que tocar de nuevo reintenta la MISMA venta.
       setErrorVenta(mensajeDeError(null))
@@ -189,9 +197,11 @@ export function NuevaVenta() {
             <Link to="/ventas" className="boton boton-secundario">
               Ver mis ventas
             </Link>
-            <Link to="/" className="boton boton-texto">
-              Volver al inicio
-            </Link>
+            {veInicio && (
+              <Link to="/" className="boton boton-texto">
+                Volver al inicio
+              </Link>
+            )}
           </div>
         </section>
       </div>

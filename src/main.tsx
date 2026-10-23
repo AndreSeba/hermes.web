@@ -4,6 +4,9 @@ import { RouterProvider } from 'react-router/dom'
 import './index.css'
 import { rutas } from './rutas'
 import { ProveedorSesion } from './sesion/ProveedorSesion'
+import { iniciarTema } from './tema/tema'
+
+iniciarTema()
 
 // Instalable en el celular (PWA). Solo en producción: en desarrollo un service worker guardaría versiones viejas del código.
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

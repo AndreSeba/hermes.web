@@ -3,6 +3,8 @@ import { Link } from 'react-router'
 import { api, type Movimiento, type ProductoStock } from '../../api/cliente'
 import { EtiquetaStock } from '../../componentes/EtiquetaStock'
 import { Icono } from '../../componentes/Icono'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { cuando, descripcion, etiquetaDeVariante } from './historial'
 
@@ -17,6 +19,9 @@ type Props = {
 }
 
 export function FilaStock({ producto: p, abierto, alAlternar, version, alLlegaronMas, alCorregir }: Props) {
+  const { tiene } = usePermisos()
+  const puedeAjustar = tiene(P.stockAjustar)
+  const puedeEditar = tiene(P.productosEditar)
   const conVariantes = p.variantes.length > 1 || p.variantes.some((v) => etiquetaDeVariante(v) !== '')
   const detalle =
     p.estado === 'SinControl'
@@ -65,18 +70,25 @@ export function FilaStock({ producto: p, abierto, alAlternar, version, alLlegaro
           <Historial productoId={p.id} version={version} conVariantes={conVariantes} />
 
           {p.controlaStock ? (
-            <div className="acciones-fila">
-              <button type="button" className="boton boton-primario" onClick={alLlegaronMas}>
-                Llegaron más
-              </button>
-              <button type="button" className="boton boton-secundario" onClick={alCorregir}>
-                Corregir
-              </button>
-            </div>
+            puedeAjustar && (
+              <div className="acciones-fila">
+                <button type="button" className="boton boton-primario" onClick={alLlegaronMas}>
+                  Llegaron más
+                </button>
+                <button type="button" className="boton boton-secundario" onClick={alCorregir}>
+                  Corregir
+                </button>
+              </div>
+            )
           ) : (
             <p className="texto-suave texto-chico">
-              Este producto no cuenta unidades: siempre figura disponible. Si querés controlarlo,{' '}
-              <Link to={`/catalogo/${p.id}`}>activá el control de stock</Link>.
+              Este producto no cuenta unidades: siempre figura disponible.
+              {puedeEditar && (
+                <>
+                  {' '}
+                  Si querés controlarlo, <Link to={`/catalogo/${p.id}`}>activá el control de stock</Link>.
+                </>
+              )}
             </p>
           )}
         </div>

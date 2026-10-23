@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, mensajeDeError, type ConfiguracionPublica, type ImagenSubida, type ProductoResumen, type Tienda } from '../../api/cliente'
 import { AreaTexto } from '../../componentes/AreaTexto'
+import { SelectorDeTema } from '../../tema/SelectorDeTema'
 import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { Dialogo } from '../../componentes/Dialogo'
@@ -266,6 +267,12 @@ export function MiTienda() {
             Cambiar dirección
           </button>
         </div>
+      </section>
+
+      <section className="seccion tarjeta">
+        <h2 className="seccion-titulo">Apariencia del panel</h2>
+        <p className="texto-suave texto-chico">Cómo ves este panel en este dispositivo. No cambia lo que ven tus clientes.</p>
+        <SelectorDeTema />
       </section>
 
       <section className="seccion tarjeta datos-cuenta">

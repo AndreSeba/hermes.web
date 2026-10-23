@@ -24,6 +24,15 @@ export function useSesion(): ContextoSesion {
   return ctx
 }
 
+// Qué puede hacer esta persona. La API es la que manda (cada pedido exige su permiso); esto solo decide qué se muestra.
+// `tiene('a|b')` = alguno de los dos. El dueño tiene todo lo que exista (su sesión trae la lista completa).
+export function usePermisos() {
+  const { acceso } = useSesionActiva()
+  const propios = new Set(acceso.permisos)
+  const tiene = (permiso: string) => permiso.split('|').some((p) => propios.has(p))
+  return { tiene, esDueno: acceso.esDueno, rol: acceso.rol }
+}
+
 // Para pantallas que solo existen con sesión (dentro de <RequiereSesion>).
 export function useSesionActiva(): Sesion {
   const { estado } = useSesion()

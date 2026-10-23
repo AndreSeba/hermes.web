@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { Icono } from './Icono'
 
 type Props = {
   abierto: boolean
@@ -27,9 +28,14 @@ export function Dialogo({ abierto, titulo, alCerrar, children, hoja, subtitulo }
 
   return (
     <dialog ref={ref} className={`dialogo${hoja ? ' dialogo-hoja' : ''}`} aria-labelledby={idTitulo} onClose={alCerrar}>
-      <h2 id={idTitulo} className="titulo-seccion">
-        {titulo}
-      </h2>
+      <div className="dialogo-cabecera">
+        <h2 id={idTitulo} className="titulo-seccion">
+          {titulo}
+        </h2>
+        <button type="button" className="dialogo-cerrar" aria-label="Cerrar" onClick={() => ref.current?.close()}>
+          <Icono nombre="cerrar" tamano={20} />
+        </button>
+      </div>
       {subtitulo && <p className="texto-suave">{subtitulo}</p>}
       {abierto && children}
     </dialog>

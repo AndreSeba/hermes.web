@@ -3,7 +3,8 @@ import { Link, useSearchParams } from 'react-router'
 import { api, mensajeDeError, type Inicio as DatosInicio, type MasVendido, type ProductoResumen, type VentaDia, type VentaResumen } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Icono, type NombreIcono } from '../../componentes/Icono'
-import { useSesionActiva } from '../../sesion/contexto'
+import { usePermisos, useSesionActiva } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { nombreDelPeriodo, nombreDelPeriodoAnterior, rangoAnterior, rangoDe, rangoPorDia, type Periodo } from '../../util/periodo'
 import { fechaLarga, iniciales, primerNombre } from '../../util/texto'
@@ -58,6 +59,8 @@ type Tablero = {
 // pasó. Los números salen del servidor (la ganancia, "ya cubriste X %", las reglas de margen y de stock): acá solo se muestran.
 export function Inicio() {
   const { usuario, tienda } = useSesionActiva()
+  const { tiene } = usePermisos()
+  const puedeRevisarPrecios = tiene(P.costosVer) && tiene(P.productosVer)
   const [params, setParams] = useSearchParams()
   const periodo = (periodos.find((p) => p.id === params.get('periodo'))?.id ?? 'mes') as Periodo
   const [tablero, setTablero] = useState<Tablero | null>(null)
@@ -71,7 +74,8 @@ export function Inicio() {
       api.GET('/api/v1/ventas/por-dia', { params: { query: rangoPorDia(14) } }),
       api.GET('/api/v1/ventas/mas-vendidos', { params: { query: { ...rangoDe(periodo), Limite: 5 } } }),
       api.GET('/api/v1/ventas', { params: { query: { Limite: 5 } } }),
-      api.GET('/api/v1/productos', { params: { query: { RevisarPrecio: true, Limite: 20 } } }),
+      // Los precios para revisar son costos y margen: solo con ese permiso (y el del catálogo).
+      puedeRevisarPrecios ? api.GET('/api/v1/productos', { params: { query: { RevisarPrecio: true, Limite: 20 } } }) : Promise.resolve(null),
     ])
       .then(([actual, anterior, dias, top, ultimas, revisar]) => {
         if (cancelado) return
@@ -83,15 +87,15 @@ export function Inicio() {
           dias: dias.data ?? [],
           masVendidos: top.data ?? [],
           ultimas: ultimas.data?.items ?? [],
-          revisar: revisar.data?.items ?? [],
-          hayMasParaRevisar: !!revisar.data?.siguiente,
+          revisar: revisar?.data?.items ?? [],
+          hayMasParaRevisar: !!revisar?.data?.siguiente,
         })
       })
       .catch(() => !cancelado && setError(mensajeDeError(null)))
     return () => {
       cancelado = true
     }
-  }, [periodo])
+  }, [periodo, puedeRevisarPrecios])
 
   const datos = tablero?.datos ?? null
   // Un pedido de la tienda pública o algo esperando en la bandeja también es actividad: si no, una tienda nueva con su primer
@@ -170,13 +174,17 @@ export function Inicio() {
 
       {tablero && (
         <nav className="accesos" aria-label="Accesos rápidos">
-          <Link to="/venta" className="boton boton-primario">
-            <Icono nombre="mas" tamano={18} />
-            Nueva venta
-          </Link>
-          <Link to="/gastos?nuevo=1" className="boton boton-secundario">
-            Anotar un gasto
-          </Link>
+          {tiene(P.ventasRegistrar) && (
+            <Link to="/venta" className="boton boton-primario">
+              <Icono nombre="mas" tamano={18} />
+              Nueva venta
+            </Link>
+          )}
+          {tiene(P.gastosGestionar) && (
+            <Link to="/gastos?nuevo=1" className="boton boton-secundario">
+              Anotar un gasto
+            </Link>
+          )}
         </nav>
       )}
     </div>
@@ -185,6 +193,9 @@ export function Inicio() {
 
 function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
   const { datos: d, anterior, dias, masVendidos, ultimas, revisar, hayMasParaRevisar } = tablero
+  const { tiene } = usePermisos()
+  const veCostos = tiene(P.costosVer) // la ganancia y todo lo que sale de ella
+  const veGastos = veCostos && tiene(P.gastosVer)
   const cubierto = d.porcentajeCubierto
   const nombrePeriodo = nombreDelPeriodo(periodo)
   const ticket = d.ventas > 0 ? d.totalVendido / d.ventas : 0
@@ -217,18 +228,20 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
 
       <section className="kpis" aria-label={`Tu ${nombrePeriodo}`}>
         <Kpi etiqueta="Vendiste" valor={bs(d.totalVendido)} pie={plural(d.ventas, 'venta', 'ventas')} />
-        <Kpi
-          verde
-          etiqueta="Ganaste"
-          valor={d.ventas > 0 ? (d.ganancia >= 0 ? bs(d.ganancia) : `−${bs(Math.abs(d.ganancia))}`) : bs(0)}
-          pie={
-            variacion !== null
-              ? `${variacion >= 0 ? '+' : '−'}${Math.abs(variacion)} % vs. ${nombreDelPeriodoAnterior(periodo)}`
-              : d.unidadesSinCosto > 0
-                ? `${plural(d.unidadesSinCosto, 'unidad sin costo cargado', 'unidades sin costo cargado')}`
-                : ''
-          }
-        />
+        {veCostos && (
+          <Kpi
+            verde
+            etiqueta="Ganaste"
+            valor={d.ventas > 0 ? (d.ganancia >= 0 ? bs(d.ganancia) : `−${bs(Math.abs(d.ganancia))}`) : bs(0)}
+            pie={
+              variacion !== null
+                ? `${variacion >= 0 ? '+' : '−'}${Math.abs(variacion)} % vs. ${nombreDelPeriodoAnterior(periodo)}`
+                : d.unidadesSinCosto > 0
+                  ? `${plural(d.unidadesSinCosto, 'unidad sin costo cargado', 'unidades sin costo cargado')}`
+                  : ''
+            }
+          />
+        )}
         <Kpi etiqueta="Ventas" valor={String(d.ventas)} pie={d.ventas > 0 ? `ticket promedio ${bs(Math.round(ticket))}` : ''} />
         <Kpi etiqueta="Productos vendidos" valor={String(d.unidades)} pie={d.unidadesDeLaTienda > 0 ? `${d.unidadesDeLaTienda} desde la tienda web` : ''} />
       </section>
@@ -237,6 +250,7 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
         <GraficoVentasPorDia dias={dias} />
 
         <div className="tablero-lateral">
+          {veGastos && (
           <section className="tarjeta gastos-cubiertos" aria-labelledby="gastos-titulo">
             <div className="gastos-cubiertos-cabecera">
               <h2 id="gastos-titulo" className="titulo-seccion">
@@ -270,6 +284,7 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
               Ver mis gastos
             </Link>
           </section>
+          )}
 
           {d.pedidosPendientes > 0 && (
             <FilaAviso
@@ -279,7 +294,7 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
               texto="Confirmalos y registrá la entrega cuando los cobres"
             />
           )}
-          {primeroARevisar && (
+          {veCostos && primeroARevisar && (
             <FilaAviso
               ruta="/catalogo?filtro=revisar"
               icono="alerta"
@@ -328,9 +343,11 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
                   <th scope="col" className="num">
                     Vendidos
                   </th>
-                  <th scope="col" className="num">
-                    Ganancia
-                  </th>
+                  {veCostos && (
+                    <th scope="col" className="num">
+                      Ganancia
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -338,7 +355,7 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
                   <tr key={p.productoId}>
                     <td className="tabla-fuerte">{p.nombre}</td>
                     <td className="num">{p.unidades}</td>
-                    <td className="num tabla-ganancia">{p.ganancia === null ? '—' : bs(p.ganancia)}</td>
+                    {veCostos && <td className="num tabla-ganancia">{p.ganancia === null ? '—' : bs(p.ganancia)}</td>}
                   </tr>
                 ))}
               </tbody>

@@ -32,6 +32,10 @@ export function descripcion(m: Movimiento, conVariantes: boolean) {
       return `Devolvieron ${m.cantidad}${sufijo}`
     case 'Reversion':
       return `Se anuló una compra: restaron ${-m.cantidad}${sufijo}`
+    case 'Reserva':
+      return `Apartaste ${-m.cantidad} para un pedido${sufijo}`
+    case 'LiberaReserva':
+      return `Se liberaron ${m.cantidad} de un pedido${sufijo}`
     case 'Ajuste': {
       const motivo = m.nota && m.nota !== MOTIVO_POR_DEFECTO ? ` · ${m.nota}` : ''
       return `Corregiste a ${m.saldo}${sufijo}${motivo}`

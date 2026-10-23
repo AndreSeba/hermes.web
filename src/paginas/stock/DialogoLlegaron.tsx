@@ -4,6 +4,8 @@ import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { Contador } from '../../componentes/Contador'
 import { Dialogo } from '../../componentes/Dialogo'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { leerMonto, soloEnteros } from '../../util/dinero'
 import { etiquetaDeVariante } from './historial'
 
@@ -23,6 +25,8 @@ export function DialogoLlegaron({ producto, alCerrar, alListo }: Props) {
 }
 
 function FormularioLlegaron({ producto, alCerrar, alListo }: { producto: ProductoStock; alCerrar: () => void; alListo: Props['alListo'] }) {
+  // Sin costos.editar el servidor ignora el costo: ni se pregunta.
+  const puedeCambiarCosto = usePermisos().tiene(P.costosEditar)
   const [cantidades, setCantidades] = useState<Record<string, string>>({})
   const [costo, setCosto] = useState(producto.costo > 0 ? String(producto.costo) : '')
   const [error, setError] = useState<string | null>(null)
@@ -43,7 +47,7 @@ function FormularioLlegaron({ producto, alCerrar, alListo }: { producto: Product
     setEnviando(true)
     try {
       const { data, error, response } = await api.POST('/api/v1/stock/ingresos', {
-        body: { productoId: producto.id, lineas, costoUnitario: costoNumero && costoNumero > 0 ? costoNumero : null },
+        body: { productoId: producto.id, lineas, costoUnitario: puedeCambiarCosto && costoNumero && costoNumero > 0 ? costoNumero : null },
       })
       if (data) alListo(data, `Sumaste ${total} a ${producto.nombre}.`)
       else setError(mensajeDeError(error, response))
@@ -69,15 +73,17 @@ function FormularioLlegaron({ producto, alCerrar, alListo }: { producto: Product
         ))}
       </div>
 
-      <Campo
-        etiqueta="Costo por unidad (opcional)"
-        prefijo="Bs"
-        inputMode="decimal"
-        value={costo}
-        onChange={(e) => setCosto(e.target.value)}
-        aria-invalid={!!avisoCosto}
-        ayuda={avisoCosto ?? 'Si cambió, actualizamos tu costo y la calculadora de precio.'}
-      />
+      {puedeCambiarCosto && (
+        <Campo
+          etiqueta="Costo por unidad (opcional)"
+          prefijo="Bs"
+          inputMode="decimal"
+          value={costo}
+          onChange={(e) => setCosto(e.target.value)}
+          aria-invalid={!!avisoCosto}
+          ayuda={avisoCosto ?? 'Si cambió, actualizamos tu costo y la calculadora de precio.'}
+        />
+      )}
 
       {error && <Aviso>{error}</Aviso>}
 

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import { api, mensajeDeError, type ResumenVentas, type Venta, type VentaResumen } from '../../api/cliente'
+import { api, mensajeDeError, type ResumenVentas, type Venta, type VentaPorVendedor, type VentaResumen } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Dialogo } from '../../componentes/Dialogo'
 import { Icono } from '../../componentes/Icono'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { cuando } from '../stock/historial'
 import { nombreDePago } from './pagos'
@@ -34,6 +36,12 @@ function rango(periodo: Periodo, ahora = new Date()) {
 const hora = (iso: string) => new Intl.DateTimeFormat('es-BO', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso))
 
 export function Ventas() {
+  const { tiene } = usePermisos()
+  const verNumeros = tiene(`${P.ventasVer}|${P.inicioVer}`) // los números del período
+  const veTodas = tiene(P.ventasVer) // sin esto solo se ven las ventas propias
+  const veCostos = tiene(P.costosVer)
+  const puedeAnular = tiene(P.ventasAnular)
+  const puedeVender = tiene(P.ventasRegistrar)
   const [params, setParams] = useSearchParams()
   const periodo = (periodos.find((p) => p.id === params.get('periodo'))?.id ?? 'hoy') as Periodo
   const conAnuladas = params.get('anuladas') === '1'
@@ -41,6 +49,7 @@ export function Ventas() {
   const [items, setItems] = useState<VentaResumen[] | null>(null)
   const [siguiente, setSiguiente] = useState<string | null>(null)
   const [resumen, setResumen] = useState<ResumenVentas | null>(null)
+  const [porVendedor, setPorVendedor] = useState<VentaPorVendedor[]>([])
   const [version, setVersion] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -61,13 +70,20 @@ export function Ventas() {
         setSiguiente(data.siguiente)
       })
       .catch(() => !cancelado && setError(mensajeDeError(null)))
-    api.GET('/api/v1/ventas/resumen', { params: { query: limites } }).then(({ data }) => {
-      if (!cancelado && data) setResumen(data)
-    })
+    if (verNumeros) {
+      api.GET('/api/v1/ventas/resumen', { params: { query: limites } }).then(({ data }) => {
+        if (!cancelado && data) setResumen(data)
+      })
+    }
+    if (veTodas) {
+      api.GET('/api/v1/ventas/por-vendedor', { params: { query: limites } }).then(({ data }) => {
+        if (!cancelado && data) setPorVendedor(data)
+      })
+    }
     return () => {
       cancelado = true
     }
-  }, [periodo, conAnuladas, version])
+  }, [periodo, conAnuladas, version, verNumeros, veTodas])
 
   useEffect(() => {
     if (!aviso) return
@@ -117,11 +133,13 @@ export function Ventas() {
   return (
     <div className="pagina">
       <header className="pagina-cabecera">
-        <h1 className="titulo-pagina">Ventas</h1>
-        <Link to="/venta" className="boton boton-primario boton-chico">
-          <Icono nombre="mas" tamano={16} />
-          Nueva venta
-        </Link>
+        <h1 className="titulo-pagina">{veTodas ? 'Ventas' : 'Mis ventas'}</h1>
+        {puedeVender && (
+          <Link to="/venta" className="boton boton-primario boton-chico">
+            <Icono nombre="mas" tamano={16} />
+            Nueva venta
+          </Link>
+        )}
       </header>
 
       <div className="segmentos" role="group" aria-label="Período">
@@ -145,7 +163,7 @@ export function Ventas() {
           <span className="resumen-stock-chico">
             {resumen.ventas === 1 ? '1 venta' : `${resumen.ventas} ventas`} · {resumen.unidades === 1 ? '1 unidad' : `${resumen.unidades} unidades`}
           </span>
-          {resumen.ventas > 0 && (
+          {resumen.ventas > 0 && veCostos && (
             <div className="resumen-chips">
               <span className="resumen-chip resumen-chip-verde">Ganaste {bs(resumen.ganancia)}</span>
               {resumen.unidadesSinCosto > 0 && (
@@ -155,6 +173,23 @@ export function Ventas() {
               )}
             </div>
           )}
+        </section>
+      )}
+
+      {porVendedor.length > 1 && (
+        <section className="tarjeta" aria-label="Ventas por vendedor">
+          <h2 className="titulo-seccion">Quién vendió</h2>
+          <ul className="lineas-venta">
+            {porVendedor.map((x) => (
+              <li key={x.usuarioId ?? x.vendedor}>
+                <span>
+                  {x.vendedor}
+                  <span className="texto-suave texto-chico"> · {x.ventas === 1 ? '1 venta' : `${x.ventas} ventas`}</span>
+                </span>
+                <strong>{bs(x.total)}</strong>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
@@ -195,6 +230,8 @@ export function Ventas() {
                 abierta={abierta === v.id}
                 alAlternar={() => setAbierta(abierta === v.id ? null : v.id)}
                 alAnular={() => setAAnular(v)}
+                veCostos={veCostos}
+                puedeAnular={puedeAnular}
               />
             ))}
           </ul>
@@ -216,11 +253,15 @@ function FilaVenta({
   abierta,
   alAlternar,
   alAnular,
+  veCostos,
+  puedeAnular,
 }: {
   venta: VentaResumen
   abierta: boolean
   alAlternar: () => void
   alAnular: () => void
+  veCostos: boolean
+  puedeAnular: boolean
 }) {
   return (
     <li className={`fila-venta${v.anulada ? ' fila-venta-anulada' : ''}`}>
@@ -236,6 +277,7 @@ function FilaVenta({
           <span className="texto-suave texto-chico">
             {cuando(v.fecha)} {hora(v.fecha)} · {nombreDePago(v.metodoPago)}
             {v.cliente ? ` · ${v.cliente}` : ''}
+            {v.vendedor ? ` · Vendió ${v.vendedor}` : ''}
           </span>
         </span>
         <span className="fila-venta-total">
@@ -243,12 +285,24 @@ function FilaVenta({
           <strong>{bs(v.total)}</strong>
         </span>
       </button>
-      {abierta && <DetalleVenta id={v.id} anulada={v.anulada} alAnular={alAnular} />}
+      {abierta && <DetalleVenta id={v.id} anulada={v.anulada} alAnular={alAnular} veCostos={veCostos} puedeAnular={puedeAnular} />}
     </li>
   )
 }
 
-function DetalleVenta({ id, anulada, alAnular }: { id: string; anulada: boolean; alAnular: () => void }) {
+function DetalleVenta({
+  id,
+  anulada,
+  alAnular,
+  veCostos,
+  puedeAnular,
+}: {
+  id: string
+  anulada: boolean
+  alAnular: () => void
+  veCostos: boolean
+  puedeAnular: boolean
+}) {
   const [venta, setVenta] = useState<Venta | null>(null)
   const [fallo, setFallo] = useState(false)
 
@@ -284,10 +338,12 @@ function DetalleVenta({ id, anulada, alAnular }: { id: string; anulada: boolean;
               </li>
             ))}
           </ul>
-          <p className="texto-suave texto-chico">
-            {venta.ganancia === null ? 'Sin costo cargado en algún producto: no se puede calcular la ganancia.' : `Ganaste ${bs(venta.ganancia)} con esta venta.`}
-          </p>
-          {!anulada && (
+          {veCostos && (
+            <p className="texto-suave texto-chico">
+              {venta.ganancia === null ? 'Sin costo cargado en algún producto: no se puede calcular la ganancia.' : `Ganaste ${bs(venta.ganancia)} con esta venta.`}
+            </p>
+          )}
+          {!anulada && puedeAnular && (
             <div className="acciones-fila">
               <button type="button" className="boton boton-secundario" onClick={alAnular}>
                 Anular venta

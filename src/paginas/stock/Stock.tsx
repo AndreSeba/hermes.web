@@ -4,6 +4,8 @@ import { api, mensajeDeError, type ProductoStock, type ResumenStock } from '../.
 import { Aviso } from '../../componentes/Aviso'
 import { Icono } from '../../componentes/Icono'
 import { PestanasInventario } from '../../componentes/PestanasInventario'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { DialogoCorregir } from './DialogoCorregir'
 import { DialogoLlegaron } from './DialogoLlegaron'
@@ -22,6 +24,7 @@ const vistas: { id: Vista; etiqueta: string; api: 'Todos' | 'AReponer' | 'PorEnc
 // la búsqueda viven en la dirección (?vista=areponer&q=…); `?llegaron=<id>` abre "Llegaron más" de un
 // producto (lo usa la pantalla de "¡Guardado!" del catálogo).
 export function Stock() {
+  const veCostos = usePermisos().tiene(P.costosVer)
   const [params, setParams] = useSearchParams()
   const vista = (vistas.find((v) => v.id === params.get('vista'))?.id ?? 'todos') as Vista
   const q = params.get('q') ?? ''
@@ -164,9 +167,18 @@ export function Stock() {
 
       {resumen && (
         <section className="resumen-stock" aria-label="Resumen del stock">
-          <span className="resumen-stock-chico">Tenés en mercadería</span>
-          <span className="resumen-stock-valor">{bs(resumen.valorCosto)}</span>
-          <span className="resumen-stock-chico">Vendiendo todo, entrarían {bs(resumen.valorVenta)}</span>
+          {veCostos ? (
+            <>
+              <span className="resumen-stock-chico">Tenés en mercadería</span>
+              <span className="resumen-stock-valor">{bs(resumen.valorCosto)}</span>
+              <span className="resumen-stock-chico">Vendiendo todo, entrarían {bs(resumen.valorVenta)}</span>
+            </>
+          ) : (
+            <>
+              <span className="resumen-stock-chico">Vendiendo todo, entrarían</span>
+              <span className="resumen-stock-valor">{bs(resumen.valorVenta)}</span>
+            </>
+          )}
           <div className="resumen-chips">
             {resumen.agotados > 0 && (
               <span className="resumen-chip resumen-chip-rojo">{resumen.agotados === 1 ? '1 agotado' : `${resumen.agotados} agotados`}</span>

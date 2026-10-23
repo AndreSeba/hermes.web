@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
 import { api } from '../api/cliente'
+import { Dialogo } from '../componentes/Dialogo'
 import { Icono } from '../componentes/Icono'
-import { useSesion, useSesionActiva } from '../sesion/contexto'
+import { SelectorDeTema } from '../tema/SelectorDeTema'
+import { useSesion, useSesionActiva, usePermisos } from '../sesion/contexto'
 import { iniciales } from '../util/texto'
-import { nuevaVenta, PEDIDOS_CAMBIARON, secciones, seccionesCelular } from './secciones'
+import { nuevaVenta, PEDIDOS_CAMBIARON, respaldoCelular, secciones, seccionesCelular } from './secciones'
 
 // Escritorio: menú lateral. Celular: barra inferior con el botón central de venta.
 // Las dos navegaciones están en el DOM y el CSS muestra una u otra (ver .menu-lateral / .barra-inferior).
@@ -12,8 +14,17 @@ import { nuevaVenta, PEDIDOS_CAMBIARON, secciones, seccionesCelular } from './se
 export function Armazon() {
   const { usuario, tienda } = useSesionActiva()
   const { salir } = useSesion()
+  const { tiene } = usePermisos()
+  const visibles = secciones.filter((s) => !s.permiso || tiene(s.permiso))
+  const puedeVender = !nuevaVenta.permiso || tiene(nuevaVenta.permiso)
+  // Barra del celular: las de siempre que la persona puede ver y, si faltan, las de respaldo (un vendedor no ve el Inicio).
+  const rutasCelular = [...seccionesCelular, ...respaldoCelular]
+    .filter((ruta) => visibles.some((s) => s.ruta === ruta))
+    .slice(0, 3)
   const ubicacion = useLocation()
   const [pedidos, setPedidos] = useState(0)
+  const [apariencia, setApariencia] = useState(false)
+  const [menuCelular, setMenuCelular] = useState(false)
 
   // Cuántos pedidos esperan (insignia del menú). Se vuelve a preguntar al cambiar de pantalla y cuando la pantalla de
   // Pedidos avisa que atendió uno (evento PEDIDOS_CAMBIARON).
@@ -23,7 +34,9 @@ export function Armazon() {
     window.addEventListener(PEDIDOS_CAMBIARON, alCambiar)
     return () => window.removeEventListener(PEDIDOS_CAMBIARON, alCambiar)
   }, [])
+  const veLosPedidos = tiene('pedidos.ver')
   useEffect(() => {
+    if (!veLosPedidos) return
     let cancelado = false
     api
       .GET('/api/v1/pedidos/resumen')
@@ -32,7 +45,7 @@ export function Armazon() {
     return () => {
       cancelado = true
     }
-  }, [ubicacion.pathname, revision])
+  }, [ubicacion.pathname, revision, veLosPedidos])
 
   return (
     <div className="armazon">
@@ -44,13 +57,15 @@ export function Armazon() {
           <span className="menu-tienda-nombre">{tienda.nombre}</span>
         </div>
 
-        <NavLink to={nuevaVenta.ruta} className="boton boton-primario">
-          <Icono nombre="mas" tamano={18} />
-          {nuevaVenta.titulo}
-        </NavLink>
+        {puedeVender && (
+          <NavLink to={nuevaVenta.ruta} className="boton boton-primario">
+            <Icono nombre="mas" tamano={18} />
+            {nuevaVenta.titulo}
+          </NavLink>
+        )}
 
         <nav aria-label="Menú principal" className="menu-enlaces">
-          {secciones.map((s) => (
+          {visibles.map((s) => (
             <NavLink key={s.ruta} to={s.ruta} end={s.ruta === '/'} className="menu-enlace">
               <Icono nombre={s.icono} />
               {s.titulo}
@@ -74,6 +89,9 @@ export function Armazon() {
             <span className="menu-usuario-nombre">{usuario.nombre}</span>
             <span className="menu-usuario-email">{usuario.email}</span>
           </span>
+          <button type="button" className="boton-icono" onClick={() => setApariencia(true)} aria-label="Apariencia" title="Apariencia">
+            <Icono nombre="paleta" />
+          </button>
           <button type="button" className="boton-icono" onClick={salir} aria-label="Cerrar sesión" title="Cerrar sesión">
             <Icono nombre="salir" />
           </button>
@@ -84,17 +102,57 @@ export function Armazon() {
         <Outlet />
       </main>
 
+      <Dialogo abierto={apariencia} titulo="Apariencia" subtitulo="Cómo se ve tu panel en este dispositivo." alCerrar={() => setApariencia(false)}>
+        <SelectorDeTema />
+      </Dialogo>
+
       <nav aria-label="Navegación principal" className="barra-inferior">
-        {seccionesCelular.slice(0, 2).map((ruta) => (
+        {rutasCelular.slice(0, 2).map((ruta) => (
           <EnlaceBarra key={ruta} ruta={ruta} />
         ))}
-        <NavLink to={nuevaVenta.ruta} className="barra-venta" aria-label={nuevaVenta.titulo}>
-          <Icono nombre="mas" tamano={26} />
-        </NavLink>
-        {seccionesCelular.slice(2).map((ruta) => (
+        {puedeVender && (
+          <NavLink to={nuevaVenta.ruta} className="barra-venta" aria-label={nuevaVenta.titulo}>
+            <Icono nombre="mas" tamano={26} />
+          </NavLink>
+        )}
+        {rutasCelular.slice(2).map((ruta) => (
           <EnlaceBarra key={ruta} ruta={ruta} />
         ))}
+        <button type="button" className="barra-enlace" aria-haspopup="dialog" onClick={() => setMenuCelular(true)}>
+          <Icono nombre="menu" tamano={22} />
+          Menú
+        </button>
       </nav>
+
+      {/* Todas las secciones en el celular: la barra solo lleva las más usadas. */}
+      <Dialogo abierto={menuCelular} titulo="Menú" subtitulo={tienda.nombre} alCerrar={() => setMenuCelular(false)} hoja>
+        <nav aria-label="Todas las secciones" className="menu-hoja">
+          {[...visibles, ...(usuario.esAdmin ? [{ ruta: '/admin', titulo: 'Administración', icono: 'precios' as const }] : [])].map((s) => (
+            <NavLink key={s.ruta} to={s.ruta} end={s.ruta === '/'} className="menu-hoja-enlace" onClick={() => setMenuCelular(false)}>
+              <Icono nombre={s.icono} />
+              {s.titulo}
+              {s.ruta === '/pedidos' && pedidos > 0 && <span className="menu-insignia">{pedidos}</span>}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="acciones-fila">
+          <button
+            type="button"
+            className="boton boton-secundario"
+            onClick={() => {
+              setMenuCelular(false)
+              setApariencia(true)
+            }}
+          >
+            <Icono nombre="paleta" tamano={18} />
+            Apariencia
+          </button>
+          <button type="button" className="boton boton-texto" onClick={salir}>
+            <Icono nombre="salir" tamano={18} />
+            Cerrar sesión
+          </button>
+        </div>
+      </Dialogo>
     </div>
   )
 }

@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from 'react'
+﻿import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { api, mensajeDeError } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { useSesion } from '../../sesion/contexto'
 import { aSlug } from '../../util/texto'
+import { Icono } from '../../componentes/Icono'
 
 // Mismas reglas que el backend (Validacion.Password / Validacion.Slug). El backend igual
 // valida: esto es solo para avisar antes de enviar.
@@ -54,7 +55,8 @@ export function Registro() {
       <form className="acceso-columna" onSubmit={enviar} noValidate>
         <header className="acceso-cabecera">
           <Link to="/bienvenida" className="enlace-volver">
-            ← Volver
+            <Icono nombre="atras" tamano={18} />
+            Volver
           </Link>
           <h1 className="titulo-grande">Creá tu cuenta</h1>
           <p className="texto-suave">Dos minutos y tu negocio queda listo para empezar.</p>

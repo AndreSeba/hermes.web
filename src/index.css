@@ -1,4 +1,4 @@
-/* ───────────── Tokens (del prototipo) ─────────────
+﻿/* ───────────── Tokens (del prototipo) ─────────────
    Colores de la APP. El color de cada tienda pública (por defecto #7C5CFC) es otra cosa. */
 :root {
   --fondo: #f6f5f1;
@@ -17,6 +17,7 @@
   --ambar-suave: #fdf0dc;
   --peligro: #b42318;
   --peligro-suave: #fdecea;
+  --tinta: #17181c; /* superficies oscuras con texto blanco (botón oscuro, tarjetas de resumen) */
 
   --radio-chico: 12px;
   --radio: 16px;
@@ -29,6 +30,26 @@
   color: var(--texto);
   background: var(--fondo);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Modo oscuro del panel (lo activa tema.ts con data-modo="oscuro"). El acento lo calcula tema.ts. */
+:root[data-modo='oscuro'] {
+  --fondo: #121316;
+  --superficie: #1b1c21;
+  --apagado: #26272d;
+  --borde: #33353d;
+  --borde-suave: #292b32;
+  --texto: #f2f2f0;
+  --texto-medio: #d2d3d6;
+  --texto-suave: #a4a6ad;
+  --acento: #4fc79d;
+  --acento-oscuro: #7ad9b6;
+  --acento-suave: #173a2e;
+  --ambar-suave: #3a2a10;
+  --ambar-oscuro: #f6c978;
+  --peligro: #f2766b;
+  --peligro-suave: #3a1c19;
+  --tinta: #2c2e36;
 }
 
 * {
@@ -349,6 +370,9 @@ a.avatar:hover {
   gap: 12px;
 }
 .enlace-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   align-self: flex-start;
   font-size: 14px;
   color: var(--texto-suave);
@@ -572,6 +596,33 @@ a.avatar:hover {
   align-items: center;
   justify-content: space-around;
   z-index: 10;
+}
+.menu-hoja {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+.menu-hoja-enlace {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  min-height: 52px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  font-weight: 600;
+  color: inherit;
+}
+.menu-hoja-enlace.active {
+  color: var(--acento);
+  border-color: var(--acento);
+}
+button.barra-enlace {
+  background: none;
+  border: 0;
+  font-family: inherit;
 }
 .barra-enlace {
   display: flex;
@@ -821,6 +872,96 @@ label.boton {
 .dialogo .formulario {
   margin-top: 14px;
 }
+/* Apariencia del panel */
+.selector-tema {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.selector-tema-titulo {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--texto-medio);
+}
+.selector-tema-colores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.muestra-color {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+}
+.muestra-color[aria-pressed='true'] {
+  border-color: var(--superficie);
+  box-shadow: 0 0 0 2px var(--texto);
+}
+
+/* Páginas numeradas */
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+.paginacion-numero-grupo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.paginacion-numero {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--borde, rgba(23, 24, 28, 0.15));
+  border-radius: 12px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.paginacion-numero[aria-current='page'] {
+  background: var(--texto);
+  border-color: transparent;
+  color: var(--superficie);
+}
+.paginacion-hueco {
+  padding: 0 2px;
+  color: var(--texto-suave, var(--texto));
+}
+.dialogo-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dialogo-cerrar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin: -8px -8px 0 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--texto-suave, var(--texto));
+  cursor: pointer;
+}
+.dialogo-cerrar:hover {
+  background: rgba(23, 24, 28, 0.06);
+}
 
 /* ───────────── Catálogo (M4) ───────────── */
 .cabecera-acciones {
@@ -829,7 +970,7 @@ label.boton {
   gap: 4px;
 }
 .boton-oscuro {
-  background: var(--texto);
+  background: var(--tinta);
   color: #fff;
 }
 .boton-oscuro:hover {
@@ -884,8 +1025,8 @@ label.boton {
   cursor: pointer;
 }
 .chip[aria-pressed='true'] {
-  background: var(--texto);
-  border-color: var(--texto);
+  background: var(--tinta);
+  border-color: var(--tinta);
   color: #fff;
 }
 .vacio {
@@ -1306,7 +1447,7 @@ label.boton {
   gap: 2px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: var(--texto);
+  background: var(--tinta);
   color: #fff;
 }
 .resumen-stock-chico {
@@ -2155,7 +2296,7 @@ label.boton {
   flex-wrap: wrap;
 }
 .boton-oscuro {
-  background: var(--texto);
+  background: var(--tinta);
   color: #fff;
 }
 .boton-oscuro:hover {
@@ -2197,7 +2338,7 @@ label.boton {
   gap: 20px;
   padding: 20px;
   border-radius: var(--radio-grande);
-  background: var(--texto);
+  background: var(--tinta);
   color: #fff;
 }
 .tarjeta-enlace-qr {
@@ -2415,7 +2556,7 @@ label.boton {
   gap: 14px;
   padding: 16px 18px;
   border-radius: var(--radio-grande);
-  background: var(--texto);
+  background: var(--tinta);
   color: #fff;
 }
 .banner-ig-icono {
@@ -2705,4 +2846,37 @@ label.boton {
 .tabla-hora {
   white-space: nowrap;
   padding-right: 14px !important;
+}
+
+/* ───────────── Modo oscuro: lo que en claro llevaba colores fijos ───────────── */
+:root[data-modo='oscuro'] .icono-caja-ambar,
+:root[data-modo='oscuro'] .aviso-advertencia,
+:root[data-modo='oscuro'] .etiqueta-bajo,
+:root[data-modo='oscuro'] .resumen-chip-ambar,
+:root[data-modo='oscuro'] .etiqueta-stock-pocos,
+:root[data-modo='oscuro'] .variantes-stock .variante-poca {
+  color: var(--ambar-oscuro);
+}
+:root[data-modo='oscuro'] .producto-foto,
+:root[data-modo='oscuro'] .galeria-foto,
+:root[data-modo='oscuro'] .fila-stock-foto,
+:root[data-modo='oscuro'] .etiqueta-sincosto,
+:root[data-modo='oscuro'] .etiqueta-stock-sincontrol,
+:root[data-modo='oscuro'] .contador {
+  background: var(--apagado);
+  color: var(--texto-suave);
+}
+:root[data-modo='oscuro'] .barra-enlace,
+:root[data-modo='oscuro'] .busqueda-caja {
+  color: var(--texto-suave);
+}
+:root[data-modo='oscuro'] .interruptor-pista {
+  background: #4a4c55;
+}
+:root[data-modo='oscuro'] .fila-stock-agotado {
+  border-color: color-mix(in srgb, var(--peligro) 45%, transparent);
+}
+:root[data-modo='oscuro'] .fila-stock-pocos,
+:root[data-modo='oscuro'] .fila-aviso-ambar {
+  border-color: color-mix(in srgb, var(--ambar) 45%, transparent);
 }

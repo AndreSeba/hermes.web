@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react'
+﻿import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { api, mensajeDeError } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { useSesion } from '../../sesion/contexto'
+import { Icono } from '../../componentes/Icono'
 
 export function Ingresar() {
   const { entrar } = useSesion()
@@ -32,7 +33,8 @@ export function Ingresar() {
       <form className="acceso-columna" onSubmit={enviar} noValidate>
         <header className="acceso-cabecera">
           <Link to="/bienvenida" className="enlace-volver">
-            ← Volver
+            <Icono nombre="atras" tamano={18} />
+            Volver
           </Link>
           <h1 className="titulo-grande">Hola de nuevo</h1>
           <p className="texto-suave">Entrá para ver cómo va tu negocio.</p>
