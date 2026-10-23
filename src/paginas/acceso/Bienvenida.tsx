@@ -4,9 +4,9 @@ import { marca } from '../../marca'
 
 const beneficios: { icono: NombreIcono; titulo: string; texto: string }[] = [
   {
-    icono: 'instagram',
-    titulo: 'Publicás una vez',
-    texto: 'Lo que subís a Instagram llega solo a tu catálogo. Nada de cargar dos veces.',
+    icono: 'stock',
+    titulo: 'Tu stock siempre al día',
+    texto: 'Cada venta descuenta sola y te avisamos antes de que se te acabe algo.',
   },
   {
     icono: 'calculadora',

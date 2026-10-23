@@ -4,6 +4,7 @@ import { api, mensajeDeError, type Inicio as DatosInicio, type MasVendido, type 
 import { Aviso } from '../../componentes/Aviso'
 import { Icono, type NombreIcono } from '../../componentes/Icono'
 import { usePermisos, useSesionActiva } from '../../sesion/contexto'
+import { INSTAGRAM_LISTO } from '../../diseno/secciones'
 import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { nombreDelPeriodo, nombreDelPeriodoAnterior, rangoAnterior, rangoDe, rangoPorDia, type Periodo } from '../../util/periodo'
@@ -17,7 +18,7 @@ const primerosPasos: { icono: NombreIcono; titulo: string; texto: string; ruta: 
   {
     icono: 'catalogo',
     titulo: 'Cargá tus productos',
-    texto: 'Con fotos, colores y tallas. O traelos desde Instagram.',
+    texto: 'Con fotos, colores y tallas.',
     ruta: '/catalogo',
   },
   {
@@ -207,7 +208,7 @@ function Panel({ tablero, periodo }: { tablero: Tablero; periodo: Periodo }) {
 
   return (
     <>
-      {bandeja > 0 && (
+      {INSTAGRAM_LISTO && bandeja > 0 && (
         <section className="banner-ig" aria-label="Instagram">
           <span className="banner-ig-icono" aria-hidden="true">
             <Icono nombre="instagram" tamano={22} />

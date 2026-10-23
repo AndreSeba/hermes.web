@@ -1,6 +1,6 @@
 import { createBrowserRouter, Outlet, type RouteObject } from 'react-router'
 import { Armazon } from './diseno/Armazon'
-import { MOSTRAR_MI_PLAN, nuevaVenta, secciones } from './diseno/secciones'
+import { INSTAGRAM_LISTO, MOSTRAR_MI_PLAN, nuevaVenta, secciones } from './diseno/secciones'
 import { Bienvenida } from './paginas/acceso/Bienvenida'
 import { Catalogo } from './paginas/catalogo/Catalogo'
 import { EditarProducto } from './paginas/catalogo/EditarProducto'
@@ -40,7 +40,7 @@ const con = (permiso: string, children: RouteObject[]): RouteObject => ({
 
 // Secciones cuyo módulo todavía no está hecho: <EnConstruccion>. Al construir un módulo, su ruta
 // pasa a tener su página propia (como Inicio o Mi tienda).
-const hechas = ['/', '/equipo','/mi-tienda', '/catalogo', '/stock', '/venta', '/ventas', '/compras', '/proveedores', '/gastos', '/instagram', '/mi-plan', '/pedidos']
+const hechas = ['/', '/equipo','/mi-tienda', '/catalogo', '/stock', '/venta', '/ventas', '/compras', '/proveedores', '/gastos', ...(INSTAGRAM_LISTO ? ['/instagram'] : []), '/mi-plan', '/pedidos']
 const pendientes = [...secciones, nuevaVenta].filter((s) => !hechas.includes(s.ruta))
 
 export const rutas = createBrowserRouter([
@@ -69,11 +69,15 @@ export const rutas = createBrowserRouter([
           con(P.ventasRegistrar, [{ path: '/venta', element: <NuevaVenta /> }]),
           con(VER_VENTAS, [{ path: '/ventas', element: <Ventas /> }]),
           con(P.gastosVer, [{ path: '/gastos', element: <Gastos /> }]),
-          con(P.instagramGestionar, [
-            { path: '/instagram', element: <Instagram /> },
-            { path: '/instagram/revisar/:id', element: <RevisarBorrador /> },
-            { path: '/instagram/conectado', element: <ConectadoInstagram /> },
-          ]),
+          ...(INSTAGRAM_LISTO
+            ? [
+                con(P.instagramGestionar, [
+                  { path: '/instagram', element: <Instagram /> },
+                  { path: '/instagram/revisar/:id', element: <RevisarBorrador /> },
+                  { path: '/instagram/conectado', element: <ConectadoInstagram /> },
+                ]),
+              ]
+            : []),
           con(P.comprasVer, [{ path: '/compras', element: <Compras /> }]),
           con(P.comprasGestionar, [{ path: '/compras/nueva', element: <NuevaCompra /> }]),
           con(P.proveedoresVer, [{ path: '/proveedores', element: <Proveedores /> }]),

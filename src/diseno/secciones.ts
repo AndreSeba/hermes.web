@@ -16,6 +16,10 @@ export type Seccion = {
 // "Mi plan" está oculto por ahora (menú, ruta y enlaces). Para mostrarlo de nuevo, ponerlo en true.
 export const MOSTRAR_MI_PLAN = false
 
+// "Desde Instagram" sigue en el menú, pero mientras sea false la pantalla dice que se está construyendo (como Precios).
+// Para habilitarla (cuando haya una app de Meta aprobada), ponerlo en true.
+export const INSTAGRAM_LISTO = false
+
 export const secciones: Seccion[] = [
   { ruta: '/', titulo: 'Inicio', icono: 'inicio', descripcion: 'Cómo va tu negocio.', permiso: P.inicioVer },
   {
