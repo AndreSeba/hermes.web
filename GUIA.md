@@ -464,3 +464,13 @@ seguidas puede chocar con el límite por IP del login (20/min): esperar un minut
   verificaciones (también pasa con la API usando Row Level Security).
 - 2026-10-15: **M12 (front)** — conectar la cuenta de Instagram, "Traer lo nuevo", fotos de Instagram en la bandeja y en la
   revisión. e2e: 200 verificaciones con el Meta falso.
+
+- 2026-10-23: **Roles y permisos en el panel.** `sesion/permisos.ts` (códigos, los mismos del backend), `usePermisos().tiene('a|b')` en
+  `sesion/contexto.ts`, `Seccion.permiso` en el menú, `RequierePermiso` en las rutas (y `rutaDeEntrada`: un vendedor sin Inicio abre
+  Nueva venta). Pantallas **Equipo** y **Roles** (`paginas/equipo/`), **cambio de contraseña obligatorio** (`CambiarPassword`) y
+  `SinAcceso`. Sin `costos.ver` no se muestran costos, márgenes ni ganancias (Catálogo, ficha, Stock, Ventas, Inicio).
+- 2026-10-23: **Barra inferior del celular** con botón **Menú** que abre una hoja con todas las secciones, Apariencia y Cerrar sesión.
+- 2026-10-23: **"Desde Instagram" en construcción**: `INSTAGRAM_LISTO = false` en `diseno/secciones.ts` (rutas, banner del Inicio y
+  textos de la bienvenida apagados). Poner `true` cuando haya app de Meta.
+- Pendiente del front: actualizar los e2e (`scripts/*.mjs`) a los permisos, la barra móvil y el Instagram oculto; poner el nombre
+  "Mi Casero"; primera tanda de mejoras de la tienda pública (vive en el backend, `Hermes.Public`). Ver `Hermes/docs/GUIA.md`.
