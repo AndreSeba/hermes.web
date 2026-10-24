@@ -1,9 +1,9 @@
-// Único lugar con la identidad visible de la app. El nombre del producto TODAVÍA NO ESTÁ DEFINIDO
-// ("Hermes" es solo el nombre en clave del proyecto): mientras sea null, la interfaz no muestra
-// ningún nombre. Nunca escribas el nombre a mano en componentes, títulos ni textos.
-// Cuando se defina el nombre, cambiarlo también en public/manifest.webmanifest (name / short_name): es un archivo estático.
+// Único lugar con la identidad visible de la app. El nombre del producto es "Mi Casero" (2026-10-24; "Hermes" quedó solo como nombre
+// en clave interno del proyecto, no se muestra en ninguna pantalla). Nunca escribas el nombre a mano en componentes, títulos ni textos.
+// Si cambia, cambiarlo también en index.html (title), public/manifest.webmanifest (name / short_name) y en el pie de las tiendas
+// públicas (Hermes.Public/Pages/Shared/_Layout.cshtml): son archivos estáticos.
 export const marca = {
-  nombre: null as string | null,
+  nombre: 'Mi Casero' as string | null,
   lema: 'Tu negocio, simple.',
 }
 

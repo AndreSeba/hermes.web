@@ -1,7 +1,7 @@
 {
-  "name": "Tu negocio, simple.",
-  "short_name": "Mi negocio",
-  "description": "Catálogo, stock, ventas y tu tienda online, desde el celular.",
+  "name": "Mi Casero",
+  "short_name": "Mi Casero",
+  "description": "Tu negocio, simple. Catálogo, stock, ventas y tu tienda online, desde el celular.",
   "lang": "es",
   "start_url": "/",
   "scope": "/",

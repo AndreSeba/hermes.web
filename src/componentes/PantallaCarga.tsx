@@ -7,7 +7,7 @@ export function PantallaCarga() {
       <span className="pantalla-carga-punto" aria-hidden="true" />
       <span className="sr-only">Cargando…</span>
       <span className="pantalla-carga-lema" aria-hidden="true">
-        {marca.lema}
+        {marca.nombre} · {marca.lema}
       </span>
     </div>
   )

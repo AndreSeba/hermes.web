@@ -1,9 +1,10 @@
-﻿import type { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { Icono } from '../../componentes/Icono'
+import { marca } from '../../marca'
 
 // Términos y privacidad. BORRADOR redactado sin abogado: antes de abrir al público, que lo revise un abogado en Bolivia
-// (ver docs/DECISIONES.md). Sin nombre de producto (src/marca.ts): se dice "la plataforma".
+// (ver docs/DECISIONES.md). El nombre del producto sale de src/marca.ts.
 const ACTUALIZADO = '14 de octubre de 2026'
 
 function Documento({ titulo, children }: { titulo: string; children: ReactNode }) {
@@ -20,7 +21,7 @@ function Documento({ titulo, children }: { titulo: string; children: ReactNode }
         </header>
         {children}
         <p className="texto-suave texto-chico">
-          ¿Dudas? Escribinos desde el panel o por los medios de contacto de la plataforma. Ver también{' '}
+          ¿Dudas? Escribinos desde el panel o por los medios de contacto de {marca.nombre}. Ver también{' '}
           {titulo === 'Términos de uso' ? <Link to="/privacidad">la política de privacidad</Link> : <Link to="/terminos">los términos de uso</Link>}.
         </p>
       </article>
@@ -32,7 +33,7 @@ export function Terminos() {
   return (
     <Documento titulo="Términos de uso">
       <section>
-        <h2 className="titulo-seccion">1. Qué es la plataforma</h2>
+        <h2 className="titulo-seccion">1. Qué es {marca.nombre}</h2>
         <p>
           Una herramienta para emprendedores de Bolivia: catálogo, stock, compras, ventas, gastos, precio sugerido y una tienda en internet donde tus
           clientes ven tus productos y te hacen pedidos por WhatsApp. No vende nada por vos ni cobra a tus clientes: los pedidos y los pagos los
@@ -43,7 +44,7 @@ export function Terminos() {
         <h2 className="titulo-seccion">2. Tu cuenta</h2>
         <p>
           Sos responsable de lo que se haga con tu cuenta: cuidá tu contraseña y no la compartas. Los datos que cargás (productos, precios, stock,
-          ventas) son tuyos; la plataforma solo los guarda y los muestra donde vos elegís.
+          ventas) son tuyos; {marca.nombre} solo los guarda y los muestra donde vos elegís.
         </p>
       </section>
       <section>
@@ -64,14 +65,14 @@ export function Terminos() {
       <section>
         <h2 className="titulo-seccion">5. Disponibilidad</h2>
         <p>
-          Hacemos lo posible para que la plataforma funcione siempre y respaldamos los datos todos los días, pero puede haber cortes o errores. Te
+          Hacemos lo posible para que {marca.nombre} funcione siempre y respaldamos los datos todos los días, pero puede haber cortes o errores. Te
           recomendamos no depender de ella como único registro de algo crítico.
         </p>
       </section>
       <section>
         <h2 className="titulo-seccion">6. Cambios y baja</h2>
         <p>
-          Si cambiamos estos términos te avisamos en el panel. Podés dejar de usar la plataforma cuando quieras y pedirnos que borremos tu cuenta y tus
+          Si cambiamos estos términos te avisamos en el panel. Podés dejar de usar {marca.nombre} cuando quieras y pedirnos que borremos tu cuenta y tus
           datos.
         </p>
       </section>
@@ -97,7 +98,7 @@ export function Privacidad() {
       <section>
         <h2 className="titulo-seccion">Para qué los usamos</h2>
         <p>
-          Solo para que la plataforma funcione: mostrar tu tienda, registrar tus operaciones, procesar los pedidos y avisarte de lo importante. No vendemos
+          Solo para que {marca.nombre} funcione: mostrar tu tienda, registrar tus operaciones, procesar los pedidos y avisarte de lo importante. No vendemos
           ni cedemos tus datos ni los de tus clientes, y no los usamos para publicidad.
         </p>
       </section>

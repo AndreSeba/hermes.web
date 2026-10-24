@@ -1,4 +1,4 @@
-﻿/* ───────────── Tokens (del prototipo) ─────────────
+/* ───────────── Tokens (del prototipo) ─────────────
    Colores de la APP. El color de cada tienda pública (por defecto #7C5CFC) es otra cosa. */
 :root {
   --fondo: #f6f5f1;
@@ -2879,4 +2879,14 @@ label.boton {
 :root[data-modo='oscuro'] .fila-stock-pocos,
 :root[data-modo='oscuro'] .fila-aviso-ambar {
   border-color: color-mix(in srgb, var(--ambar) 45%, transparent);
+}
+
+/* El nombre del producto, sobre el titular de la bienvenida */
+.marca-nombre {
+  margin: 0 0 6px;
+  font-family: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  color: var(--acento);
 }

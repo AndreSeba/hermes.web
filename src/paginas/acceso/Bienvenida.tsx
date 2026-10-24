@@ -25,6 +25,7 @@ export function Bienvenida() {
     <div className="acceso">
       <div className="acceso-columna">
         <header className="acceso-cabecera">
+          <p className="marca-nombre">{marca.nombre}</p>
           <h1 className="titulo-grande">{marca.lema}</h1>
           <p className="texto-suave">
             Catálogo, stock, ventas y tu tienda online, en un solo lugar y pensado para que lo manejes desde el celular.
