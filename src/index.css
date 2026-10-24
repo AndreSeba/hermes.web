@@ -240,6 +240,15 @@ p {
 a.avatar:hover {
   color: var(--ambar-oscuro);
 }
+/* El logo de la tienda dentro del círculo */
+.avatar {
+  overflow: hidden;
+}
+.avatar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 /* ───────────── Formularios ───────────── */
 .formulario {

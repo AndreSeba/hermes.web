@@ -3,12 +3,13 @@ import { Link, useSearchParams } from 'react-router'
 import { api, mensajeDeError, type Inicio as DatosInicio, type MasVendido, type ProductoResumen, type VentaDia, type VentaResumen } from '../../api/cliente'
 import { Aviso } from '../../componentes/Aviso'
 import { Icono, type NombreIcono } from '../../componentes/Icono'
+import { LogoTienda } from '../../componentes/LogoTienda'
 import { usePermisos, useSesionActiva } from '../../sesion/contexto'
 import { INSTAGRAM_LISTO } from '../../diseno/secciones'
 import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
 import { nombreDelPeriodo, nombreDelPeriodoAnterior, rangoAnterior, rangoDe, rangoPorDia, type Periodo } from '../../util/periodo'
-import { fechaLarga, iniciales, primerNombre } from '../../util/texto'
+import { fechaLarga, primerNombre } from '../../util/texto'
 import { cuando } from '../stock/historial'
 import { nombreDePago } from '../ventas/pagos'
 import { GraficoVentasPorDia } from './GraficoVentasPorDia'
@@ -133,7 +134,7 @@ export function Inicio() {
           </div>
         )}
         <Link to="/mi-tienda" className="avatar avatar-grande solo-celular" aria-label="Mi tienda">
-          {iniciales(tienda.nombre)}
+          <LogoTienda />
         </Link>
       </header>
 

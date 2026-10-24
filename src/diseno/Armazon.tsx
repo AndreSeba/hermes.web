@@ -3,9 +3,9 @@ import { NavLink, Outlet, useLocation } from 'react-router'
 import { api } from '../api/cliente'
 import { Dialogo } from '../componentes/Dialogo'
 import { Icono } from '../componentes/Icono'
+import { LogoTienda } from '../componentes/LogoTienda'
 import { SelectorDeTema } from '../tema/SelectorDeTema'
 import { useSesion, useSesionActiva, usePermisos } from '../sesion/contexto'
-import { iniciales } from '../util/texto'
 import { nuevaVenta, PEDIDOS_CAMBIARON, respaldoCelular, secciones, seccionesCelular } from './secciones'
 
 // Escritorio: menú lateral. Celular: barra inferior con el botón central de venta.
@@ -52,7 +52,7 @@ export function Armazon() {
       <aside className="menu-lateral">
         <div className="menu-tienda">
           <span className="avatar" aria-hidden="true">
-            {iniciales(tienda.nombre)}
+            <LogoTienda />
           </span>
           <span className="menu-tienda-nombre">{tienda.nombre}</span>
         </div>
