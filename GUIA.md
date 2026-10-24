@@ -383,14 +383,12 @@ Reglas en `../Hermes/docs/GUIA.md` ("Planes y panel admin (M13)").
 
 ## Nombre del producto: Mi Casero (definido el 2026-10-24)
 
-"Hermes" es solo el nombre en clave del proyecto (repos, carpetas, código). **En la interfaz no
-aparece ningún nombre** hasta que el usuario lo defina: ni en títulos, ni en textos, ni en
-`index.html`, ni en el manifiesto PWA, ni en logos. Todo lo visible de la marca sale de
-`src/marca.ts` (`marca.nombre` es `null` hasta entonces; usar `tituloDePagina()` para el `<title>`).
-Cuando se elija el nombre, se cambia ahí y en ningún otro lado. El logo del prototipo (que dice
-"hermes") **no se usa**: el menú muestra el nombre y las iniciales de la TIENDA del usuario.
-La prueba e2e verifica que ningún texto visible diga "hermes".
-
+El producto se llama **Mi Casero**. "Hermes" es solo el nombre en clave interno del proyecto (repos, carpetas, código, base de datos):
+**no se muestra en ninguna pantalla**. Lo visible de la marca sale de `src/marca.ts` (`marca.nombre`; usar `tituloDePagina()` para el
+`<title>`). Además el nombre está escrito a mano en `index.html` (título y `apple-mobile-web-app-title`), en el manifiesto PWA
+(`public/manifest.webmanifest`) y en el pie de las tiendas públicas (`Hermes.Public/Pages/Shared/_Layout.cshtml`): si cambia, hay que
+cambiarlo también ahí. El logo del prototipo (que dice "hermes") **no se usa**: el menú muestra el nombre y las iniciales de la TIENDA
+del usuario. La prueba e2e verifica que ningún texto visible diga "hermes".
 ## Diseño
 
 - Fuente de la verdad visual: el prototipo navegable (lienzo de diseño, 31 pantallas, celular 390 y
