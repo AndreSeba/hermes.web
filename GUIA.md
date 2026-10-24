@@ -35,7 +35,7 @@ src/
 │                 historial.ts), panel/ (Inicio, MiTienda, EnConstruccion), NoEncontrada
 ├── util/         texto.ts (iniciales, aSlug, fechaLarga…), color.ts (5 colores de tienda, colorDeTexto),
 │                 dinero.ts (bs, leerMonto, listaDeTextos)
-├── marca.ts      identidad visible (nombre SIN DEFINIR)
+├── marca.ts      identidad visible (nombre: Mi Casero)
 └── rutas.tsx     todas las rutas
 scripts/e2e.mjs   prueba de punta a punta (pnpm e2e)
 ```
@@ -381,7 +381,7 @@ Reglas en `../Hermes/docs/GUIA.md` ("Planes y panel admin (M13)").
   las crea `e2e_planes.py`), aprueba y revisa Tiendas/Planes; vuelve la dueña y ya puede crear más. Ojo: el nombre y la
   dirección de la tienda de prueba cambian en la parte de Mi tienda, se leen de la API.
 
-## Nombre del producto: SIN DEFINIR (2026-10-14, pedido del usuario)
+## Nombre del producto: Mi Casero (definido el 2026-10-24)
 
 "Hermes" es solo el nombre en clave del proyecto (repos, carpetas, código). **En la interfaz no
 aparece ningún nombre** hasta que el usuario lo defina: ni en títulos, ni en textos, ni en
@@ -473,4 +473,4 @@ seguidas puede chocar con el límite por IP del login (20/min): esperar un minut
 - 2026-10-23: **"Desde Instagram" en construcción**: `INSTAGRAM_LISTO = false` en `diseno/secciones.ts` (rutas, banner del Inicio y
   textos de la bienvenida apagados). Poner `true` cuando haya app de Meta.
 - Pendiente del front: actualizar los e2e (`scripts/*.mjs`) a los permisos, la barra móvil y el Instagram oculto; poner el nombre
-  "Mi Casero"; primera tanda de mejoras de la tienda pública (vive en el backend, `Hermes.Public`). Ver `Hermes/docs/GUIA.md`.
+  primera tanda de mejoras de la tienda pública (vive en el backend, `Hermes.Public`). Ver `Hermes/docs/GUIA.md`.
