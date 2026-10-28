@@ -246,10 +246,23 @@ function DetallePedido({ id, alCerrar, alCambiar }: { id: string; alCerrar: () =
       <div className="detalle-pedido-bloque">
         <span className="historial-titulo">Entrega</span>
         {pedido.entrega === 'Envio' ? (
-          <p>
-            Envío a <strong>{pedido.direccion}</strong>
-            {pedido.referencia && <span className="texto-suave"> · {pedido.referencia}</span>}
-          </p>
+          <>
+            <p>
+              Envío a <strong>{pedido.direccion}</strong>
+              {pedido.referencia && <span className="texto-suave"> · {pedido.referencia}</span>}
+            </p>
+            {pedido.latitud != null && pedido.longitud != null && (
+              <a
+                className="boton boton-secundario boton-chico"
+                href={`https://www.google.com/maps?q=${pedido.latitud},${pedido.longitud}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icono nombre="ubicacion" tamano={16} />
+                Ver en el mapa
+              </a>
+            )}
+          </>
         ) : (
           <p>Pasa a retirarlo.</p>
         )}

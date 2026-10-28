@@ -74,7 +74,7 @@ export function NuevaCompra() {
   useEffect(() => {
     let cancelado = false
     api
-      .GET('/api/v1/ventas/productos', { params: { query: { Buscar: q || undefined, Limite: POR_PAGINA } } })
+      .GET('/api/v1/ventas/productos', { params: { query: { Buscar: q || undefined, Limite: POR_PAGINA, IncluirInsumos: true } } })
       .then(({ data, error, response }) => {
         if (cancelado) return
         if (!data) return setError(mensajeDeError(error, response))
@@ -93,7 +93,7 @@ export function NuevaCompra() {
     setCargandoMas(true)
     try {
       const { data, error, response } = await api.GET('/api/v1/ventas/productos', {
-        params: { query: { Buscar: q || undefined, Limite: POR_PAGINA, Cursor: siguiente } },
+        params: { query: { Buscar: q || undefined, Limite: POR_PAGINA, Cursor: siguiente, IncluirInsumos: true } },
       })
       if (!data) return setError(mensajeDeError(error, response))
       setItems((previos) => [...(previos ?? []), ...data.items])
@@ -407,7 +407,7 @@ function FilaComprar({
           <span className="fila-stock-nombre">{p.nombre}</span>
           <span className="texto-suave texto-chico">
             Tu costo hoy: {p.costo > 0 ? bs(p.costo) : 'sin cargar'}
-            {p.controlaStock ? ` · Tenés ${p.stock ?? 0}` : ''}
+            {p.controlaStock ? ` · Tenés ${p.stock ?? 0}` : ' · Sin control de stock: la compra no suma unidades'}
           </span>
         </span>
         {!conVariantes && contador(p.variantes[0], `Cantidad de ${p.nombre}`)}

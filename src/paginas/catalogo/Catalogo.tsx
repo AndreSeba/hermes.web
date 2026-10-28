@@ -22,8 +22,9 @@ export function Catalogo() {
   const q = params.get('q') ?? ''
   const categoria = params.get('categoria')
   const revisar = params.get('filtro') === 'revisar'
+  const insumos = params.get('filtro') === 'insumos'
   const archivados = params.get('archivados') === '1'
-  const hayFiltro = !!(q || categoria || revisar || archivados)
+  const hayFiltro = !!(q || categoria || revisar || insumos || archivados)
   const pagina = Math.max(1, Number.parseInt(params.get('pagina') ?? '1', 10) || 1)
 
   const [texto, setTexto] = useState(q)
@@ -39,6 +40,7 @@ export function Catalogo() {
     Buscar: q || undefined,
     CategoriaId: categoria ?? undefined,
     RevisarPrecio: revisar || undefined,
+    SeVende: insumos ? false : undefined,
     Archivados: archivados || undefined,
     Limite: POR_PAGINA,
     Pagina: pagina,
@@ -70,7 +72,7 @@ export function Catalogo() {
       clearTimeout(espera)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `consulta` se arma con estos mismos valores
-  }, [q, categoria, revisar, archivados, pagina, version])
+  }, [q, categoria, revisar, insumos, archivados, pagina, version])
 
   useEffect(() => {
     let cancelado = false
@@ -147,6 +149,14 @@ export function Catalogo() {
               Revisar precio
             </button>
           )}
+          <button
+            type="button"
+            className="chip"
+            aria-pressed={insumos}
+            onClick={() => cambiar({ ...sinFiltros, filtro: insumos ? null : 'insumos' })}
+          >
+            Insumos
+          </button>
           {categorias.map((c) => (
             <button
               key={c.id}
@@ -209,7 +219,8 @@ export function Catalogo() {
                     ) : (
                       <Icono nombre="bolsa" tamano={38} />
                     )}
-                    {!p.visibleEnTienda && <span className="producto-oculto">Oculto</span>}
+                    {!p.seVende && <span className="producto-oculto">Insumo</span>}
+                    {p.seVende && !p.visibleEnTienda && <span className="producto-oculto">Oculto</span>}
                     {p.estadoStock !== 'SinControl' && (
                       <span className={`producto-stock${p.estadoStock === 'Agotado' ? ' producto-stock-agotado' : ''}`}>
                         {p.estadoStock === 'Agotado' ? 'Agotado' : `Quedan ${p.stock}`}
@@ -218,8 +229,8 @@ export function Catalogo() {
                   </span>
                   <span className="producto-datos">
                     <span className="producto-nombre">{p.nombre}</span>
-                    <span className="producto-precio">{bs(p.precio)}</span>
-                    {veCostos && <EtiquetaMargen estado={p.estadoPrecio} ganancia={p.ganancia} />}
+                    <span className="producto-precio">{p.seVende ? bs(p.precio) : veCostos && p.costo > 0 ? `Costo ${bs(p.costo)}` : 'No se vende'}</span>
+                    {veCostos && p.seVende && <EtiquetaMargen estado={p.estadoPrecio} ganancia={p.ganancia} />}
                   </span>
                 </Link>
               </li>

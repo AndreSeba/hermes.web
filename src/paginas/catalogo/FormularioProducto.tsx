@@ -21,6 +21,7 @@ type Estado = {
   colores: string // "café, negro"
   tallas: string
   visible: boolean
+  seVende: boolean // false = insumo: se compra pero no se vende
   fotos: ImagenSubida[]
   controlaStock: boolean
   stockMinimo: string // "3": texto del campo; se valida como entero
@@ -29,7 +30,7 @@ type Estado = {
 const MINIMO_POR_DEFECTO = '3' // el mismo que ReglaStock.MinimoPorDefecto del backend
 
 const vacio: Estado = {
-  nombre: '', descripcion: '', precio: '', costo: '', categoriaId: '', colores: '', tallas: '', visible: true, fotos: [],
+  nombre: '', descripcion: '', precio: '', costo: '', categoriaId: '', colores: '', tallas: '', visible: true, seVende: true, fotos: [],
   controlaStock: true, stockMinimo: MINIMO_POR_DEFECTO,
 }
 
@@ -44,6 +45,7 @@ const desdeProducto = (p: Producto): Estado => ({
   colores: unicos(p.variantes.map((v) => v.color)),
   tallas: unicos(p.variantes.map((v) => v.talla)),
   visible: p.visibleEnTienda,
+  seVende: p.seVende,
   fotos: p.fotos,
   controlaStock: p.controlaStock,
   stockMinimo: String(p.stockMinimo),
@@ -143,30 +145,31 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
   const variantes = colores.length && tallas.length ? colores.length * tallas.length : Math.max(colores.length, tallas.length, 1)
   const hayCambios = !servidor || firma(form) !== firma(desdeProducto(servidor))
 
-  const avisoPrecio = form.precio.trim() && (precio === null || precio <= 0) ? 'Escribí un precio mayor a 0 (hasta 2 decimales).' : null
+  const avisoPrecio = form.seVende && form.precio.trim() && (precio === null || precio <= 0) ? 'Escribí un precio mayor a 0 (hasta 2 decimales).' : null
   const avisoCosto = costo === null ? 'Escribí un monto válido (hasta 2 decimales) o dejalo vacío.' : null
   const avisoVariantes = variantes > MAXIMO_VARIANTES ? `Son demasiadas combinaciones (${variantes}). El máximo es ${MAXIMO_VARIANTES}.` : null
   const minimo = /^\d+$/.test(form.stockMinimo.trim()) ? Number(form.stockMinimo) : null
   const avisoMinimo = form.controlaStock && (minimo === null || minimo > 100_000) ? 'Escribí un número entero (0 o más).' : null
   const puedeGuardar =
-    !guardando && form.nombre.trim() !== '' && precio !== null && precio > 0 && costo !== null && !avisoVariantes && !avisoMinimo && hayCambios
+    !guardando && form.nombre.trim() !== '' && (!form.seVende || (precio !== null && precio > 0)) && costo !== null && !avisoVariantes && !avisoMinimo && hayCambios
 
   // Aritmética pura (no la regla de "ganás poco"): esa la decide el servidor y se ve en el catálogo.
-  const ganancia = precio !== null && precio > 0 && costo !== null && costo > 0 ? precio - costo : null
+  const ganancia = form.seVende && precio !== null && precio > 0 && costo !== null && costo > 0 ? precio - costo : null
 
   async function guardar(e: FormEvent) {
     e.preventDefault()
-    if (!puedeGuardar || precio === null || costo === null) return
+    if (!puedeGuardar || (form.seVende && precio === null) || costo === null) return
     setError(null)
     setGuardando(true)
     try {
       const body = {
         nombre: form.nombre,
         descripcion: form.descripcion.trim() || null,
-        precio,
+        precio: form.seVende ? (precio ?? 0) : 0,
         costo,
+        seVende: form.seVende,
         categoriaId: form.categoriaId || null,
-        visibleEnTienda: form.visible,
+        visibleEnTienda: form.seVende && form.visible,
         colores,
         tallas,
         fotoIds: form.fotos.map((f) => f.id),
@@ -313,6 +316,16 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
       />
 
       <section className="seccion tarjeta">
+        <Interruptor
+          etiqueta="Lo vendo"
+          ayuda={
+            form.seVende
+              ? 'Sale en Nueva venta y puede salir en tu tienda.'
+              : 'Es un insumo: solo lo comprás (queso, carne, pan). No pide precio ni sale en ventas ni en la tienda.'
+          }
+          activo={form.seVende}
+          alCambiar={(seVende) => cambiar({ seVende })}
+        />
         <Campo
           etiqueta="Nombre"
           value={form.nombre}
@@ -322,17 +335,19 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
         />
 
         <div className="fila-doble">
-          <Campo
-            etiqueta="Precio"
-            prefijo="Bs"
-            inputMode="decimal"
-            placeholder="180"
-            value={form.precio}
-            onChange={(e) => cambiar({ precio: e.target.value })}
-            aria-invalid={!!avisoPrecio}
-            ayuda={avisoPrecio ?? undefined}
-            required
-          />
+          {form.seVende && (
+            <Campo
+              etiqueta="Precio"
+              prefijo="Bs"
+              inputMode="decimal"
+              placeholder="180"
+              value={form.precio}
+              onChange={(e) => cambiar({ precio: e.target.value })}
+              aria-invalid={!!avisoPrecio}
+              ayuda={avisoPrecio ?? undefined}
+              required
+            />
+          )}
           {puedeCostos && (
             <Campo
               etiqueta="Tu costo"
@@ -456,12 +471,14 @@ export function FormularioProducto({ inicial, costoBloqueado = false, borrador, 
             ayuda={avisoMinimo ?? 'Con esta cantidad o menos, figura "por agotarse".'}
           />
         )}
-        <Interruptor
-          etiqueta="Mostrar en mi tienda"
-          ayuda="Apagado, queda solo en tu catálogo."
-          activo={form.visible}
-          alCambiar={(visible) => cambiar({ visible })}
-        />
+        {form.seVende && (
+          <Interruptor
+            etiqueta="Mostrar en mi tienda"
+            ayuda="Apagado, queda solo en tu catálogo."
+            activo={form.visible}
+            alCambiar={(visible) => cambiar({ visible })}
+          />
+        )}
       </section>
 
       {!esNuevo && !servidor.archivado && puedeArchivar && (

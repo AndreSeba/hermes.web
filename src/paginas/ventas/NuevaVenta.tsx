@@ -12,10 +12,11 @@ import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { Contador } from '../../componentes/Contador'
 import { Icono } from '../../componentes/Icono'
-import { usePermisos } from '../../sesion/contexto'
+import { usePermisos, useSesionActiva } from '../../sesion/contexto'
 import { P } from '../../sesion/permisos'
-import { bs, soloEnteros } from '../../util/dinero'
+import { bs, leerMonto, soloEnteros } from '../../util/dinero'
 import { rangoDelMes } from '../../util/periodo'
+import { anchoGuardado, guardarAncho, imprimirTicket, type AnchoTicket } from '../../util/ticket'
 import { etiquetaDeVariante } from '../stock/historial'
 import { MAXIMO_POR_LINEA, metodosDePago, nombreDePago } from './pagos'
 
@@ -53,6 +54,13 @@ export function NuevaVenta() {
 
   const [lineas, setLineas] = useState<Record<string, Linea>>({})
   const [pago, setPago] = useState<MetodoPago>(pagoGuardado)
+  // Pago mixto: cuánto se cobró con cada forma de pago (texto de los campos).
+  const [mixto, setMixto] = useState(false)
+  const [montos, setMontos] = useState<Partial<Record<MetodoPago, string>>>({})
+  // Efectivo que entregó el cliente, para decirle cuánto cambio devolver.
+  const [recibido, setRecibido] = useState('')
+  const { tienda } = useSesionActiva()
+  const [ancho, setAncho] = useState<AnchoTicket>(anchoGuardado)
   const [cliente, setCliente] = useState('')
   const [conCliente, setConCliente] = useState(false)
   const [enviando, setEnviando] = useState(false)
@@ -120,16 +128,32 @@ export function NuevaVenta() {
     ? null
     : elegidas.reduce((n, l) => n + l.cantidad * (l.producto.precio - l.producto.costo), 0)
 
+  // Cobro en centavos enteros: sin errores de coma flotante al comparar sumas.
+  const centavos = (n: number) => Math.round(n * 100)
+  const pagosMixtos = metodosDePago
+    .map((m) => ({ metodo: m.id, monto: leerMonto(montos[m.id] ?? '') ?? 0 }))
+    .filter((p) => p.monto > 0)
+  const falta = (centavos(total) - pagosMixtos.reduce((n, p) => n + centavos(p.monto), 0)) / 100
+  const mixtoValido = pagosMixtos.length >= 2 && falta === 0
+  const efectivoACobrar = mixto ? (pagosMixtos.find((p) => p.metodo === 'Efectivo')?.monto ?? 0) : pago === 'Efectivo' ? total : 0
+  const entregado = leerMonto(recibido)
+  const recibidoDeMenos = entregado !== null && efectivoACobrar > 0 && centavos(entregado) < centavos(efectivoACobrar)
+  const cambio = entregado !== null && efectivoACobrar > 0 && !recibidoDeMenos ? (centavos(entregado) - centavos(efectivoACobrar)) / 100 : null
+  const cobroValido = (!mixto || mixtoValido) && !recibidoDeMenos
+
   async function registrar() {
-    if (elegidas.length === 0 || enviando) return
+    if (elegidas.length === 0 || enviando || !cobroValido) return
     setEnviando(true)
     setErrorVenta(null)
     try {
+      const principal = mixto ? [...pagosMixtos].sort((a, b) => b.monto - a.monto)[0].metodo : pago
       const { data, error, response } = await api.POST('/api/v1/ventas', {
         body: {
           claveIdempotencia: clave.current,
           lineas: elegidas.map((l) => ({ varianteId: l.variante.id, cantidad: l.cantidad })),
-          metodoPago: pago,
+          metodoPago: principal,
+          pagos: mixto ? pagosMixtos : null,
+          efectivoRecibido: efectivoACobrar > 0 && entregado !== null ? entregado : null,
           cliente: cliente.trim() || null,
         },
       })
@@ -140,7 +164,7 @@ export function NuevaVenta() {
         return
       }
       try {
-        localStorage.setItem(CLAVE_PAGO, pago)
+        localStorage.setItem(CLAVE_PAGO, principal)
       } catch {
         /* sin almacenamiento: se usa Efectivo la próxima vez */
       }
@@ -163,6 +187,9 @@ export function NuevaVenta() {
   function otra() {
     setHecha(null)
     setCubierto(null)
+    setMixto(false)
+    setMontos({})
+    setRecibido('')
     setLineas({})
     setCliente('')
     setConCliente(false)
@@ -181,9 +208,17 @@ export function NuevaVenta() {
           <h1 className="titulo-pagina">¡Venta registrada!</h1>
           <p className="venta-lista-total">{bs(hecha.total)}</p>
           <p className="texto-suave">
-            {hecha.unidades === 1 ? '1 unidad' : `${hecha.unidades} unidades`} · {nombreDePago(hecha.metodoPago)}
+            {hecha.unidades === 1 ? '1 unidad' : `${hecha.unidades} unidades`} ·{' '}
+            {(hecha.pagos ?? []).length > 1
+              ? hecha.pagos!.map((p) => `${nombreDePago(p.metodo)} ${bs(p.monto)}`).join(' + ')
+              : nombreDePago(hecha.metodoPago)}
             {hecha.cliente ? ` · ${hecha.cliente}` : ''}
           </p>
+          {hecha.cambio != null && hecha.cambio > 0 && (
+            <p className="venta-lista-cambio" role="status">
+              Devolvé {bs(hecha.cambio)} de cambio
+            </p>
+          )}
           {hecha.ganancia !== null && <p className="texto-ok">Ganaste {bs(hecha.ganancia)}</p>}
           {cubierto !== null && (
             <p className="texto-suave texto-chico" role="status">
@@ -194,6 +229,28 @@ export function NuevaVenta() {
             <button type="button" className="boton boton-primario boton-grande" onClick={otra}>
               Registrar otra venta
             </button>
+            <div className="venta-lista-ticket">
+              <button type="button" className="boton boton-secundario" onClick={() => imprimirTicket(hecha, tienda.nombre, ancho)}>
+                <Icono nombre="imprimir" tamano={18} />
+                Imprimir ticket
+              </button>
+              <div className="chips" role="group" aria-label="Ancho del papel">
+                {([58, 80] as const).map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    className="chip"
+                    aria-pressed={ancho === a}
+                    onClick={() => {
+                      setAncho(a)
+                      guardarAncho(a)
+                    }}
+                  >
+                    {a} mm
+                  </button>
+                ))}
+              </div>
+            </div>
             <Link to="/ventas" className="boton boton-secundario">
               Ver mis ventas
             </Link>
@@ -263,12 +320,82 @@ export function NuevaVenta() {
         <div className="pie-venta-fila">
           <div className="chips" role="group" aria-label="Cómo pagó">
             {metodosDePago.map((m) => (
-              <button key={m.id} type="button" className="chip" aria-pressed={pago === m.id} onClick={() => setPago(m.id)}>
+              <button
+                key={m.id}
+                type="button"
+                className="chip"
+                aria-pressed={!mixto && pago === m.id}
+                onClick={() => {
+                  setMixto(false)
+                  setPago(m.id)
+                }}
+              >
                 {m.etiqueta}
               </button>
             ))}
+            <button type="button" className="chip" aria-pressed={mixto} onClick={() => setMixto(true)}>
+              Mixto
+            </button>
           </div>
         </div>
+        {mixto && (
+          <div className="cobro-mixto">
+            {metodosDePago.map((m) => {
+              const actual = montos[m.id] ?? ''
+              return (
+                <div key={m.id} className="cobro-mixto-fila">
+                  <Campo
+                    etiqueta={m.etiqueta}
+                    prefijo="Bs"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={actual}
+                    onChange={(e) => setMontos((previos) => ({ ...previos, [m.id]: e.target.value }))}
+                  />
+                  {falta > 0 && !actual && (
+                    <button
+                      type="button"
+                      className="boton boton-texto boton-chico"
+                      onClick={() => setMontos((previos) => ({ ...previos, [m.id]: String(falta) }))}
+                    >
+                      Resto
+                    </button>
+                  )}
+                </div>
+              )
+            })}
+            <p className={`texto-chico ${falta === 0 ? 'texto-ok' : 'texto-peligro'}`} role="status">
+              {unidades === 0
+                ? 'Elegí lo que vendiste y repartí el cobro.'
+                : falta === 0
+                  ? pagosMixtos.length >= 2
+                    ? 'El cobro está completo.'
+                    : 'Usá al menos dos formas de pago (o elegí una sola).'
+                  : falta > 0
+                    ? `Faltan ${bs(falta)} por cobrar.`
+                    : `Te pasaste por ${bs(-falta)}.`}
+            </p>
+          </div>
+        )}
+        {efectivoACobrar > 0 && unidades > 0 && (
+          <div className="cobro-cambio">
+            <Campo
+              etiqueta={`Recibí en efectivo (cobrar ${bs(efectivoACobrar)})`}
+              prefijo="Bs"
+              inputMode="decimal"
+              placeholder="Opcional"
+              value={recibido}
+              onChange={(e) => setRecibido(e.target.value)}
+              aria-invalid={recibidoDeMenos}
+            />
+            {cambio !== null && (
+              <p className="cobro-cambio-monto" role="status">
+                {cambio > 0 ? `Devolvé ${bs(cambio)}` : 'Sin cambio: pagó justo'}
+              </p>
+            )}
+            {recibidoDeMenos && <p className="texto-chico texto-peligro">Lo recibido no alcanza para el efectivo.</p>}
+          </div>
+        )}
         {conCliente || cliente ? (
           <Campo
             etiqueta="Cliente (opcional)"
@@ -289,7 +416,7 @@ export function NuevaVenta() {
             <strong className="pie-venta-monto">{bs(total)}</strong>
             {ganancia !== null && unidades > 0 && <span className="texto-ok texto-chico">Ganás {bs(ganancia)}</span>}
           </div>
-          <button type="button" className="boton boton-primario boton-grande" disabled={unidades === 0 || enviando} onClick={registrar}>
+          <button type="button" className="boton boton-primario boton-grande" disabled={unidades === 0 || enviando || !cobroValido} onClick={registrar}>
             {enviando ? 'Registrando…' : 'Registrar venta'}
           </button>
         </div>

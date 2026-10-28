@@ -4,9 +4,10 @@ import { api, mensajeDeError, type ResumenVentas, type Venta, type VentaPorVende
 import { Aviso } from '../../componentes/Aviso'
 import { Dialogo } from '../../componentes/Dialogo'
 import { Icono } from '../../componentes/Icono'
-import { usePermisos } from '../../sesion/contexto'
+import { usePermisos, useSesionActiva } from '../../sesion/contexto'
 import { P } from '../../sesion/permisos'
 import { bs } from '../../util/dinero'
+import { imprimirTicket } from '../../util/ticket'
 import { cuando } from '../stock/historial'
 import { nombreDePago } from './pagos'
 
@@ -303,6 +304,7 @@ function DetalleVenta({
   veCostos: boolean
   puedeAnular: boolean
 }) {
+  const { tienda } = useSesionActiva()
   const [venta, setVenta] = useState<Venta | null>(null)
   const [fallo, setFallo] = useState(false)
 
@@ -343,13 +345,22 @@ function DetalleVenta({
               {venta.ganancia === null ? 'Sin costo cargado en algún producto: no se puede calcular la ganancia.' : `Ganaste ${bs(venta.ganancia)} con esta venta.`}
             </p>
           )}
-          {!anulada && puedeAnular && (
-            <div className="acciones-fila">
+          {(venta.pagos ?? []).length > 1 && (
+            <p className="texto-suave texto-chico">
+              Pagó con {venta.pagos!.map((p) => `${nombreDePago(p.metodo)} ${bs(p.monto)}`).join(' + ')}.
+            </p>
+          )}
+          <div className="acciones-fila">
+            <button type="button" className="boton boton-texto" onClick={() => imprimirTicket(venta, tienda.nombre)}>
+              <Icono nombre="imprimir" tamano={18} />
+              Imprimir ticket
+            </button>
+            {!anulada && puedeAnular && (
               <button type="button" className="boton boton-secundario" onClick={alAnular}>
                 Anular venta
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </>
       )}
     </div>

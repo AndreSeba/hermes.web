@@ -1847,6 +1847,72 @@ label.boton {
   background: var(--acento-suave);
   color: var(--acento);
 }
+.venta-lista-cambio {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--acento);
+}
+.venta-lista-ticket {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Gastos que se repiten */
+.recurrentes-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.recurrentes-ver {
+  align-self: flex-start;
+}
+.por-confirmar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radio);
+  background: var(--acento-suave);
+}
+.por-confirmar-titulo {
+  margin: 0;
+}
+
+/* Cobro de Nueva venta: pago mixto y cambio */
+.cobro-mixto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.cobro-mixto > p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.cobro-mixto-fila {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+.cobro-mixto-fila > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.cobro-cambio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cobro-cambio-monto {
+  margin: 0;
+  font-weight: 700;
+  color: var(--acento);
+}
 
 /* Desde Instagram */
 .lector,

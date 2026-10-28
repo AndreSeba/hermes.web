@@ -1899,6 +1899,288 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gastos/recurrentes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoRecurrenteDto"][];
+                        "application/json": components["schemas"]["GastoRecurrenteDto"][];
+                        "text/json": components["schemas"]["GastoRecurrenteDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                    "text/json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                    "application/*+json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoRecurrenteDto"];
+                        "application/json": components["schemas"]["GastoRecurrenteDto"];
+                        "text/json": components["schemas"]["GastoRecurrenteDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/recurrentes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                    "text/json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                    "application/*+json": components["schemas"]["GuardarGastoRecurrenteDto"];
+                };
+            };
+            responses: {
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/recurrentes/{id}/pausar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoRecurrenteDto"];
+                        "application/json": components["schemas"]["GastoRecurrenteDto"];
+                        "text/json": components["schemas"]["GastoRecurrenteDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/recurrentes/{id}/reanudar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GastoRecurrenteDto"];
+                        "application/json": components["schemas"]["GastoRecurrenteDto"];
+                        "text/json": components["schemas"]["GastoRecurrenteDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/recurrentes/{id}/confirmar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConfirmarGastoRecurrenteDto"];
+                    "text/json": components["schemas"]["ConfirmarGastoRecurrenteDto"];
+                    "application/*+json": components["schemas"]["ConfirmarGastoRecurrenteDto"];
+                };
+            };
+            responses: {
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/recurrentes/{id}/omitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/imagenes": {
         parameters: {
             query?: never;
@@ -3105,6 +3387,7 @@ export interface paths {
                     Cursor?: string;
                     Limite?: number;
                     Pagina?: number;
+                    SeVende?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -4855,6 +5138,7 @@ export interface paths {
                     Buscar?: string;
                     Cursor?: string;
                     Limite?: number;
+                    IncluirInsumos?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -5191,6 +5475,10 @@ export interface components {
             pedidosPorWhatsapp: boolean;
             fondo: components["schemas"]["FondoTienda"];
         };
+        ConfirmarGastoRecurrenteDto: {
+            /** Format: double */
+            monto?: null | number;
+        };
         CosteoDto: {
             tiene: boolean;
             /** Format: double */
@@ -5254,6 +5542,8 @@ export interface components {
         EstadoStock: "SinControl" | "Ok" | "Pocos" | "Agotado";
         /** @enum {unknown} */
         FondoTienda: "Claro" | "Crema" | "Oscuro";
+        /** @enum {unknown} */
+        FrecuenciaGasto: "Semanal" | "Quincenal" | "Mensual";
         GastoDto: {
             /** Format: uuid */
             id: string;
@@ -5265,6 +5555,21 @@ export interface components {
             anulado: boolean;
             /** Format: date-time */
             anuladoEn: null | string;
+            /** Format: uuid */
+            recurrenteId?: null | string;
+        };
+        GastoRecurrenteDto: {
+            /** Format: uuid */
+            id: string;
+            concepto: string;
+            /** Format: double */
+            monto: number;
+            frecuencia: components["schemas"]["FrecuenciaGasto"];
+            /** Format: date */
+            proxima: string;
+            confirmarAntes: boolean;
+            activo: boolean;
+            porConfirmar: boolean;
         };
         GuardarCosteoDto: {
             /** Format: double */
@@ -5277,6 +5582,16 @@ export interface components {
             costoFijo: number;
             /** Format: int32 */
             margenObjetivo: number;
+        };
+        GuardarGastoRecurrenteDto: {
+            concepto: string;
+            /** Format: double */
+            monto: number;
+            frecuencia: components["schemas"]["FrecuenciaGasto"];
+            /** Format: date */
+            primeraFecha?: null | string;
+            /** @default false */
+            confirmarAntes: boolean;
         };
         GuardarProductoDto: {
             nombre: string;
@@ -5298,6 +5613,8 @@ export interface components {
              * @default 3
              */
             stockMinimo: number;
+            /** @default true */
+            seVende: boolean;
         };
         GuardarProveedorDto: {
             nombre: string;
@@ -5598,6 +5915,11 @@ export interface components {
             /** Format: date-time */
             resueltoEn: null | string;
         };
+        PagoVentaDto: {
+            metodo: components["schemas"]["MetodoPago"];
+            /** Format: double */
+            monto: number;
+        };
         PedidoDto: {
             /** Format: uuid */
             id: string;
@@ -5622,6 +5944,10 @@ export interface components {
             motivoCancelacion: null | string;
             /** Format: date-time */
             resueltoEn: null | string;
+            /** Format: double */
+            latitud?: null | number;
+            /** Format: double */
+            longitud?: null | number;
         };
         PedidoLineaDto: {
             /** Format: uuid */
@@ -5724,6 +6050,8 @@ export interface components {
             controlaStock: boolean;
             /** Format: int32 */
             stockMinimo: number;
+            /** @default true */
+            seVende: boolean;
         };
         ProductoLeidoDto: {
             nombre: null | string;
@@ -5792,6 +6120,8 @@ export interface components {
             /** Format: int32 */
             stock: null | number;
             estadoStock: components["schemas"]["EstadoStock"];
+            /** @default true */
+            seVende: boolean;
         };
         ProductoStockDto: {
             /** Format: uuid */
@@ -5883,6 +6213,9 @@ export interface components {
             lineas: components["schemas"]["LineaVentaDto"][];
             metodoPago: components["schemas"]["MetodoPago"];
             cliente?: null | string;
+            pagos?: null | components["schemas"]["PagoVentaDto"][];
+            /** Format: double */
+            efectivoRecibido?: null | number;
         };
         RegistroDto: {
             nombre: string;
@@ -6089,6 +6422,11 @@ export interface components {
             ganancia: null | number;
             lineas: components["schemas"]["VentaLineaDto"][];
             vendedor?: null | string;
+            pagos?: null | components["schemas"]["PagoVentaDto"][];
+            /** Format: double */
+            efectivoRecibido?: null | number;
+            /** Format: double */
+            cambio?: null | number;
         };
         VentaLineaDto: {
             /** Format: uuid */

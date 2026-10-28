@@ -5,9 +5,12 @@ import { Aviso } from '../../componentes/Aviso'
 import { Campo } from '../../componentes/Campo'
 import { Dialogo } from '../../componentes/Dialogo'
 import { Icono } from '../../componentes/Icono'
+import { usePermisos } from '../../sesion/contexto'
+import { P } from '../../sesion/permisos'
 import { bs, leerMonto } from '../../util/dinero'
 import { nombreDelMes, rangoDelMes } from '../../util/periodo'
 import { cuando } from '../stock/historial'
+import { GastosRecurrentes } from './GastosRecurrentes'
 
 const POR_PAGINA = 30
 
@@ -15,6 +18,7 @@ const POR_PAGINA = 30
 // El total del mes alimenta el Inicio ("ya cubriste el X % de tus gastos"). Un gasto no se borra: se anula.
 export function Gastos() {
   const [params, setParams] = useSearchParams()
+  const puedeGestionar = usePermisos().tiene(P.gastosGestionar)
   const [items, setItems] = useState<Gasto[] | null>(null)
   const [siguiente, setSiguiente] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
@@ -89,6 +93,8 @@ export function Gastos() {
         <span className="resumen-stock-valor">{bs(total)}</span>
         <span className="resumen-stock-chico">Sin contar lo que le comprás a tus proveedores: eso está en Compras.</span>
       </section>
+
+      <GastosRecurrentes puedeGestionar={puedeGestionar} alCambiar={() => setVersion((n) => n + 1)} />
 
       {aviso && <Aviso tipo="exito">{aviso}</Aviso>}
       {error && <Aviso>{error}</Aviso>}
