@@ -5,6 +5,8 @@
 export const marca = {
   nombre: 'Mi Casero' as string | null,
   lema: 'Tu negocio, simple.',
+  // Ícono del logo (bolsa con check, decidido el 2026-11-14). Es el mismo archivo que el favicon.
+  icono: '/favicon.svg',
 }
 
 export const tituloDePagina = (seccion?: string) =>

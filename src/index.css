@@ -423,12 +423,10 @@ a.avatar:hover {
   justify-content: center;
   gap: 16px;
 }
-.pantalla-carga-punto {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--acento);
-  animation: latido 1s ease-in-out infinite;
+.pantalla-carga-icono {
+  width: 64px;
+  height: 64px;
+  animation: latido-suave 1.2s ease-in-out infinite;
 }
 .pantalla-carga-lema {
   font-family: var(--fuente-titulo);
@@ -441,8 +439,14 @@ a.avatar:hover {
     opacity: 0.5;
   }
 }
+@keyframes latido-suave {
+  50% {
+    transform: scale(1.08);
+    opacity: 0.75;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .pantalla-carga-punto {
+  .pantalla-carga-icono {
     animation: none;
   }
 }
@@ -2958,10 +2962,18 @@ label.boton {
 
 /* El nombre del producto, sobre el titular de la bienvenida */
 .marca-nombre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 0 6px;
   font-family: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
   font-weight: 700;
   font-size: 18px;
   letter-spacing: 0.01em;
   color: var(--acento);
+}
+.marca-icono {
+  width: 32px;
+  height: 32px;
+  flex: none;
 }
